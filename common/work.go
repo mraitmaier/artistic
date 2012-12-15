@@ -10,7 +10,7 @@ type Work struct {
     Artist
     *Technique
     Size string
-    Dating
+    *Dating
     TimeOfCreation string
     Motive string
     Signature string
@@ -40,7 +40,8 @@ func NewWork() *Work {
     s := make([]string, 0, DefaultWorkCapacity) // sources
     e := make([]string, 0, DefaultWorkCapacity) // exhibitions
     n := make([]Note, 0, DefaultWorkCapacity) // remarks
-    return &Work{"", CreatePerson(), &Technique{"", ""}, "", 0, "", "", "",
+    w := &Dating{Dating_Unknown, "Default Description"}
+    return &Work{"", CreatePerson(), &Technique{"", ""}, "", w, "", "", "",
                  "", "", "", "", "", "", e, s, n, ""}
 }
 func (w *Work) Display() string {

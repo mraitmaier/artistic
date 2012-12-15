@@ -1,19 +1,23 @@
 
 package artistic
 
-type Dating int
+import (
+    "fmt"
+)
+
+type DatingValue int
 const (
-    Dating_L Dating = iota
+    Dating_Unknown DatingValue = iota
+    Dating_L
     Dating_S
     Dating_A
     Dating_aq
     Dating_aqn
     Dating_pq
     Dating_pqn
-    Dating_Unknown
 )
 
-func (d Dating) String() string {
+func (d DatingValue) String() string {
     s := ""
     switch d {
     case Dating_L:
@@ -35,8 +39,24 @@ func (d Dating) String() string {
     }
     return s
 }
+/**
+ *
+ */
+type Dating struct {
+    DatingValue
+    Description string
+}
 
-func convDating2str(val Dating) string {
+func (d *Dating) String() string {
+    return d.DatingValue.String()
+}
+
+func (d *Dating) Display() string {
+    s := fmt.Sprintf("%q\n%s\n", d.DatingValue.String(), d.Description)
+    return s
+}
+
+func convDating2str(val DatingValue) string {
     d := ""
     switch val {
     case Dating_L:
@@ -59,7 +79,7 @@ func convDating2str(val Dating) string {
     return d
 }
 
-func convDating2val(s string) Dating {
+func convDating2val(s string) DatingValue {
     val := Dating_Unknown
 
     switch s {
@@ -71,14 +91,20 @@ func convDating2val(s string) Dating {
         val = Dating_A
     case "a.q.":
         val = Dating_aq
+    case "aq":
+        val = Dating_aq
     case "a.q.n.":
+        val = Dating_aqn
+    case "aqn":
         val = Dating_aqn
     case "p.q.":
         val = Dating_pq
+    case "pq":
+        val = Dating_pq
     case "p.q.n.":
         val = Dating_pqn
-    default:
-        val = Dating_Unknown
+    case "pqn.":
+        val = Dating_pqn
     }
     return val
 }

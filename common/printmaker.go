@@ -2,19 +2,17 @@ package artistic
 
 import (
 //    "fmt"
-//    "time"
-//    "net/url"
     "encoding/json"
 )
 
 /*****************************************************************************
- * type Person - struct representing the person
+ * type Printmaker - struct representing the person
  *
  * This type is a basis for all artists: painters, sculptors, writers etc.
  *
  * Implements the Artist interface.
  */
-type Person struct {
+type Printmaker struct {
     /* name of the person */
     *Name
 
@@ -44,25 +42,24 @@ type Person struct {
     Picture string;
 }
 
-const DefaultPersonCapacity = 10
-func CreatePerson() *Person {
+func CreatePrintmaker() *Printmaker {
     n := make([]Note, 0, DefaultPersonCapacity)
     s := make([]string, 0, DefaultPersonCapacity)
-    return &Person{&Name{"", "", ""}, &Name{"", "", ""}, 
+    return &Printmaker{&Name{"", "", ""}, &Name{"", "", ""}, 
                    "", "", "", s, "", n, ""}
 }
 
 /*
- * Person.String - a string representation of the Person
+ * Printmaker.String - a string representation of the Printmaker
  */
-func (p *Person) String() string {
+func (p *Printmaker) String() string {
     return p.Name.String()
 }
 
 /*
- * Person.Json- a JSON-encoded representation of the Person
+ * Printmaker.Json- a JSON-encoded representation of the Printmaker
  */
-func (p *Person) Json() (string, error) {
+func (p *Printmaker) Json() (string, error) {
     s, err := json.Marshal(p)
     return string(s[:]), err
 }
