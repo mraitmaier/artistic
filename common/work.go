@@ -36,7 +36,7 @@ func (w *Work) Json() (string, error) {
 }
 
 const DefaultWorkCapacity = 10
-func NewWork() *Work {
+func CreateNewWork() *Work {
     s := make([]string, 0, DefaultWorkCapacity) // sources
     e := make([]string, 0, DefaultWorkCapacity) // exhibitions
     n := make([]Note, 0, DefaultWorkCapacity) // remarks
