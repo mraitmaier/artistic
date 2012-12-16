@@ -48,7 +48,7 @@ const DefaultPersonCapacity = 10
 func CreatePerson() *Person {
     n := make([]Note, 0, DefaultPersonCapacity)
     s := make([]string, 0, DefaultPersonCapacity)
-    return &Person{&Name{"", "", ""}, &Name{"", "", ""}, 
+    return &Person{&Name{"", "", ""}, &Name{"", "", ""},
                    "", "", "", s, "", n, ""}
 }
 
