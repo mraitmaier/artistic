@@ -14,19 +14,17 @@ type Architect struct {
     *Person
 }
 
-func CreateArchitect() *Architect {
-    return &Architect{CreatePerson()}
-}
+func CreateArchitect() *Architect { return &Architect{CreatePerson()} }
 
 /*
  * Architect.String - a string representation of the Architect
  */
-func (p *Architect) String() string { return p.Person.String() }
+func (a *Architect) String() string { return a.Person.String() }
 
 /*
- * Architect.Json- a JSON-encoded representation of the Painter
+ * Architect.Json- a JSON-encoded representation of the Architect
  */
-func (p *Architect) Json() (string, error) {
-    s, err := json.Marshal(p.Person)
+func (a *Architect) Json() (string, error) {
+    s, err := json.Marshal(a.Person)
     return string(s[:]), err
 }

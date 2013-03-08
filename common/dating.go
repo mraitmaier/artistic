@@ -39,6 +39,7 @@ func (d DatingValue) String() string {
     }
     return s
 }
+
 /**
  *
  */
@@ -89,22 +90,22 @@ func convDating2val(s string) DatingValue {
         val = Dating_S
     case "A":
         val = Dating_A
-    case "a.q.":
+    case "a.q.", "aq", "a q":
         val = Dating_aq
-    case "aq":
-        val = Dating_aq
-    case "a.q.n.":
+//    case "aq":
+//        val = Dating_aq
+    case "a.q.n.", "aqn", "a q n":
         val = Dating_aqn
-    case "aqn":
-        val = Dating_aqn
-    case "p.q.":
+//    case "aqn":
+//        val = Dating_aqn
+    case "p.q.", "pq", "p q":
         val = Dating_pq
-    case "pq":
-        val = Dating_pq
-    case "p.q.n.":
+//    case "pq":
+//        val = Dating_pq
+    case "p.q.n.", "pqn", "p q n":
         val = Dating_pqn
-    case "pqn.":
-        val = Dating_pqn
+//    case "pqn.":
+//        val = Dating_pqn
     }
     return val
 }

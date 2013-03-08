@@ -23,7 +23,10 @@ type Name struct {
  * Name.String - a string representation of the Name
  */
 func (n *Name) String() string {
-    return fmt.Sprint("%s %s %s", n.First, n.Middle, n.Last)
+    if n.Middle == "" {
+        return fmt.Sprintf("%s %s", n.First, n.Last)
+    }
+    return fmt.Sprintf("%s %s %s", n.First, n.Middle, n.Last)
 }
 
 /*
