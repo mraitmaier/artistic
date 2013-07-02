@@ -1,9 +1,8 @@
-
 package artistic
 
 import (
-    "fmt"
-    "time"
+	"fmt"
+	"time"
 )
 
 /*
@@ -12,32 +11,34 @@ import (
  * - a formatted timestamp (format: "2012-12-15 15:05:05")
  */
 type Note struct {
-    /* a string representing a note */
-    note string
-    /* a string representing a formatted timestamp */
-    created string
+	/* a string representing a note */
+	note string
+	/* a string representing a formatted timestamp */
+	created string
 }
 
 /* display a note */
 func (n *Note) String() string {
-    return fmt.Sprintf("[%s] %s\n", n.created, n.note)
+	return fmt.Sprintf("[%s] %s\n", n.created, n.note)
 }
 
-/* create a new note with given string; timestamp is created (and formatted) 
+/* create a new note with given string; timestamp is created (and formatted)
  * automatically */
 func CreateNote(n string) *Note {
-    t := time.Now()
-    note := &Note{n, t.Format("2012-12-15 15:04:05")}
-    return note
+	t := time.Now()
+	note := &Note{n, t.Format("2012-12-15 15:04:05")}
+	return note
 }
 
 /* append a new note to an existing slice of notes */
 func AppendNote(notes []Note, n *Note) []Note {
-    if n != nil && notes != nil { notes = append(notes, *n) }
-    return notes
+	if n != nil && notes != nil {
+		notes = append(notes, *n)
+	}
+	return notes
 }
 
 /* extend existing slice of notes with new slice of notes */
 func ExtendNotes(existing []Note, add []Note) []Note {
-    return append(existing, add...)
+	return append(existing, add...)
 }

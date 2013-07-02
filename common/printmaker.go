@@ -1,8 +1,8 @@
 package artistic
 
 import (
-//    "fmt"
-    "encoding/json"
+	//    "fmt"
+	"encoding/json"
 )
 
 /*****************************************************************************
@@ -13,11 +13,11 @@ import (
  * Implements the Artist interface.
  */
 type Printmaker struct {
-    *Person
+	*Person
 }
 
 func CreatePrintmaker() *Printmaker {
-    return &Printmaker{CreatePerson()}
+	return &Printmaker{CreatePerson()}
 }
 
 /*
@@ -29,6 +29,6 @@ func (p *Printmaker) String() string { return p.Person.String() }
  * Printmaker.Json- a JSON-encoded representation of the Printmaker
  */
 func (p *Printmaker) Json() (string, error) {
-    s, err := json.Marshal(p.Person)
-    return string(s[:]), err
+	s, err := json.Marshal(p.Person)
+	return string(s[:]), err
 }

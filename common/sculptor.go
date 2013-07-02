@@ -1,8 +1,8 @@
 package artistic
 
 import (
-//    "fmt"
-    "encoding/json"
+	//    "fmt"
+	"encoding/json"
 )
 
 /*****************************************************************************
@@ -13,11 +13,11 @@ import (
  * Implements the Artist interface.
  */
 type Sculptor struct {
-    *Person
+	*Person
 }
 
 func CreateSculptor() *Sculptor {
-    return &Sculptor{CreatePerson()}
+	return &Sculptor{CreatePerson()}
 }
 
 /*
@@ -29,6 +29,6 @@ func (sc *Sculptor) String() string { return sc.Person.String() }
  * Sculptor.Json- a JSON-encoded representation of the Painter
  */
 func (sc *Sculptor) Json() (string, error) {
-    s, err := json.Marshal(sc.Person)
-    return string(s[:]), err
+	s, err := json.Marshal(sc.Person)
+	return string(s[:]), err
 }

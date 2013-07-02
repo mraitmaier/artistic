@@ -1,8 +1,8 @@
 package artistic
 
 import (
-//    "fmt"
-    "encoding/json"
+	//    "fmt"
+	"encoding/json"
 )
 
 /*****************************************************************************
@@ -11,7 +11,7 @@ import (
  * Implements the Artist interface.
  */
 type Architect struct {
-    *Person
+	*Person
 }
 
 func CreateArchitect() *Architect { return &Architect{CreatePerson()} }
@@ -25,6 +25,6 @@ func (a *Architect) String() string { return a.Person.String() }
  * Architect.Json- a JSON-encoded representation of the Architect
  */
 func (a *Architect) Json() (string, error) {
-    s, err := json.Marshal(a.Person)
-    return string(s[:]), err
+	s, err := json.Marshal(a.Person)
+	return string(s[:]), err
 }
