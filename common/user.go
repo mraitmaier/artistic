@@ -2,7 +2,7 @@
  * user.go 
  *
  * History:
- *  0.1   Jun11 MR Initial version, limited testing
+ *  1   Jun11 MR Initial version, limited testing
  */
 
 package artistic
@@ -22,9 +22,6 @@ const (
 	UnknownRole Role = iota
 	GuestRole
 	UserRole
-	TesterRole
-	DeveloperRole
-	ManagerRole
 	AdminRole
 )
 
@@ -37,12 +34,6 @@ func (r Role) String() string {
 		return "Admin"
 	case UserRole:
 		return "User"
-	case TesterRole:
-		return "Tester"
-	case DeveloperRole:
-		return "Developer"
-	case ManagerRole:
-		return "Manager"
 	case GuestRole:
 		return "Guest"
 	}
@@ -56,12 +47,6 @@ func RoleValue(s string) Role {
 	switch strings.ToLower(s) {
 	case "admin", "administrator":
 		return AdminRole
-	case "manager":
-		return ManagerRole
-	case "developer":
-		return DeveloperRole
-	case "tester":
-		return TesterRole
 	case "user":
 		return UserRole
 	case "guest":
@@ -97,7 +82,7 @@ func (u *User) String() (s string) {
 func (u *User) Json() (string, error) {
 	b, err := json.Marshal(u)
 	if err != nil {
-		return "", err
+		return "JSON marshal error - User", err
 	}
 	return string(b[:]), err
 }
