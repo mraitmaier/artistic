@@ -7,7 +7,7 @@ import (
 type DatingValue int
 
 const (
-	Dating_Unknown DatingValue = iota
+	Dating_Unknown DatingValue = iota 
 	Dating_L
 	Dating_S
 	Dating_A
@@ -41,10 +41,14 @@ func (d DatingValue) String() string {
 }
 
 /**
- *
+ * Dating - a structure representing a dating
  */
 type Dating struct {
+
+    /* a dating value is defined (as enum) above */
 	DatingValue
+
+    /* this is description of a dating */
 	Description string
 }
 
@@ -57,32 +61,14 @@ func (d *Dating) Display() string {
 	return s
 }
 
-func convDating2str(val DatingValue) string {
-	d := ""
-	switch val {
-	case Dating_L:
-		d = "L"
-	case Dating_S:
-		d = "S"
-	case Dating_A:
-		d = "A"
-	case Dating_aq:
-		d = "a.q."
-	case Dating_aqn:
-		d = "a.q.n."
-	case Dating_pq:
-		d = "p.q."
-	case Dating_pqn:
-		d = "p.q.n."
-	default:
-		d = "Unknown dating"
-	}
-	return d
+/* Convert a dating value into string value */
+func ConvDating2str(val DatingValue) string {
+	return val.String()
 }
 
-func convDating2val(s string) DatingValue {
+/* convert a dating value represented as string into DatingValue */
+func ConvDating2val(s string) DatingValue {
 	val := Dating_Unknown
-
 	switch s {
 	case "L":
 		val = Dating_L
@@ -92,20 +78,12 @@ func convDating2val(s string) DatingValue {
 		val = Dating_A
 	case "a.q.", "aq", "a q":
 		val = Dating_aq
-		//    case "aq":
-		//        val = Dating_aq
 	case "a.q.n.", "aqn", "a q n":
 		val = Dating_aqn
-		//    case "aqn":
-		//        val = Dating_aqn
 	case "p.q.", "pq", "p q":
 		val = Dating_pq
-		//    case "pq":
-		//        val = Dating_pq
 	case "p.q.n.", "pqn", "p q n":
 		val = Dating_pqn
-		//    case "pqn.":
-		//        val = Dating_pqn
 	}
 	return val
 }

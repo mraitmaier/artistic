@@ -16,7 +16,7 @@ type Work struct {
 	/* This artwork is made in which technique? */
 	*Technique
 
-	/* Size: dimensions, measures of the artowork */
+	/* Size: dimensions, measures of the artwork */
 	Size string
 
 	/* dating of the artwork */
@@ -137,3 +137,20 @@ func (w *Work) DisplayExhibitions() string {
 	}
 	return s
 }
+
+/* WorkList - a list of Works */
+type WorkList []Work
+
+/*
+const defaultWorkListLen = 10
+func CreateDefaultWorkList() []WorkList {
+    l := make([]WorkList, defaultWorkListLen)
+    return l
+}
+
+func CreateWorkList(length, capacity int) []WorkList {
+    l := make([]WorkList, length, capacity)
+    return l
+}
+
+*/

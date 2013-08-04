@@ -15,6 +15,7 @@ import (
  * Implements the Artist interface.
  */
 type Person struct {
+
 	/* name of the person */
 	*Name
 
@@ -67,3 +68,8 @@ func (p *Person) Json() (string, error) {
 	s, err := json.Marshal(p)
 	return string(s[:]), err
 }
+
+/**
+    PersonList - this is type representing a list of persons
+*/
+type PersonList []Person

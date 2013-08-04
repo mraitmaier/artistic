@@ -8,8 +8,10 @@ import (
  * Technique - a type representing an art technique
  */
 type Technique struct {
+
 	/* name of the technique */
 	Name string
+
 	/* description of the technique */
 	Description string
 }

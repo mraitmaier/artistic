@@ -14,7 +14,7 @@ type Architect struct {
 	*Person
 }
 
-func CreateArchitect() *Architect { return &Architect{CreatePerson()} }
+func CreateArchitect() *Architect { return &Architect { CreatePerson() } }
 
 /*
  * Architect.String - a string representation of the Architect
