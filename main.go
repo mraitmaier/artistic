@@ -5,7 +5,6 @@ import (
     "fmt"
     "flag"
     "net/http"
-    //"bitbucket.org/miranr/artistic"
     "bitbucket.org/miranr/artistic/artistic"
 )
 
