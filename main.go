@@ -4,6 +4,10 @@ package main
 import (
     "fmt"
     "flag"
+    "os"
+    "path"
+    "path/filepath"
+    "runtime"
     "net/http"
     "bitbucket.org/miranr/artistic/core"
     "bitbucket.org/miranr/artistic/utils"
@@ -33,7 +37,6 @@ type ArtisticCtrl struct {
 
     // a debug flag (only for testing purposes)
     debug bool
-
 }
 
 // Let's define the default log levels for different log handlers:
@@ -100,10 +103,23 @@ func createLoggers(ac * ArtisticCtrl, format string, debug bool) error {
 }
 
 /*
+ * defineDefLogName - define a default log file location
  *
+ * This is private function that defines the default path for log file.
+ * If app is run on Unix/Linux environment, the default path is standard
+ * '/var/log/artistc.log'. In the case of WinXY environment, the default is
+ * taken from '%USERPROFILE%' env variable (this is usually
+ * 'c:\Users\<Username>'). 
  */
 func defineDefLogFname() string {
-    return "path to log file (default is /var/log/artistic.log)" // FIXME
+
+    defDir := "/var/log/artistic.log"
+
+    if runtime.GOOS == "windows" {
+        defDir = path.Join(os.Getenv("USERPROFILE"), "artistic.log")
+    }
+
+    return filepath.Clean(defDir)
 }
 
 /*
@@ -115,9 +131,10 @@ func parseArgs(ac *ArtisticCtrl) {
         panic("FATAL: The main control structure is NOT defined...")
     }
 
-    flag.StringVar(&ac.logFname, "l", "/var/log/artistic.log",
-                                 defineDefLogFname())
-    flag.StringVar(&ac.syslogIP, "s", "", "IP address of the Syslog server")
+    flag.StringVar(&ac.logFname, "l", defineDefLogFname(), 
+            "define the custom log file path (absolute, please!)")
+    flag.StringVar(&ac.syslogIP, "s", "127.0.0.1", 
+            "IP address of the Syslog server")
     flag.BoolVar(&ac.debug, "d", false, "enable debug mode (only for testing!)")
 
     flag.Parse()
