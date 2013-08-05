@@ -1,4 +1,4 @@
-package artistic
+package core
 
 import (
 	"encoding/json"

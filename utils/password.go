@@ -6,7 +6,7 @@
  *  2   Aug13 MR New and much shorter version using bcrypt package
  */
 
-package artistic
+package utils
 
 import (
 	"fmt"

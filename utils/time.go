@@ -5,7 +5,7 @@
  *  1   Jul11   MR  The initial version
  */
 
-package artistic
+package utils
 
 import (
 	"strings"

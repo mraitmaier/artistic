@@ -1,5 +1,5 @@
 
-package artistic
+package utils
 
 import (
 	"errors"

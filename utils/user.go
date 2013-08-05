@@ -5,7 +5,7 @@
  *  1   Jun11 MR Initial version, limited testing
  */
 
-package artistic
+package utils
 
 import (
 	"encoding/json"

@@ -5,7 +5,8 @@ import (
     "fmt"
     "flag"
     "net/http"
-    "bitbucket.org/miranr/artistic/artistic"
+    "bitbucket.org/miranr/artistic/core"
+    "bitbucket.org/miranr/artistic/utils"
 )
 
 type ArtisticUser struct {
@@ -28,7 +29,7 @@ type ArtisticCtrl struct {
     syslogIP string
 
     // a logger
-    log *artistic.Log
+    log *utils.Log
 
     // a debug flag (only for testing purposes)
     debug bool
@@ -39,8 +40,8 @@ type ArtisticCtrl struct {
 //   
 const (
     numOfLogHandlers int = 2
-    defSyslogLevel artistic.LogLevel = artistic.NoticeLogLevel
-    defFileLevel   artistic.LogLevel = artistic.InfoLogLevel
+    defSyslogLevel utils.LogLevel = utils.NoticeLogLevel
+    defFileLevel   utils.LogLevel = utils.InfoLogLevel
 )
 
 func testHandler(w http.ResponseWriter, r *http.Request) {
@@ -57,7 +58,7 @@ func createLog(ac *ArtisticCtrl) (err error) {
         panic("FATAL: The main control structure is NOT defined...")
     }
 
-    ac.log = artistic.NewLog(numOfLogHandlers)
+    ac.log = utils.NewLog(numOfLogHandlers)
 
     if ac.logFname != "" {
         format := "%s %s %s"
@@ -80,17 +81,17 @@ func createLoggers(ac * ArtisticCtrl, format string, debug bool) error {
     fLevel := defFileLevel
     sLevel := defSyslogLevel
     if ac.debug {
-        fLevel = artistic.DebugLogLevel
-        sLevel = artistic.DebugLogLevel
+        fLevel = utils.DebugLogLevel
+        sLevel = utils.DebugLogLevel
     }
     // add file log handler
-    f, err := artistic.NewFileHandler(ac.logFname, format, fLevel)
+    f, err := utils.NewFileHandler(ac.logFname, format, fLevel)
     if f != nil {
         ac.log.Handlers = ac.log.AddHandler(f)
     }
     // add syslog log handler
     if ac.syslogIP != "" {
-        s := artistic.NewSyslogHandler(ac.syslogIP, format, sLevel)
+        s := utils.NewSyslogHandler(ac.syslogIP, format, sLevel)
         if s != nil {
             ac.log.Handlers = ac.log.AddHandler(s)
         }
@@ -133,8 +134,8 @@ func main () {
     createLog(ac)
 
     //testing import for local code
-    p := artistic.CreatePainter()
-    p.Name = artistic.CreateName("Vincent", "", "Van Gogh")
+    p := core.CreatePainter()
+    p.Name = core.CreateName("Vincent", "", "Van Gogh")
     fmt.Println(p.String())
 
     fmt.Println("Serving application on 'localhost:8080'...")

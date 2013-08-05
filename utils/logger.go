@@ -7,7 +7,7 @@
  *  0.1.0   Jul11   MR  The initial version
  */
 
-package artistic
+package utils 
 
 import (
 	"fmt"

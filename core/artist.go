@@ -1,7 +1,7 @@
 /*
  * person.go
  */
-package artistic
+package core
 
 import (
 	"fmt"

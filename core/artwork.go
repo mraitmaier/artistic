@@ -1,4 +1,4 @@
-package artistic
+package core
 
 type Artwork interface {
 	String() string
