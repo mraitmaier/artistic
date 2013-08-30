@@ -2,7 +2,7 @@
  * file.go -  misc utility functions for working with files 
  *
  * History:
- *  0.1.0   Jul11   MR  The initial version
+ *  1   Jul11   MR  The initial version
  */
 
 package utils
