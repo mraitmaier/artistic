@@ -1,16 +1,22 @@
-
+/*
+    main.go -
+ */
 package main
 
 import (
     "fmt"
     "flag"
-    "os"
-    "path"
-    "path/filepath"
-    "runtime"
     "net/http"
     "bitbucket.org/miranr/artistic/core"
     "bitbucket.org/miranr/artistic/utils"
+    "bitbucket.org/miranr/artistic/db"
+    "labix.org/v2/mgo"
+)
+
+const (
+
+    // default path to config file
+    DefConfigFile string = "./artistic.cfg"
 )
 
 type ArtisticUser struct {
@@ -35,91 +41,18 @@ type ArtisticCtrl struct {
     // a logger
     log *utils.Log
 
+    // config file path
+    configFile string
+
+    // MongoDB session 
+    db *mgo.Session
+
     // a debug flag (only for testing purposes)
     debug bool
 }
 
-// Let's define the default log levels for different log handlers:
-//   
-const (
-    numOfLogHandlers int = 2
-    defSyslogLevel utils.LogLevel = utils.NoticeLogLevel
-    defFileLevel   utils.LogLevel = utils.InfoLogLevel
-)
-
 func testHandler(w http.ResponseWriter, r *http.Request) {
     fmt.Fprintf(w, "Artistic Test Web Page")
-}
-
-
-/*
- * createLog - 
- */
-func createLog(ac *ArtisticCtrl) (err error) {
-
-    if ac == nil {
-        panic("FATAL: The main control structure is NOT defined...")
-    }
-
-    ac.log = utils.NewLog(numOfLogHandlers)
-
-    if ac.logFname != "" {
-        format := "%s %s %s"
-        err := createLoggers(ac, format, ac.debug)
-        if err != nil {
-            return err
-        }
-        ac.log.Info("Log successfully created\n")
-    }
-    return nil
-}
-
-func createLoggers(ac * ArtisticCtrl, format string, debug bool) error {
-
-    if ac == nil {
-        panic("FATAL: The main control structure is NOT defined...")
-    }
-   var err error = nil
-    // define default log levels
-    fLevel := defFileLevel
-    sLevel := defSyslogLevel
-    if ac.debug {
-        fLevel = utils.DebugLogLevel
-        sLevel = utils.DebugLogLevel
-    }
-    // add file log handler
-    f, err := utils.NewFileHandler(ac.logFname, format, fLevel)
-    if f != nil {
-        ac.log.Handlers = ac.log.AddHandler(f)
-    }
-    // add syslog log handler
-    if ac.syslogIP != "" {
-        s := utils.NewSyslogHandler(ac.syslogIP, format, sLevel)
-        if s != nil {
-            ac.log.Handlers = ac.log.AddHandler(s)
-        }
-    }
-    return err
-}
-
-/*
- * defineDefLogName - define a default log file location
- *
- * This is private function that defines the default path for log file.
- * If app is run on Unix/Linux environment, the default path is standard
- * '/var/log/artistc.log'. In the case of WinXY environment, the default is
- * taken from '%USERPROFILE%' env variable (this is usually
- * 'c:\Users\<Username>'). 
- */
-func defineDefLogFname() string {
-
-    defDir := "/var/log/artistic.log"
-
-    if runtime.GOOS == "windows" {
-        defDir = path.Join(os.Getenv("USERPROFILE"), "artistic.log")
-    }
-
-    return filepath.Clean(defDir)
 }
 
 /*
@@ -136,6 +69,8 @@ func parseArgs(ac *ArtisticCtrl) {
     flag.StringVar(&ac.syslogIP, "s", "127.0.0.1", 
             "IP address of the Syslog server")
     flag.BoolVar(&ac.debug, "d", false, "enable debug mode (only for testing!)")
+    flag.StringVar(&ac.configFile, "c", DefConfigFile, 
+            "Define custom path for config file")
 
     flag.Parse()
 }
@@ -144,11 +79,23 @@ func main () {
     //
     ac := new(ArtisticCtrl)
 
+    // handle config file
+    //handleConfigFile(ac)
+
     // parse the CLI arguments
     parseArgs(ac)
 
     // create the logger
     createLog(ac)
+
+    // connect to MongoDB
+    uri := db.CreateUri("artistic", "artistic", "127.0.0.1")
+    s, err := db.Connect(uri)
+    if err != nil {
+        panic("Connection to MongoDB cannot be established.")
+    }
+    ac.db = s
+    ac.log.Notice("Connection to MongoDB established.")
 
     //testing import for local code
     p := core.CreatePainter()
