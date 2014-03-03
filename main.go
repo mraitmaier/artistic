@@ -6,7 +6,8 @@ package main
 import (
     "fmt"
     "flag"
-    "net/http"
+    "time"
+//    "net/http"
     "bitbucket.org/miranr/artistic/core"
     "bitbucket.org/miranr/artistic/utils"
     "bitbucket.org/miranr/artistic/db"
@@ -17,6 +18,9 @@ const (
 
     // default path to config file
     DefConfigFile string = "./artistic.cfg"
+
+    // default timeout for DB connect 
+    DatabaseTimeout time.Duration = 5 * time.Second
 )
 
 type ArtisticUser struct {
@@ -51,10 +55,6 @@ type ArtisticCtrl struct {
     debug bool
 }
 
-func testHandler(w http.ResponseWriter, r *http.Request) {
-    fmt.Fprintf(w, "Artistic Test Web Page")
-}
-
 /*
  * parseArgs - parse the CLI arguments
  */
@@ -63,15 +63,12 @@ func parseArgs(ac *ArtisticCtrl) {
     if ac == nil {
         panic("FATAL: The main control structure is NOT defined...")
     }
-
-    flag.StringVar(&ac.logFname, "l", defineDefLogFname(), 
+    flag.StringVar(&ac.logFname, "l", defineDefLogFname(),
             "define the custom log file path (absolute, please!)")
-    flag.StringVar(&ac.syslogIP, "s", "127.0.0.1", 
-            "IP address of the Syslog server")
+    flag.StringVar(&ac.syslogIP, "s", "", "IP address of the Syslog server")
+    flag.StringVar(&ac.configFile, "c", DefConfigFile,
+            "define custom path for config file")
     flag.BoolVar(&ac.debug, "d", false, "enable debug mode (only for testing!)")
-    flag.StringVar(&ac.configFile, "c", DefConfigFile, 
-            "Define custom path for config file")
-
     flag.Parse()
 }
 
@@ -80,7 +77,7 @@ func main () {
     ac := new(ArtisticCtrl)
 
     // handle config file
-    //handleConfigFile(ac)
+    handleConfigFile(ac)
 
     // parse the CLI arguments
     parseArgs(ac)
@@ -88,14 +85,16 @@ func main () {
     // create the logger
     createLog(ac)
 
-    // connect to MongoDB
-    uri := db.CreateUri("artistic", "artistic", "127.0.0.1")
-    s, err := db.Connect(uri)
-    if err != nil {
+    var err error
+
+    // connect to MongoDB (NOTE: currently hardcoded, should be read from 
+    // config file in the final version)
+    url := db.CreateUrl("localhost", 27017, "artistic", "artistic", "artistic")
+    if ac.db, err = db.Connect(url, DatabaseTimeout); err != nil {
         panic("Connection to MongoDB cannot be established.")
     }
-    ac.db = s
     ac.log.Notice("Connection to MongoDB established.")
+    defer db.Close(ac.db)
 
     //testing import for local code
     p := core.CreatePainter()
@@ -104,6 +103,5 @@ func main () {
 
     fmt.Println("Serving application on 'localhost:8080'...")
 
-    http.HandleFunc("/", testHandler)
-    http.ListenAndServe(":8080", nil)
+    webStart(ac, "./web")
 }

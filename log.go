@@ -4,6 +4,7 @@
 package main
 
 import (
+    "fmt"
     "os"
     "path"
     "path/filepath"
@@ -17,7 +18,6 @@ const (
     numOfLogHandlers int = 2
     defSyslogLevel utils.LogLevel = utils.NoticeLogLevel
     defFileLevel   utils.LogLevel = utils.InfoLogLevel
-
 )
 
 /*
@@ -47,7 +47,8 @@ func createLoggers(ac * ArtisticCtrl, format string, debug bool) error {
     if ac == nil {
         panic("FATAL: The main control structure is NOT defined...")
     }
-   var err error = nil
+    var err error = nil
+
     // define default log levels
     fLevel := defFileLevel
     sLevel := defSyslogLevel
@@ -55,11 +56,14 @@ func createLoggers(ac * ArtisticCtrl, format string, debug bool) error {
         fLevel = utils.DebugLogLevel
         sLevel = utils.DebugLogLevel
     }
+
     // add file log handler
-    f, err := utils.NewFileHandler(ac.logFname, format, fLevel)
+    f, err := utils.NewFileHandler(ac.logFname,
+                                   fmt.Sprintf("%s\n", format), fLevel)
     if f != nil {
         ac.log.Handlers = ac.log.AddHandler(f)
     }
+
     // add syslog log handler
     if ac.syslogIP != "" {
         s := utils.NewSyslogHandler(ac.syslogIP, format, sLevel)
