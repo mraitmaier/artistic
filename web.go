@@ -1,46 +1,50 @@
 /*
-    web.go -
  */
 package main
 
 import (
-    "fmt"
+   // "fmt"
     "net/http"
     "path/filepath"
     "html/template"
 )
 
-type webCtrl struct {
+// global var holding cached page templates
+var templates *template.Template
 
-    // cached templates
-    templ *template.Template
-}
+func registerHandlers() {
 
-func webStart(ac *ArtisticCtrl, wwwpath string) *webCtrl {
-
-    web := new(webCtrl)
-
-    // register handler functions
     http.HandleFunc("/", indexHandler)
     http.HandleFunc("/index", indexHandler)
+    http.HandleFunc("/favicon.ico", faviconHandler)
+}
+
+/* initializes and starts web server */
+func webStart(ac *ArtisticCtrl, wwwpath string) {
+
+    // register handler functions
+    registerHandlers()
 
     // handle static files
-    http.Handle(wwwpath,
-                http.StripPrefix(wwwpath, http.FileServer(http.Dir("web"))))
-//    http.Handle(wwwpath, http.FileServer(http.Dir("web")))
+    path := filepath.Join(wwwpath, "static")
+    http.Handle("/static/", http.StripPrefix("/static/",
+            http.FileServer(http.Dir(path))))
 
     //web page templates
     t := filepath.Join(wwwpath, "templates", "*.tpl")
-    web.templ = template.Must(template.ParseGlob(t))
+    templates = template.Must(template.ParseGlob(t))
 
     // finally, start web server
     http.ListenAndServe(":8088", nil)
-
-    return web
 }
 
+/* Index (home) page handler */
 func indexHandler(w http.ResponseWriter, r *http.Request) {
-    fmt.Fprintf(w, "Artistic Index Web Page")
+    if err := templates.ExecuteTemplate(w, "index", nil); err != nil {
+    }
 }
 
+func faviconHandler(w http.ResponseWriter, r *http.Request) {
+ //   http.ServeFile(
+}
 

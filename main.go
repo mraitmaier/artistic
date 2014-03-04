@@ -21,6 +21,10 @@ const (
 
     // default timeout for DB connect 
     DatabaseTimeout time.Duration = 5 * time.Second
+
+    // default web server root
+    //DefWebRoot = "D:/Miran/koda/hg/go/src/bitbucket.org/miranr/artistic/web"
+    DefWebRoot = "./web/"
 )
 
 type ArtisticUser struct {
@@ -103,5 +107,5 @@ func main () {
 
     fmt.Println("Serving application on 'localhost:8080'...")
 
-    webStart(ac, "./web")
+    webStart(ac, DefWebRoot)
 }
