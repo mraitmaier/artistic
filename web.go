@@ -45,6 +45,6 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func faviconHandler(w http.ResponseWriter, r *http.Request) {
- //   http.ServeFile(
+    http.ServeFile(w, r, "/static/favicon.ico")
 }
 
