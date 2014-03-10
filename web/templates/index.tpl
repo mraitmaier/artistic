@@ -1,5 +1,5 @@
 {{define "navbar"}}
-<nav class="navbar navbar-default" role="navigation">
+<nav class="navbar navbar-inverse" role="navigation">
   <div class="container-fluid">
     <!-- Brand and toggle get grouped for better mobile display -->
     <div class="navbar-header">
@@ -16,9 +16,22 @@
         <div class="form-group">
           <input type="text" class="form-control" placeholder="Search">
         </div>
-        <button type="submit" class="btn btn-default">Submit</button>
+        <button type="submit" class="btn btn-primary">Submit</button>
       </form>
       <ul class="nav navbar-nav navbar-right">
+        <li>
+        <a href="#"><span class="glyphicon glyphicon-star"></span></a>
+        </li>
+        <li>
+        <a href="#"><span class="glyphicon glyphicon-cog"></span></a>
+        </li>
+        <li>
+        <a href="#"><span class="glyphicon glyphicon-copyright-mark"></span></a>
+        </li>
+        <li>
+        <a href="#"><span class="glyphicon glyphicon-user"></span></a>
+        </li>
+    <!--
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">
           View<b class="caret"></b>
@@ -28,7 +41,8 @@
             <li><a href="#">About</a></li>
           </ul>
         </li>
-
+    -->
+    <!--
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">
           Logged in as admin<b class="caret"></b>
@@ -37,6 +51,11 @@
             <li><a href="#">Profile</a></li>
             <li><a href="#">Logout</a></li>
           </ul>
+        </li>
+    -->
+        <li><p class="navbar-text">Logged in as admin</p></li>
+        <li>
+            <a href="#"><span class="glyphicon glyphicon-log-out"></span></a>
         </li>
       </ul>
     </div><!-- /.navbar-collapse -->
