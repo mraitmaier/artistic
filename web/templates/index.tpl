@@ -1,5 +1,6 @@
 {{define "navbar"}}
-<nav class="navbar navbar-inverse" role="navigation">
+<!-- <nav class="navbar navbar-inverse" role="navigation"> -->
+<nav class="navbar navbar-inverse navbar-static-top" role="navigation">
   <div class="container-fluid">
     <!-- Brand and toggle get grouped for better mobile display -->
     <div class="navbar-header">
@@ -88,8 +89,32 @@
 
   <body>
     {{template "navbar"}}
-    <h1>Hello, world!</h1>
 
+    <div class="container-fluid">
+
+    <div class="row">
+
+        <div class="col-md-2" id="menu">
+            <h1>Hello</h1>
+
+            <p>Hello, World!</p>
+        </div>
+
+        <div class="col-md-4" id="data-list">
+            <h1>Hello, World!</h1>
+
+            <p>Hello, World!</p>
+        </div>
+
+        <div class="col-md-6" id="data-details">
+            <h1>Hello, World!</h1>
+
+            <p>Hello, World!</p>
+        </div>
+
+    </div> <!-- row -->
+
+    </div> <!-- container fluid -->
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
  <!--   <script 
         src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js">
