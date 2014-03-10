@@ -105,7 +105,7 @@ func main () {
     p.Name = core.CreateName("Vincent", "", "Van Gogh")
     fmt.Println(p.String())
 
-    fmt.Println("Serving application on 'localhost:8080'...")
+    fmt.Println("Serving application on 'localhost:8088'...")
 
     webStart(ac, DefWebRoot)
 }
