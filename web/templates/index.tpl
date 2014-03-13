@@ -1,69 +1,3 @@
-{{define "navbar"}}
-<!-- <nav class="navbar navbar-inverse" role="navigation"> -->
-<nav class="navbar navbar-inverse navbar-static-top" role="navigation">
-  <div class="container-fluid">
-    <!-- Brand and toggle get grouped for better mobile display -->
-    <div class="navbar-header">
-      <a class="navbar-brand" href="#">Artistic</a>
-    </div>
-
-    <!-- Collect the nav links, forms, and other content for toggling -->
-    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-      <ul class="nav navbar-nav">
-        <li class="active"><a href="#">Link</a></li>
-        <li><a href="#">Link</a></li>
-      </ul>
-      <form class="navbar-form navbar-left" role="search">
-        <div class="form-group">
-          <input type="text" class="form-control" placeholder="Search">
-        </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
-      </form>
-      <ul class="nav navbar-nav navbar-right">
-        <li>
-        <a href="#"><span class="glyphicon glyphicon-star"></span></a>
-        </li>
-        <li>
-        <a href="#"><span class="glyphicon glyphicon-cog"></span></a>
-        </li>
-        <li>
-        <a href="#"><span class="glyphicon glyphicon-copyright-mark"></span></a>
-        </li>
-        <li>
-        <a href="#"><span class="glyphicon glyphicon-user"></span></a>
-        </li>
-    <!--
-        <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-          View<b class="caret"></b>
-          </a>
-          <ul class="dropdown-menu">
-            <li><a href="#">License</a></li>
-            <li><a href="#">About</a></li>
-          </ul>
-        </li>
-    -->
-    <!--
-        <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-          Logged in as admin<b class="caret"></b>
-          </a>
-          <ul class="dropdown-menu">
-            <li><a href="#">Profile</a></li>
-            <li><a href="#">Logout</a></li>
-          </ul>
-        </li>
-    -->
-        <li><p class="navbar-text">Logged in as admin</p></li>
-        <li>
-            <a href="#"><span class="glyphicon glyphicon-log-out"></span></a>
-        </li>
-      </ul>
-    </div><!-- /.navbar-collapse -->
-  </div><!-- /.container-fluid -->
-</nav>
-{{end}}
-
 
 {{define "index"}}
 <!DOCTYPE html>
@@ -85,6 +19,9 @@
       <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
       <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
+
+    <!-- custom CSS, additional to CSS -->
+    <link href="static/css/custom.css" rel="stylesheet">
   </head>
 
   <body>
@@ -95,21 +32,21 @@
     <div class="row">
 
         <div class="col-md-2" id="menu">
-            <h1>Hello</h1>
+            <h1 id="menu-header"></h1>
 
-            <p>Hello, World!</p>
+            {{template "accordion"}}
         </div>
 
         <div class="col-md-4" id="data-list">
-            <h1>Hello, World!</h1>
+            <h1 id="data-list-header">Data list</h1>
 
-            <p>Hello, World!</p>
+            <p>List</p>
         </div>
 
         <div class="col-md-6" id="data-details">
-            <h1>Hello, World!</h1>
+            <h1 id="data-details-header">Details</h1>
 
-            <p>Hello, World!</p>
+            <p>Details</p>
         </div>
 
     </div> <!-- row -->
