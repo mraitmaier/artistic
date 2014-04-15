@@ -43,6 +43,13 @@ type Person struct {
 	/* this is actually an URI */
 	//    Picture url.URL;
 	Picture string
+
+    /* artist flags, a person can be many things at once */
+    Painter bool
+    Sculptor bool
+    Printmaker bool
+    Architect bool
+    Ceramicist bool
 }
 
 const DefaultPersonCapacity = 10
@@ -51,7 +58,7 @@ func CreatePerson() *Person {
 	n := make([]Note, 0, DefaultPersonCapacity)
 	s := make([]string, 0, DefaultPersonCapacity)
 	return &Person{&Name{"", "", ""}, &Name{"", "", ""},
-		"", "", "", s, "", n, ""}
+		"", "", "", s, "", n, "", false, false, false, false, false }
 }
 
 /*
