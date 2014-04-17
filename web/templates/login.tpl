@@ -31,15 +31,22 @@
     <div class="row">
         <div class="col-md-2"></div>
         <div class="col-md-8">
+    <!--
         <div class="jumbotron">
             <h1 class="text-center">Artistic</h1>
             <p class="text-center">
             Artistic is a web application to manage art history resources.
             </p>
-            <img src=""></img>
 
-        </div> <!-- jumbotron -->
-        </div>
+        </div> 
+    -->
+            <div class="well well-sm">
+            <h1 class="text-center">Artistic</h1>
+            <p class="text-center text-info">
+            Artistic is a web application to manage art history resources.
+            </p>
+            </div> <!-- well -->
+        </div> <!-- col-md-8 -->
         <div class="col-md-2"></div>
     </div> <!-- row -->
 
