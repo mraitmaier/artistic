@@ -35,6 +35,21 @@
         </div>
     </div>
 
+    <div class="panel panel-default" id="other-menu">
+        <div class="panel-heading">
+            <a href="#other-collapse" data-parent="#main-menu" 
+               data-toggle="collapse" class="accordion-toggle">Other</a>
+        </div>
+    </div>
+    <div class="panel-collapse collapse" id="other-collapse">
+        <div class="panel-body">
+            <p>Datings</p>
+            <p>Techniques</p>
+            <p>Styles</p>
+        </div>
+    </div>
+
+
 </div>
 {{end}}
 

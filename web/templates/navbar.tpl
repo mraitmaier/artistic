@@ -5,7 +5,7 @@
   <div class="container-fluid">
     <!-- Brand and toggle get grouped for better mobile display -->
     <div class="navbar-header">
-      <a class="navbar-brand" href="#"
+      <a class="navbar-brand" href="index"
          data-toggle="tooltip" data-placement="left" title="Home">Artistic
 <!--         <span class="glyphicon glyphicon-home"></span> -->
       </a>
@@ -13,10 +13,12 @@
 
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+<!--    
       <ul class="nav navbar-nav">
         <li class="active"><a href="#">Link</a></li>
         <li><a href="#">Link</a></li>
       </ul>
+-->
       <form class="navbar-form navbar-left" role="search">
         <div class="form-group">
           <input type="text" class="form-control" placeholder="Search">
@@ -24,6 +26,16 @@
         <button type="submit" class="btn btn-primary">Submit</button>
       </form>
       <ul class="nav navbar-nav navbar-right">
+    
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+          Admin<b class="caret"></b>
+          </a>
+          <ul class="dropdown-menu">
+            <li><a href="users">Users</a></li>
+          </ul>
+        </li>
+ 
         <li>
            <a href="#" 
               data-toggle="tooltip" data-placement="left" title="About">
@@ -37,7 +49,7 @@
             </a>
         </li>
         <li>
-            <a href="#"
+            <a href="license"
                data-toggle="tooltip" data-placement="left" title="License">
                 <span class="glyphicon glyphicon-copyright-mark"></span>
             </a>
@@ -48,18 +60,7 @@
                 <span class="glyphicon glyphicon-user"></span>
             </a>
         </li>
-    <!--
-        <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-          View<b class="caret"></b>
-          </a>
-          <ul class="dropdown-menu">
-            <li><a href="#">License</a></li>
-            <li><a href="#">About</a></li>
-          </ul>
-        </li>
-    -->
-    <!--
+   <!--
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">
           Logged in as admin<b class="caret"></b>

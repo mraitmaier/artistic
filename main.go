@@ -53,11 +53,14 @@ type ArtisticCtrl struct {
     configFile string
 
     // MongoDB session 
-    db *mgo.Session
+    dbsess *mgo.Session
 
     // a debug flag (only for testing purposes)
     debug bool
 }
+
+// create new global struct instance
+var ac = new(ArtisticCtrl)
 
 /*
  * parseArgs - parse the CLI arguments
@@ -77,14 +80,12 @@ func parseArgs(ac *ArtisticCtrl) {
 }
 
 func main () {
-    //
-    ac := new(ArtisticCtrl)
-
-    // handle config file
-    handleConfigFile(ac)
 
     // parse the CLI arguments
     parseArgs(ac)
+
+    // handle config file
+    handleConfigFile(ac)
 
     // create the logger
     createLog(ac)
@@ -94,11 +95,18 @@ func main () {
     // connect to MongoDB (NOTE: currently hardcoded, should be read from 
     // config file in the final version)
     url := db.CreateUrl("localhost", 27017, "artistic", "artistic", "artistic")
-    if ac.db, err = db.Connect(url, DatabaseTimeout); err != nil {
-        panic("Connection to MongoDB cannot be established.")
+    if ac.dbsess, err = db.Connect(url, DatabaseTimeout); err != nil {
+        //panic("Connection to MongoDB cannot be established.")
+        fmt.Println("Connection to MongoDB cannot be established.")
+        fmt.Println("Exiting...")
+        return
     }
     ac.log.Notice("Connection to MongoDB established.")
-    defer db.Close(ac.db)
+    // deferring the DB connection close; must use a closure
+    defer func() {
+                    db.Close(ac.dbsess)
+                    ac.log.Notice("Connection to MongoDb closed.")
+          }()
 
     //testing import for local code
     p := core.CreatePainter()
@@ -107,5 +115,5 @@ func main () {
 
     fmt.Println("Serving application on 'localhost:8088'...")
 
-    webStart(ac, DefWebRoot)
+    webStart(DefWebRoot)
 }

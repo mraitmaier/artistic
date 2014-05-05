@@ -60,7 +60,7 @@ func RoleValue(s string) Role {
  */
 type User struct {
 	Username  string // username 
-	*Password        // password (is hidden so it can be hashed always) 
+	Password  string // password (should always be hashed, use CreateUser()! ) 
 	Hint      string // password hint
 	Name      string // full name
 	Role      Role   // user role (guest, user, admin)
@@ -72,7 +72,7 @@ type User struct {
  */
 func (u *User) String() (s string) {
 	s = fmt.Sprintf("%s [%s]: %s %q", u.Username, u.Email,
-		u.Password.Get(), u.Role.String())
+		u.Password, u.Role.String())
 	return s
 }
 
@@ -95,5 +95,5 @@ func (u *User) Json() (string, error) {
 func CreateUser(username, password string) *User {
 	p := new(Password)
 	p.Set(password)
-	return &User{username, p, "", "", UnknownRole, ""}
+	return &User{username, p.Get(), "", "", UnknownRole, ""}
 }

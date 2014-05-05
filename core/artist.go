@@ -1,5 +1,5 @@
 /*
- * person.go
+ * artist.go
  */
 package core
 

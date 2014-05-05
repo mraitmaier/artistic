@@ -54,13 +54,13 @@
         <div class="col-md-4"></div>
         <div class="col-md-4">
 
-      <form class="form-signin" role="form">
+      <form class="form-signin" role="form" id="signin_form" method="post">
         <h2 class="form-signin-heading">Please sign in</h2>
-        <input type="text" class="form-control" 
+        <input type="text" class="form-control" name="username" 
                             placeholder="Username" required autofocus>
-        <input type="password" class="form-control" 
+        <input type="password" class="form-control" name="password"
                             placeholder="Password" required>
-        <button class="btn btn-lg btn-primary btn-block" 
+        <button class="btn btn-lg btn-primary btn-block" id="signin_button"
                 type="submit">Sign in</button>
       </form>
 
