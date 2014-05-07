@@ -15,11 +15,6 @@ import (
     "bitbucket.org/miranr/artistic/utils"
 )
 
-const (
-    // a (quite) random string that is used as a key for sessions
-    sessKey = `iufwnwieh3436SiKJSJo90e3jdiejdlje3+'0%$#!)dlkjja(!~§<sdfad$io*"`
-)
-
 // authenticate the user with given username and password
 func authenticateUser(u *utils.User,
                       w http.ResponseWriter, r *http.Request) (bool, error) {
