@@ -5,7 +5,7 @@ package main
 
 import (
     "fmt"
-    "os"
+//    "os"
     "path"
     "path/filepath"
     "runtime"
@@ -87,7 +87,8 @@ func defineDefLogFname() string {
 
     defDir := "/var/log/artistic.log"
     if runtime.GOOS == "windows" {
-        defDir = path.Join(os.Getenv("USERPROFILE"), "artistic.log")
+//        defDir = path.Join(os.Getenv("USERPROFILE"), "artistic.log")
+        defDir = path.Join(ac.workDir, "artistic.log")
     }
     return filepath.Clean(defDir)
 }

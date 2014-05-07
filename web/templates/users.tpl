@@ -43,14 +43,6 @@
             <p> {{template "user-list" .}}</p>
         </div>
 
-<!--
-        <div class="col-md-6" id="data-details">
-            <h1 id="data-details-header">User Details</h1>
-
-            <p>User Details</p>
-        </div>
--->
-
     </div> <!-- row -->
 
     </div> <!-- container fluid -->
@@ -77,6 +69,7 @@
             <th>Name</th>
             <th>Role</th>
             <th>Email</th>
+            <th>Actions</th>
         </tr>
     </thead>
 
@@ -88,9 +81,49 @@
             <td>{{printf "%s" $element.Name}}</td>
             <td>{{printf "%s" $element.Role}}</td>
             <td>{{printf "%s" $element.Email}}</td>
+            <td>
+                <a href="#" data-toggle="tooltip" data-placement="left" 
+                            title="View details">
+                    <span class="glyphicon glyphicon-eye-open"></span>
+                </a>
+                <a href="#" data-toggle="tooltip" data-placement="left" 
+                            title="Edit">
+                    <span class="glyphicon glyphicon-cog" ></span>
+                </a>
+                <a href="#" data-toggle="tooltip" data-placement="left" 
+                            title="Delete">
+                    <span class="glyphicon glyphicon-trash"></span>
+                </a>
+            </td>
         </tr>
         {{end}}
     </tbody>
     </table>
 {{end}}
 
+{{define "view-user-details"}}
+<div class="modal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" 
+                              aria-hidden="true">x</button>
+        <h4 class="modal-title">{{.Username}}</h4>
+      </div>
+
+      <div class="modal-body">
+        <p>One fine body</p>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">
+        Close
+        </button>
+      <!-- 
+      <button type="button" class="btn btn-primary">Save changes</button>
+      -->
+      </div>
+    </div>
+  </div>
+</div>
+{{end}}
