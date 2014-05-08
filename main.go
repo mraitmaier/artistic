@@ -30,20 +30,8 @@ const (
     //DefWebRoot = "D:/Miran/koda/hg/go/src/bitbucket.org/miranr/artistic/web"
     DefWebRoot = "./web/"
 )
-/*
-type ArtisticUser struct {
-    // 
-    Username string
-
-    // Is the user 
-    Authenticated bool
-}
-*/
 
 type ArtisticCtrl struct {
-
-    // a list of current users
-//    Users []ArtisticUser
 
     // working folder
     workDir string
@@ -82,7 +70,8 @@ func parseArgs(ac *ArtisticCtrl) {
         fmt.Println("FATAL: The main control structure is NOT defined...")
         os.Exit(1)
     }
-    flag.StringVar(&ac.logFname, "l", defineDefLogFname(),
+    //flag.StringVar(&ac.logFname, "l", defineDefLogFname(),
+    flag.StringVar(&ac.logFname, "l", "",
             "define the custom log file path (absolute, please!)")
     flag.StringVar(&ac.syslogIP, "s", "", "IP address of the Syslog server")
     flag.StringVar(&ac.configFile, "c", DefConfigFile,
@@ -120,15 +109,15 @@ func cleanup() {
     // close the DB connection
     if ac.dbsess != nil {
         db.Close(ac.dbsess)
-        ac.log.Notice("Connection to MongoDb closed.\n")
+        ac.log.Notice("Connection to MongoDb closed.")
     }
 
     // clean the sessions directory
     cleanSessDir()
-    ac.log.Info("Sessions folder deleted.\n")
+    ac.log.Info("Sessions folder deleted.")
 
     // close the log 
-    ac.log.Info("Closing log.\n")
+    ac.log.Info("Closing log.")
     ac.log.Close()
 }
 
@@ -156,7 +145,7 @@ func main () {
     // config file in the final version)
     url := db.CreateUrl("localhost", 27017, "artistic", "artistic", "artistic")
     if ac.dbsess, err = db.Connect(url, DatabaseTimeout); err != nil {
-        ac.log.Critical("Connection to MongoDB cannot be established.\n")
+        ac.log.Critical("Connection to MongoDB cannot be established.")
         fmt.Println("Connection to MongoDB cannot be established.")
         fmt.Println("Exiting...")
         return
@@ -168,13 +157,13 @@ func main () {
     signal.Notify(c, os.Interrupt)
     go func() {
         <-c
-        ac.log.Info("Received a CTRL-C signal to terminate.\n")
+        ac.log.Info("Received a CTRL-C signal to terminate.")
         cleanup()
         os.Exit(0) // CTRL-C is clean exit for this app...
     }()
 
     // start web interface
     fmt.Println("Serving application on 'localhost:8088'...")
-    ac.log.Info("Serving application on 'localhost:8088'...\n")
+    ac.log.Info("Serving application on 'localhost:8088'...")
     webStart(DefWebRoot)
 }

@@ -1,39 +1,88 @@
-/*
- * artist.go
- */
 package core
 
 import (
-	"fmt"
+	//    "fmt"
+	//    "time"
+	//    "net/url"
+	"encoding/json"
 )
 
-type Artist interface {
-	String() string
-	Json() (string, error)
-}
-
 /*****************************************************************************
- * type Name - struct representing a person's name
+ * type Artist - struct representing the person
+ *
+ * This type is a basis for all artists: painters, sculptors, writers etc.
+ *
+ * Implements the Artist interface.
  */
-type Name struct {
-	First  string
-	Middle string
-	Last   string
+type Artist struct {
+
+	/* name of the person */
+	*Name
+
+	/* real name if the person used pseudonim; with artists this is common */
+	RealName *Name
+
+	/* Date of birth */
+	Born string
+
+	/* Date of death */
+	Dead string
+
+	/* his/her nationality */
+	Nationality string
+
+	/* a list of sources about the person */
+	Sources []string
+
+	/* his/her biography, of course */
+	Biography string
+
+	/* private notes about the person */
+	Notes []Note
+
+	/* this is actually an URI */
+	//    Picture url.URL;
+	Picture string
+
+    /* artist flags, a person can be many things at once */
+    IsPainter bool
+    IsSculptor bool
+    IsPrintmaker bool
+    IsArchitect bool
+    IsCeramicist bool
+
+    // timestamp when an instance was created
+    created string
+
+    // timestamp when an instance was last updated
+    updated string
+}
+
+const DefaultArtistCapacity = 10
+
+func CreateArtist() *Artist {
+	n := make([]Note, 0, DefaultArtistCapacity)
+	s := make([]string, 0, DefaultArtistCapacity)
+	return &Artist{&Name{"", "", ""}, &Name{"", "", ""},
+		"", "", "", s, "", n, "", false, false, false, false, false }
 }
 
 /*
- * Name.String - a string representation of the Name
+ * Artist.String - a string representation of the Artist
  */
-func (n *Name) String() string {
-	if n.Middle == "" {
-		return fmt.Sprintf("%s %s", n.First, n.Last)
-	}
-	return fmt.Sprintf("%s %s %s", n.First, n.Middle, n.Last)
+func (p *Artist) String() string {
+	return p.Name.String()
 }
 
 /*
- * CreateName - creates a new empty instance of the Name
+ * Artist.Json- a JSON-encoded representation of the Artist
  */
-func CreateName(first string, middle string, last string) *Name {
-	return &Name{first, middle, last}
+func (p *Artist) Json() (string, error) {
+	s, err := json.Marshal(p)
+	return string(s[:]), err
 }
+
+/**
+    ArtistList - this is type representing a list of persons
+*/
+type ArtistList []Artist

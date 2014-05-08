@@ -84,7 +84,7 @@ func checkSessDir(path string) bool {
     if path == "" {
         switch runtime.GOOS {
             case "windows": basedir = os.Getenv("TEMP")
-            default: basedir = os.Getenv("TMP")
+            default: basedir = "/tmp"
         }
         ac.sessDir = filepath.Join(basedir, "artistic", "sessions")
     }

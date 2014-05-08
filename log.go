@@ -5,15 +5,13 @@ package main
 
 import (
     "fmt"
-//    "os"
     "path"
     "path/filepath"
     "runtime"
     "bitbucket.org/miranr/artistic/utils"
 )
 
-// Let's define the default log levels for different log handlers:
-//   
+// Let's define the default log levels for different log handlers
 const (
     numOfLogHandlers int = 2
     defSyslogLevel utils.LogLevel = utils.NoticeLogLevel
@@ -31,18 +29,22 @@ func createLog(ac *ArtisticCtrl) (err error) {
 
     ac.log = utils.NewLog(numOfLogHandlers)
 
-    if ac.logFname != "" {
-        format := "%s %s %s"
-        err := createLoggers(ac, format, ac.debug)
-        if err != nil {
-            return err
-        }
-        ac.log.Info("Log successfully created\n")
+    // define the name of the log file
+    if ac.logFname == "" {
+        ac.logFname = defineDefLogFname()
+    } else {
+        ac.logFname = filepath.Join(ac.workDir, "artistic.log")
     }
+
+    format := "%s %s %s"
+    err = createLoggers(ac, format, ac.debug)
+    if err != nil { return err }
+    ac.log.Info("Log successfully created.")
+
     return nil
 }
 
-func createLoggers(ac * ArtisticCtrl, format string, debug bool) error {
+func createLoggers(ac *ArtisticCtrl, format string, debug bool) error {
 
     if ac == nil {
         panic("FATAL: The main control structure is NOT defined...")
@@ -58,6 +60,7 @@ func createLoggers(ac * ArtisticCtrl, format string, debug bool) error {
     }
 
     // add file log handler
+
     f, err := utils.NewFileHandler(ac.logFname,
                                    fmt.Sprintf("%s\n", format), fLevel)
     if f != nil {
@@ -87,7 +90,6 @@ func defineDefLogFname() string {
 
     defDir := "/var/log/artistic.log"
     if runtime.GOOS == "windows" {
-//        defDir = path.Join(os.Getenv("USERPROFILE"), "artistic.log")
         defDir = path.Join(ac.workDir, "artistic.log")
     }
     return filepath.Clean(defDir)
