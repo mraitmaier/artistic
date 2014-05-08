@@ -2,7 +2,7 @@ package core
 
 import (
 	//    "fmt"
-	//    "time"
+	    "time"
 	//    "net/url"
 	"encoding/json"
 )
@@ -61,10 +61,12 @@ type Artist struct {
 const DefaultArtistCapacity = 10
 
 func CreateArtist() *Artist {
+    creat := time.Now().Format("2012-12-15 15:0405")
 	n := make([]Note, 0, DefaultArtistCapacity)
 	s := make([]string, 0, DefaultArtistCapacity)
 	return &Artist{&Name{"", "", ""}, &Name{"", "", ""},
-		"", "", "", s, "", n, "", false, false, false, false, false }
+		"", "", "", s, "", n, "",
+        false, false, false, false, false, creat, creat }
 }
 
 /*

@@ -12,7 +12,11 @@ import (
  * the inheritance in Go
  */
 type Painting struct {
+    // 
 	*Work
+
+    // is this painting actually a fresco?
+    IsFresco bool
 }
 
 func (p *Painting) String() string { return p.Work.Title }
@@ -22,7 +26,7 @@ func (p *Painting) Json() (string, error) {
 	return string(s[:]), err
 }
 
-func NewPainting() *Painting { return &Painting{CreateNewWork()} }
+func NewPainting() *Painting { return &Painting{CreateNewWork(), false} }
 
 func (p *Painting) Display() string { return p.Work.Display() }
 
@@ -32,4 +36,8 @@ func (p *Painting) DisplayNotes() string { return p.Work.DisplayNotes() }
 
 func (p *Painting) DisplayExhibitions() string {
 	return p.Work.DisplayExhibitions()
+}
+
+func (p *Painting) Created() string {
+    return p.Work.Created()
 }

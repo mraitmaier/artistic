@@ -27,3 +27,5 @@ func (p *Print) DisplayNotes() string { return p.Work.DisplayNotes() }
 func (p *Print) DisplayExhibitions() string {
 	return p.Work.DisplayExhibitions()
 }
+
+func (p *Print) Created() string { return p.Work.Created() }
