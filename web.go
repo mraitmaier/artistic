@@ -19,6 +19,12 @@ import (
     "bitbucket.org/miranr/artistic/utils"
 )
 
+type WebInfo struct {
+
+    // a path to where session files are stored
+    SessDir string
+}
+
 const (
     // a (quite) random string that is used as a key for sessions
     sessKey = `iufwnwieh3436SiKJSJo90e3jdiejdlje3+'0%$#!)dlkjja(!~§<sdfad$io*"`
@@ -32,7 +38,7 @@ var (
     store = sessions.NewCookieStore([]byte(sessKey))
 
     // aux DB type instance
-    DB = ac.dbsess.DB("artistic")
+    //DB = aa.dbsess.DB("artistic")
 )
 
 // register web page handler functions
@@ -50,12 +56,14 @@ func registerHandlers() {
 // initializes and starts web server
 func webStart(wwwpath string) {
 
+    aa.WebInfo = new(WebInfo)
+
     // register handler functions
     registerHandlers()
 
     // check dir for session files and create it if needed
     if !checkSessDir("") {
-        ac.log.Critical("Cannot create session folder; cannot continue...\n")
+        aa.Log.Critical("Cannot create session folder; cannot continue...\n")
         return
     }
 
@@ -86,11 +94,11 @@ func checkSessDir(path string) bool {
             case "windows": basedir = os.Getenv("TEMP")
             default: basedir = "/tmp"
         }
-        ac.sessDir = filepath.Join(basedir, "artistic", "sessions")
+        aa.WebInfo.SessDir = filepath.Join(basedir, "artistic", "sessions")
     }
 
     // if path does not exits, create it...
-    if err := os.MkdirAll(ac.sessDir, 0755); err != nil  {
+    if err := os.MkdirAll(aa.WebInfo.SessDir, 0755); err != nil  {
         fmt.Println("FATAL: Cannot create path. Cannot continue...")
         fmt.Println(err.Error()) // DEBUG
         return false
@@ -104,9 +112,9 @@ func checkSessDir(path string) bool {
 func cleanSessDir() bool {
     status := false
 
-    if ac.sessDir != "" {
-        if err := os.RemoveAll(ac.sessDir); err != nil {
-            ac.log.Error(err.Error())
+    if aa.WebInfo.SessDir != "" {
+        if err := os.RemoveAll(aa.WebInfo.SessDir); err != nil {
+            aa.Log.Error(err.Error())
             return status
         }
         status = true
@@ -161,7 +169,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 // user admin page handler
 func usersHandler(w http.ResponseWriter, r *http.Request) {
 
-    log := ac.log
+    log := aa.Log
 /* this is currently not needed yet...
     if userIsAuthenticated(r) {
         if err := templates.ExecuteTemplate(w, "users", nil); err != nil {
@@ -195,9 +203,9 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 //    s, err := store.Get(r, "session")
 //    if err != nil {
 //    }
-    fmt.Printf("DEBUG DB=%v\n", DB) // DEBUG
+    //fmt.Printf("DEBUG DB=%v\n", DB) // DEBUG
 
-    log := ac.log // get logger instance
+    log := aa.Log // get logger instance
 
     switch r.Method {
 
@@ -248,7 +256,7 @@ func int64ToBytes(i int64) []byte {
 // retrieves all users from DoB
 func getAllUsers() ([]utils.User, error) {
 
-    db := ac.dbsess.DB("artistic")
+    db := aa.DbSess.DB("artistic")
 
     // prepare the empty slice for users
     u := make([]utils.User, 0)

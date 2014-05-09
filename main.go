@@ -13,9 +13,9 @@ import (
     "path/filepath"
 //    "net/http"
 //    "bitbucket.org/miranr/artistic/core"
-    "bitbucket.org/miranr/artistic/utils"
+//    "bitbucket.org/miranr/artistic/utils"
     "bitbucket.org/miranr/artistic/db"
-    "labix.org/v2/mgo"
+//    "labix.org/v2/mgo"
 )
 
 const (
@@ -31,52 +31,25 @@ const (
     DefWebRoot = "./web/"
 )
 
-type ArtisticCtrl struct {
-
-    // working folder
-    workDir string
-
-    // a log filename
-    logFname string
-
-    // a syslog IP address
-    syslogIP string
-
-    // a logger
-    log *utils.Log
-
-    // config file path
-    configFile string
-
-    // MongoDB session 
-    dbsess *mgo.Session
-
-    // folder for session files
-    sessDir string
-
-    // a debug flag (only for testing purposes)
-    debug bool
-}
-
-// create new global struct instance
-var ac = new(ArtisticCtrl)
+// create a new Artistic application instance
+var aa = new(ArtisticApp)
 
 /*
  * parseArgs - parse the CLI arguments
  */
-func parseArgs(ac *ArtisticCtrl) {
+func parseArgs(ac *ArtisticApp, cfgfile *string) {
 
     if ac == nil {
         fmt.Println("FATAL: The main control structure is NOT defined...")
         os.Exit(1)
     }
     //flag.StringVar(&ac.logFname, "l", defineDefLogFname(),
-    flag.StringVar(&ac.logFname, "l", "",
+    flag.StringVar(&ac.LogFname, "l", "",
             "define the custom log file path (absolute, please!)")
-    flag.StringVar(&ac.syslogIP, "s", "", "IP address of the Syslog server")
-    flag.StringVar(&ac.configFile, "c", DefConfigFile,
+    flag.StringVar(&ac.SyslogIP, "s", "", "IP address of the Syslog server")
+    flag.StringVar(cfgfile, "c", DefConfigFile,
             "define custom path for config file")
-    flag.BoolVar(&ac.debug, "d", false, "enable debug mode (only for testing!)")
+    flag.BoolVar(&ac.Debug, "d", false, "enable debug mode (only for testing!)")
     flag.Parse()
 }
 
@@ -84,7 +57,7 @@ func parseArgs(ac *ArtisticCtrl) {
 func setWorkDir() bool {
 
     // if working folder is already set in global struct, use it
-    wdir := ac.workDir
+    wdir := aa.WorkDir
 
     // otherwise, the default working folder is the "artistic" folder in $HOME
     if wdir == "" {
@@ -92,11 +65,11 @@ func setWorkDir() bool {
             case "windows": wdir = os.Getenv("USERPROFILE")
             default: wdir = os.Getenv("HOME")
         }
-        ac.workDir = filepath.Join(wdir, "artistic")
+        aa.WorkDir = filepath.Join(wdir, "artistic")
     }
 
     // create the working folder, if it doesn't exist
-    if err := os.MkdirAll(ac.workDir, 0755); err != nil {
+    if err := os.MkdirAll(aa.WorkDir, 0755); err != nil {
         return false
     }
 
@@ -107,35 +80,36 @@ func setWorkDir() bool {
 func cleanup() {
 
     // close the DB connection
-    if ac.dbsess != nil {
-        db.Close(ac.dbsess)
-        ac.log.Notice("Connection to MongoDb closed.")
+    if aa.DbSess != nil {
+        db.Close(aa.DbSess)
+        aa.Log.Notice("Connection to MongoDb closed.")
     }
 
     // clean the sessions directory
     cleanSessDir()
-    ac.log.Info("Sessions folder deleted.")
+    aa.Log.Info("Sessions folder deleted.")
 
     // close the log 
-    ac.log.Info("Closing log.")
-    ac.log.Close()
+    aa.Log.Info("Closing log.")
+    aa.Log.Close()
 }
 
 func main () {
+    configfile := ""
     // parse the CLI arguments
-    parseArgs(ac)
+    parseArgs(aa, &configfile)
 
     // handle config file
-    handleConfigFile(ac)
+    handleConfigFile(aa, configfile)
 
     // set working directory
-    if !setWorkDir() {
+    if !aa.SetWorkDir() {
         fmt.Println("FATAL: cannot create working folder, cannot continue...")
         return
     }
 
     // create the logger
-    createLog(ac)
+    createLog(aa)
 
     // deferring the the cleanup procedure when app is terminated normally
     defer cleanup()
@@ -144,26 +118,26 @@ func main () {
     // connect to MongoDB (FIXME: currently hardcoded, should be read from 
     // config file in the final version)
     url := db.CreateUrl("localhost", 27017, "artistic", "artistic", "artistic")
-    if ac.dbsess, err = db.Connect(url, DatabaseTimeout); err != nil {
-        ac.log.Critical("Connection to MongoDB cannot be established.")
+    if aa.DbSess, err = db.Connect(url, DatabaseTimeout); err != nil {
+        aa.Log.Critical("Connection to MongoDB cannot be established.")
         fmt.Println("Connection to MongoDB cannot be established.")
         fmt.Println("Exiting...")
         return
     }
-    ac.log.Notice("Connection to MongoDB established.")
+    aa.Log.Notice("Connection to MongoDB established.")
 
     // handle CTRL-C signal and perform cleanup before app is terminated
     c := make(chan os.Signal, 1)
     signal.Notify(c, os.Interrupt)
     go func() {
         <-c
-        ac.log.Info("Received a CTRL-C signal to terminate.")
+        aa.Log.Info("Received a CTRL-C signal to terminate.")
         cleanup()
         os.Exit(0) // CTRL-C is clean exit for this app...
     }()
 
     // start web interface
     fmt.Println("Serving application on 'localhost:8088'...")
-    ac.log.Info("Serving application on 'localhost:8088'...")
+    aa.Log.Info("Serving application on 'localhost:8088'...")
     webStart(DefWebRoot)
 }

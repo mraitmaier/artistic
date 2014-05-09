@@ -25,7 +25,7 @@ func authenticateUser(u *utils.User,
 
     // get information from DB
     query := bson.M{ "username" : u.Username }
-    err := ac.dbsess.DB("artistic").C("users").Find(query).One(u)
+    err := aa.DbSess.DB("artistic").C("users").Find(query).One(u)
     if err != nil {
 fmt.Printf("ERROR: user=%s\n", u.String()) // DEBUG
         return false, err
@@ -44,7 +44,7 @@ fmt.Printf("ERROR: user=%s\n", u.String()) // DEBUG
 
     // create a new file in sessions folder to indicate valid session; we don't
     // care about the descriptor
-    _, err = os.Create(filepath.Join(ac.sessDir, id))
+    _, err = os.Create(filepath.Join(aa.WebInfo.SessDir, id))
     if err != nil { return false, err }
 
     // save the session data
@@ -64,7 +64,7 @@ func logout(u *utils.User, r *http.Request) error {
     // in the sessions folder. 
     // Delete it, if it exists. 
     // If it doesn't exist, there's probably something wrong: do nothing.
-    f := filepath.Join(ac.sessDir, id.(string))
+    f := filepath.Join(aa.WebInfo.SessDir, id.(string))
     if utils.FileExists(f) {
         os.Remove(f)
     }

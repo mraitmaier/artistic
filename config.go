@@ -12,10 +12,9 @@ import (
 //    "bitbucket.org/miranr/artistic/utils"
 )
 
-func handleConfigFile(ac *ArtisticCtrl) error {
+func handleConfigFile(aa *ArtisticApp, file string) error {
     
-    path := ac.configFile
-    fmt.Printf("Config file: %q\n", path)
+    fmt.Printf("Config file: %q\n", file)
 
     return nil
 }

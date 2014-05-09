@@ -21,30 +21,30 @@ const (
 /*
  * createLog - 
  */
-func createLog(ac *ArtisticCtrl) (err error) {
+func createLog(ac *ArtisticApp) (err error) {
 
     if ac == nil {
         panic("FATAL: The main control structure is NOT defined...")
     }
 
-    ac.log = utils.NewLog(numOfLogHandlers)
+    ac.Log = utils.NewLog(numOfLogHandlers)
 
     // define the name of the log file
-    if ac.logFname == "" {
-        ac.logFname = defineDefLogFname()
+    if ac.LogFname == "" {
+        ac.LogFname = defineDefLogFname()
     } else {
-        ac.logFname = filepath.Join(ac.workDir, "artistic.log")
+        ac.LogFname = filepath.Join(ac.WorkDir, "artistic.log")
     }
 
     format := "%s %s %s"
-    err = createLoggers(ac, format, ac.debug)
+    err = createLoggers(ac, format, ac.Debug)
     if err != nil { return err }
-    ac.log.Info("Log successfully created.")
+    ac.Log.Info("Log successfully created.")
 
     return nil
 }
 
-func createLoggers(ac *ArtisticCtrl, format string, debug bool) error {
+func createLoggers(ac *ArtisticApp, format string, debug bool) error {
 
     if ac == nil {
         panic("FATAL: The main control structure is NOT defined...")
@@ -54,24 +54,24 @@ func createLoggers(ac *ArtisticCtrl, format string, debug bool) error {
     // define default log levels
     fLevel := defFileLevel
     sLevel := defSyslogLevel
-    if ac.debug {
+    if ac.Debug {
         fLevel = utils.DebugLogLevel
         sLevel = utils.DebugLogLevel
     }
 
     // add file log handler
 
-    f, err := utils.NewFileHandler(ac.logFname,
+    f, err := utils.NewFileHandler(ac.LogFname,
                                    fmt.Sprintf("%s\n", format), fLevel)
     if f != nil {
-        ac.log.Handlers = ac.log.AddHandler(f)
+        ac.Log.Handlers = ac.Log.AddHandler(f)
     }
 
     // add syslog log handler
-    if ac.syslogIP != "" {
-        s := utils.NewSyslogHandler(ac.syslogIP, format, sLevel)
+    if ac.SyslogIP != "" {
+        s := utils.NewSyslogHandler(ac.SyslogIP, format, sLevel)
         if s != nil {
-            ac.log.Handlers = ac.log.AddHandler(s)
+            ac.Log.Handlers = ac.Log.AddHandler(s)
         }
     }
     return err
@@ -90,7 +90,7 @@ func defineDefLogFname() string {
 
     defDir := "/var/log/artistic.log"
     if runtime.GOOS == "windows" {
-        defDir = path.Join(ac.workDir, "artistic.log")
+        defDir = path.Join(aa.WorkDir, "artistic.log")
     }
     return filepath.Clean(defDir)
 }
