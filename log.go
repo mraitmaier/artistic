@@ -14,8 +14,8 @@ import (
 // Let's define the default log levels for different log handlers
 const (
     numOfLogHandlers int = 2
-    defSyslogLevel utils.LogLevel = utils.NoticeLogLevel
-    defFileLevel   utils.LogLevel = utils.InfoLogLevel
+    defSyslogLevel utils.Severity = utils.Notice
+    defFileLevel   utils.Severity = utils.Informational
 )
 
 /*
@@ -39,7 +39,11 @@ func createLog(ac *ArtisticApp) (err error) {
     format := "%s %s %s"
     err = createLoggers(ac, format, ac.Debug)
     if err != nil { return err }
+
+    ac.Log.Run()
+
     ac.Log.Info("Log successfully created.")
+ //   ac.Log.SendMsg("info", "Log successfully created - from goroutine.")
 
     return nil
 }
@@ -55,8 +59,8 @@ func createLoggers(ac *ArtisticApp, format string, debug bool) error {
     fLevel := defFileLevel
     sLevel := defSyslogLevel
     if ac.Debug {
-        fLevel = utils.DebugLogLevel
-        sLevel = utils.DebugLogLevel
+        fLevel = utils.Debug
+        sLevel = utils.Debug
     }
 
     // add file log handler

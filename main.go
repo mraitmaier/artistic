@@ -8,9 +8,9 @@ import (
     "flag"
     "time"
     "os"
-    "runtime"
+//    "runtime"
     "os/signal"
-    "path/filepath"
+//    "path/filepath"
 //    "net/http"
 //    "bitbucket.org/miranr/artistic/core"
 //    "bitbucket.org/miranr/artistic/utils"
@@ -53,54 +53,17 @@ func parseArgs(ac *ArtisticApp, cfgfile *string) {
     flag.Parse()
 }
 
-// Define working folder and create it, if it doesn't exist
-func setWorkDir() bool {
-
-    // if working folder is already set in global struct, use it
-    wdir := aa.WorkDir
-
-    // otherwise, the default working folder is the "artistic" folder in $HOME
-    if wdir == "" {
-        switch runtime.GOOS {
-            case "windows": wdir = os.Getenv("USERPROFILE")
-            default: wdir = os.Getenv("HOME")
-        }
-        aa.WorkDir = filepath.Join(wdir, "artistic")
-    }
-
-    // create the working folder, if it doesn't exist
-    if err := os.MkdirAll(aa.WorkDir, 0755); err != nil {
-        return false
-    }
-
-    return true
-}
-
-// Cleanup oprocedure when app is terminated.
-func cleanup() {
-
-    // close the DB connection
-    if aa.DbSess != nil {
-        db.Close(aa.DbSess)
-        aa.Log.Notice("Connection to MongoDb closed.")
-    }
-
-    // clean the sessions directory
-    cleanSessDir()
-    aa.Log.Info("Sessions folder deleted.")
-
-    // close the log 
-    aa.Log.Info("Closing log.")
-    aa.Log.Close()
-}
-
 func main () {
+
     configfile := ""
     // parse the CLI arguments
     parseArgs(aa, &configfile)
 
     // handle config file
-    handleConfigFile(aa, configfile)
+    if err := aa.HandleConfigFile(configfile); err != nil {
+        fmt.Println("FATAL: cannot read config file. Cannot continue...")
+        os.Exit(1)
+    }
 
     // set working directory
     if !aa.SetWorkDir() {
@@ -109,10 +72,10 @@ func main () {
     }
 
     // create the logger
-    createLog(aa)
+    aa.createLogs()
 
     // deferring the the cleanup procedure when app is terminated normally
-    defer cleanup()
+    defer aa.Cleanup()
 
     var err error
     // connect to MongoDB (FIXME: currently hardcoded, should be read from 
@@ -120,24 +83,29 @@ func main () {
     url := db.CreateUrl("localhost", 27017, "artistic", "artistic", "artistic")
     if aa.DbSess, err = db.Connect(url, DatabaseTimeout); err != nil {
         aa.Log.Critical("Connection to MongoDB cannot be established.")
+        //aa.Log.SendMsg("error","Connection to MongoDB cannot be established.")
         fmt.Println("Connection to MongoDB cannot be established.")
         fmt.Println("Exiting...")
         return
     }
     aa.Log.Notice("Connection to MongoDB established.")
+    //aa.Log.SendMsg("info", "Connection to MongoDB established.")
 
     // handle CTRL-C signal and perform cleanup before app is terminated
     c := make(chan os.Signal, 1)
     signal.Notify(c, os.Interrupt)
     go func() {
         <-c
+        fmt.Println("DEBUG: Received a CTRL-C signal to terminate.") // DEBUG
         aa.Log.Info("Received a CTRL-C signal to terminate.")
-        cleanup()
+        //aa.Log.SendMsg("info", "Received a CTRL-C signal to terminate.")
+        aa.Cleanup()
         os.Exit(0) // CTRL-C is clean exit for this app...
     }()
 
     // start web interface
     fmt.Println("Serving application on 'localhost:8088'...")
     aa.Log.Info("Serving application on 'localhost:8088'...")
-    webStart(DefWebRoot)
+    //aa.Log.SendMsg("info", "Serving application on 'localhost:8088'...")
+    aa.startWeb(DefWebRoot)
 }

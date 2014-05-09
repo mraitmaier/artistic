@@ -4,89 +4,44 @@
  * Default log module is simply not enough
  *
  * History:
- *  0.1.0   Jul11   MR  The initial version
+ *  1   Jul11   MR  The initial version
+ *  2   May14   MR  Refactoring and simplification: the LogLevel type is out,
+ *                  Severity is now used instead. The second is introduction of
+ *                  concurency: log can now run as goroutine and messages are
+ *                  sent over a channel.
  */
 
-package utils 
+package utils
 
 import (
 	"fmt"
 	"os"
 	"strings"
+//    "errors"
 	"time"
 )
 
-/************************** LogLevel ***********************************/
-/*
- * LogLevel - an enum defining log levels
- */
-type LogLevel Severity
-
-const (
-	EmergencyLogLevel LogLevel = iota
-	AlertLogLevel
-	CriticalLogLevel
-	ErrorLogLevel
-	WarningLogLevel
-	NoticeLogLevel
-	InfoLogLevel
-	DebugLogLevel
-	UnknownLogLevel
-)
-
-/*
- * LogLevel.String - a method returning the string representation of the
- *                   LogLevel value
- */
-func (ll LogLevel) String() (s string) {
-	switch ll {
-	case EmergencyLogLevel:
-		s = "EMERGENCY"
-	case AlertLogLevel:
-		s = "ALERT"
-	case CriticalLogLevel:
-		s = "CRITICAL"
-	case ErrorLogLevel:
-		s = "ERROR"
-	case WarningLogLevel:
-		s = "WARNING"
-	case NoticeLogLevel:
-		s = "NOTICE"
-	case InfoLogLevel:
-		s = "INFO"
-	case DebugLogLevel:
-		s = "DEBUG"
-	default:
-		panic("Unknown Log Level")
-	}
-	return s
-}
-
-/*
- * LogLevelFromString - converts log level given as string into proper LogLevel
- *                      value
- *
- * If invalid string is given, function returns 'UnknownLogLevel' value.
- */
-func LogLevelFromString(lvl string) LogLevel {
-	loglvl := UnknownLogLevel
+// Converts log level given as string into proper Severity value.
+// If invalid string is given, function returns 'UnknownSeverity' value.
+func SeverityFromString(lvl string) Severity {
+    loglvl := UnknownSeverity
 	switch strings.ToUpper(lvl) {
 	case "EMERGENCY":
-		loglvl = EmergencyLogLevel
+		loglvl = Emergency
 	case "ALERT":
-		loglvl = AlertLogLevel
+		loglvl = Alert
 	case "CRITICAL":
-		loglvl = CriticalLogLevel
+		loglvl = Critical
 	case "ERROR":
-		loglvl = ErrorLogLevel
+		loglvl = Error
 	case "WARNING":
-		loglvl = WarningLogLevel
+		loglvl = Warning
 	case "NOTICE":
-		loglvl = NoticeLogLevel
+		loglvl = Notice
 	case "INFO":
-		loglvl = InfoLogLevel
+		loglvl = Informational
 	case "DEBUG":
-		loglvl = DebugLogLevel
+		loglvl = Debug
 	}
 	return loglvl
 }
@@ -113,28 +68,41 @@ type Logger interface {
  * logHandler - private struct that defines log level and format
  */
 type logHandler struct {
-	level  LogLevel /* log level set for this LogHandler */
+	sev  Severity /* set severity for this LogHandler */
 	format string   /* a formatter for this LogHandler */
 }
 
-func (l *logHandler) Level() LogLevel { return l.level }
+func (l *logHandler) Severity() Severity { return l.sev }
 
-func (l *logHandler) SetLevel(lvl LogLevel) { l.level = lvl }
+func (l *logHandler) SetSeverity(s Severity) { l.sev = s }
 
 func (l *logHandler) Format() string { return l.format }
 
 func (l *logHandler) SetFormat(fmt string) { l.format = fmt }
 
-func newLogHandler(fmt string, lvl LogLevel) *logHandler {
-	return &logHandler{lvl, fmt}
+func newLogHandler(fmt string, sev Severity) *logHandler {
+	return &logHandler{sev, fmt}
 }
 
 /************************** Log ***********************************/
 /*
  * Log - a slice of different Loggers that can be added at will
  */
+type logmsg struct {
+    sev Severity
+    msg string
+}
+
 type Log struct {
+
+    // a list of log handlers
 	Handlers []Logger
+
+    // a channel to send log messages
+    logch chan *logmsg
+
+    // a channel to signal when to stop the logger goroutine
+    stop chan int
 }
 
 func (l *Log) String() string {
@@ -174,100 +142,47 @@ func (l *Log) AddHandler(log Logger) []Logger {
 	return l.Handlers
 }
 
-/*
- * Log - a generic Log method
- * 
- * Calls all needed log handlers and logs the given message with given level.
- * If an unknown log level is specified, do nothing.
- */
-func (l *Log) Log(level LogLevel, msg string) {
+// A dispatch log messages method.
+// Calls all needed log handlers and logs the given message with given level.
+// If an unknown log level is received, do nothing.
+func (l *Log) dispatch(sev Severity, msg string) {
 	for _, h := range l.Handlers {
-		switch level {
-		case EmergencyLogLevel:
+		switch sev {
+		case Emergency:
 			h.Emergency(msg)
-		case AlertLogLevel:
+		case Alert:
 			h.Alert(msg)
-		case CriticalLogLevel:
+		case Critical:
 			h.Critical(msg)
-		case ErrorLogLevel:
+		case Error:
 			h.Error(msg)
-		case WarningLogLevel:
+		case Warning:
 			h.Warning(msg)
-		case NoticeLogLevel:
+		case Notice:
 			h.Notice(msg)
-		case InfoLogLevel:
+		case Informational:
 			h.Info(msg)
-		case DebugLogLevel:
+		case Debug:
 			h.Debug(msg)
 		}
 	}
 }
 
-/*
- * LogS - a string version of the Log() method (see above)
- *
- * Calls all needed log handlers and logs the given message with given level.
- * Level is specified as string. 
- * If an unknown log level is specified, do nothing.
- */
-func (l *Log) LogS(level string, msg string) {
-	// get a Loglevel value from given string
-	ll := LogLevelFromString(level)
+func (l *Log) Debug(msg string) { l.send(Debug, msg) }
 
-	// check that a valid LogLevel value has been received and log the message;
-	// if invalid log level, do nothing
-	if ll != UnknownLogLevel {
-		l.Log(ll, msg)
-	}
-}
+func (l *Log) Info(msg string) { l.send(Informational, msg) }
 
-func (l *Log) Debug(msg string) {
-	for _, h := range l.Handlers {
-		h.Debug(msg)
-	}
-}
+func (l *Log) Notice(msg string) { l.send(Notice, msg) }
 
-func (l *Log) Info(msg string) {
-	for _, h := range l.Handlers {
-		h.Info(msg)
-	}
-}
+func (l *Log) Warning(msg string) { l.send(Warning, msg) }
 
-func (l *Log) Notice(msg string) {
-	for _, h := range l.Handlers {
-		h.Notice(msg)
-	}
-}
+func (l *Log) Error(msg string) { l.send(Error, msg) }
 
-func (l *Log) Warning(msg string) {
-	for _, h := range l.Handlers {
-		h.Warning(msg)
-	}
-}
+func (l *Log) Critical(msg string) { l.send(Critical, msg) }
 
-func (l *Log) Error(msg string) {
-	for _, h := range l.Handlers {
-		h.Error(msg)
-	}
-}
+func (l *Log) Alert(msg string) { l.send(Alert, msg) }
 
-func (l *Log) Critical(msg string) {
-	for _, h := range l.Handlers {
-		h.Critical(msg)
-	}
-}
-
-func (l *Log) Alert(msg string) {
-	for _, h := range l.Handlers {
-		h.Alert(msg)
-	}
-}
-
-func (l *Log) Emergency(msg string) {
-	for _, h := range l.Handlers {
-		h.Emergency(msg)
-	}
-}
+func (l *Log) Emergency(msg string) { l.send(Emergency, msg) }
 
 func (l *Log) Len() int { return len(l.Handlers) }
 
@@ -275,15 +190,74 @@ func (l *Log) Close() {
 	for _, h := range l.Handlers {
 		h.Close()
 	}
+
+    // send a signal to quit logger goroutine
+    if l.stop != nil {
+        close(l.logch)
+        l.stop <- 1
+    }
 }
 
-const logLength int = 5
+const logLength int = 3
 
-func NewLog(num int) *Log {
+// Create new logger, specify the number of log handlers and create needed  
+// channels: the one onto which the log messages are sent and the other where
+// signal when to stop is sent.
+// Return the Log instance. 
+func NewLog(num int) (*Log) {
+    // default the handler value
 	if num == 0 {
 		num = logLength
 	}
-	return &Log{make([]Logger, 0, logLength)}
+
+    // create new Log instance
+	l := &Log{ make([]Logger, 0, logLength), nil, nil }
+    return l
+}
+
+/*
+func (l *Log) sendS(sev, msg string) {
+    if l.logch != nil {
+        l.logch <- &logmsg{ SeverityFromString(sev), msg }
+    }
+}
+*/
+
+func (l *Log) send(sev Severity,  msg string) {
+    if l.logch != nil {
+        l.logch <- &logmsg{ sev, msg }
+    }
+}
+
+// run logger as a goroutine
+func (l *Log) Run() error {
+
+    // open logger channels 
+    l.logch = make(chan *logmsg, 10)  // message channel (buffered)
+    l.stop  = make(chan int)          // stop channel
+
+    // now start a logger goroutine
+    go func(l *Log) {
+
+        for {
+            select {
+
+            // when message is received over channel, write it
+            case m :=<-l.logch:
+                //fmt.Printf("DEBUG, logger: msg=%v\n", m) // DEBUG
+                //l.Log(m.sev, m.msg)
+                l.dispatch(m.sev, m.msg)
+
+            // when data is received over stop channel, just exit the goroutine
+            case <- l.stop:
+                return
+
+            default: // do nothing
+            }
+        }
+    }(l)
+
+    return nil
 }
 
 /************************** Formatter  ***********************************/
@@ -306,42 +280,42 @@ type FileHandler struct {
 /*
  * FileHandler.log - creates new stream handler
  */
-func (f *FileHandler) log(level LogLevel, msg string) {
-	if f.Level() >= level {
+func (f *FileHandler) log(level Severity, msg string) {
+	if f.Severity() >= level {
 		fmt.Fprintf(f.file, f.Format(), Now(), level, msg)
 	}
 }
 
 func (f *FileHandler) Debug(msg string) {
-	f.log(DebugLogLevel, msg)
+	f.log(Debug, msg)
 }
 
 func (f *FileHandler) Info(msg string) {
-	f.log(InfoLogLevel, msg)
+	f.log(Informational, msg)
 }
 
 func (f *FileHandler) Notice(msg string) {
-	f.log(NoticeLogLevel, msg)
+	f.log(Notice, msg)
 }
 
 func (f *FileHandler) Warning(msg string) {
-	f.log(WarningLogLevel, msg)
+	f.log(Warning, msg)
 }
 
 func (f *FileHandler) Error(msg string) {
-	f.log(ErrorLogLevel, msg)
+	f.log(Error, msg)
 }
 
 func (f *FileHandler) Critical(msg string) {
-	f.log(CriticalLogLevel, msg)
+	f.log(Critical, msg)
 }
 
 func (f *FileHandler) Alert(msg string) {
-	f.log(AlertLogLevel, msg)
+	f.log(Alert, msg)
 }
 
 func (f *FileHandler) Emergency(msg string) {
-	f.log(EmergencyLogLevel, msg)
+	f.log(Emergency, msg)
 }
 
 func (f *FileHandler) Close() {
@@ -352,17 +326,17 @@ func (f *FileHandler) Close() {
 
 func (f *FileHandler) String() string {
 	return fmt.Sprintf("  FileHandler: fmt=%q, lvl=%-10s, fd=%d\n",
-		f.Format(), f.Level(), f.file.Fd())
+		f.Format(), f.Severity(), f.file.Fd())
 }
 
 /*
  * NewFileHandler - creates new file handler
  */
 func NewFileHandler(filename string,
-	fmt string, lvl LogLevel) (*FileHandler, error) {
+	fmt string, sev Severity) (*FileHandler, error) {
 	// open log file
 	f, err := os.OpenFile(filename, os.O_CREATE|os.O_WRONLY, 0755)
-	return &FileHandler{newLogHandler(fmt, lvl), f}, err
+	return &FileHandler{newLogHandler(fmt, sev), f}, err
 }
 
 /************************** StreamHandler ***********************************/
@@ -374,42 +348,42 @@ type StreamHandler FileHandler
 /*
  * StreamHandler.log - creates new stream handler
  */
-func (s *StreamHandler) log(level LogLevel, msg string) {
-	if s.Level() >= level {
+func (s *StreamHandler) log(level Severity, msg string) {
+	if s.Severity() >= level {
 		fmt.Printf(s.Format(), Now(), level, msg)
 	}
 }
 
 func (s *StreamHandler) Debug(msg string) {
-	s.log(DebugLogLevel, msg)
+	s.log(Debug, msg)
 }
 
 func (s *StreamHandler) Info(msg string) {
-	s.log(InfoLogLevel, msg)
+	s.log(Informational, msg)
 }
 
 func (s *StreamHandler) Notice(msg string) {
-	s.log(NoticeLogLevel, msg)
+	s.log(Notice, msg)
 }
 
 func (s *StreamHandler) Warning(msg string) {
-	s.log(WarningLogLevel, msg)
+	s.log(Warning, msg)
 }
 
 func (s *StreamHandler) Error(msg string) {
-	s.log(ErrorLogLevel, msg)
+	s.log(Error, msg)
 }
 
 func (s *StreamHandler) Critical(msg string) {
-	s.log(CriticalLogLevel, msg)
+	s.log(Critical, msg)
 }
 
 func (s *StreamHandler) Alert(msg string) {
-	s.log(AlertLogLevel, msg)
+	s.log(Alert, msg)
 }
 
 func (s *StreamHandler) Emergency(msg string) {
-	s.log(EmergencyLogLevel, msg)
+	s.log(Emergency, msg)
 }
 
 func (s *StreamHandler) Close() {
@@ -418,14 +392,14 @@ func (s *StreamHandler) Close() {
 
 func (s *StreamHandler) String() string {
 	return fmt.Sprintf("StreamHandler: fmt=%q, lvl=%-10s\n",
-		s.Format(), s.Level())
+		s.Format(), s.Severity())
 }
 
 /*
  * NewStreamHandler - creates new stream handler
  */
-func NewStreamHandler(fmt string, lvl LogLevel) *StreamHandler {
-	return &StreamHandler{newLogHandler(fmt, lvl), os.Stdout}
+func NewStreamHandler(fmt string, sev Severity) *StreamHandler {
+	return &StreamHandler{newLogHandler(fmt, sev), os.Stdout}
 }
 
 /************************** SyslogHandler ***********************************/
@@ -441,10 +415,10 @@ type SyslogHandler struct {
 /*
  * SyslogHandler.log - sends a message to the wire using UDP port 514
  */
-func (s *SyslogHandler) log(level LogLevel, msg string) error {
-	if s.Level() >= level {
+func (s *SyslogHandler) log(level Severity, msg string) error {
+	if s.Severity() >= level {
 		s.Fac = FacLocal0
-		s.Sev = Severity(level)
+		s.Sev = level
 		s.Msg = fmt.Sprintf("%s %s", level.String(), msg)
 		t := time.Now()
 		s.SetTimestamp(t)
@@ -457,35 +431,35 @@ func (s *SyslogHandler) log(level LogLevel, msg string) error {
 }
 
 func (s *SyslogHandler) Debug(msg string) {
-	s.log(DebugLogLevel, msg)
+	s.log(Debug, msg)
 }
 
 func (s *SyslogHandler) Info(msg string) {
-	s.log(InfoLogLevel, msg)
+	s.log(Informational, msg)
 }
 
 func (s *SyslogHandler) Notice(msg string) {
-	s.log(NoticeLogLevel, msg)
+	s.log(Notice, msg)
 }
 
 func (s *SyslogHandler) Warning(msg string) {
-	s.log(WarningLogLevel, msg)
+	s.log(Warning, msg)
 }
 
 func (s *SyslogHandler) Error(msg string) {
-	s.log(ErrorLogLevel, msg)
+	s.log(Error, msg)
 }
 
 func (s *SyslogHandler) Critical(msg string) {
-	s.log(CriticalLogLevel, msg)
+	s.log(Critical, msg)
 }
 
 func (s *SyslogHandler) Alert(msg string) {
-	s.log(AlertLogLevel, msg)
+	s.log(Alert, msg)
 }
 
 func (s *SyslogHandler) Emergency(msg string) {
-	s.log(EmergencyLogLevel, msg)
+	s.log(Emergency, msg)
 }
 
 func (s *SyslogHandler) Close() {
@@ -494,13 +468,13 @@ func (s *SyslogHandler) Close() {
 
 func (s *SyslogHandler) String() string {
 	return fmt.Sprintf("SyslogHandler: fmt=%q, lvl=%-10s, Server=%q %s\n",
-		s.Format(), s.Level(), s.IP)
+		s.Format(), s.Severity(), s.IP)
 }
 
 /*
  * NewSyslogHandler - creates new syslog handler
  */
-func NewSyslogHandler(ip string, fmt string, lvl LogLevel) *SyslogHandler {
+func NewSyslogHandler(ip string, fmt string, sev Severity) *SyslogHandler {
 	//
-	return &SyslogHandler{newLogHandler(fmt, lvl), ip, NewSyslogMsg()}
+	return &SyslogHandler{newLogHandler(fmt, sev), ip, NewSyslogMsg()}
 }

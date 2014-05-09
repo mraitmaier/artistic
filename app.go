@@ -7,7 +7,7 @@ import (
     "fmt"
     "os"
     "runtime"
-    "errors"
+//    "errors"
     "path/filepath"
 //    "bitbucket.org/miranr/artistic/core"
     "bitbucket.org/miranr/artistic/utils"
@@ -40,6 +40,22 @@ type ArtisticApp struct {
 
     // a debug flag (only for testing purposes)
     Debug bool
+}
+
+func (a *ArtisticApp) createLogs() { createLog(a) }
+
+func (a *ArtisticApp) startWeb(path string) {
+
+    if err := webStart(path); err != nil {
+        a.Log.Error(err.Error())
+    }
+}
+
+func (a *ArtisticApp) HandleConfigFile(cfgfile string) error {
+
+    fmt.Printf("DEBUG config file: %q\n", cfgfile) // DEBUG
+
+    return nil
 }
 
 // Define working folder and create it, if it doesn't exist
@@ -83,6 +99,7 @@ func (a* ArtisticApp) Cleanup() {
     a.Log.Close()
 }
 
+/*
 func (a *ArtisticApp) Init() error {
 
     configfile := ""
@@ -113,7 +130,6 @@ func (a *ArtisticApp) Init() error {
     }
     a.Log.Notice("Connection to MongoDB established.")
 
-/*
     // handle CTRL-C signal and perform cleanup before app is terminated
     c := make(chan os.Signal, 1)
     signal.Notify(c, os.Interrupt)
@@ -123,7 +139,6 @@ func (a *ArtisticApp) Init() error {
         cleanup()
         os.Exit(0) // CTRL-C is clean exit for this app...
     }()
-    */
 
     // start web interface
     fmt.Println("Serving application on 'localhost:8088'...")
@@ -131,3 +146,4 @@ func (a *ArtisticApp) Init() error {
     webStart(DefWebRoot)
     return nil
 }
+    */

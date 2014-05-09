@@ -19,6 +19,7 @@ const (
 	Notice
 	Informational
 	Debug
+    UnknownSeverity
 )
 
 func (s Severity) String() string {

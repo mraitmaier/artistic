@@ -7,6 +7,7 @@ import (
     "os"
     "runtime"
     "fmt"
+    "errors"
     "bytes"
     "encoding/binary"
     "net/http"
@@ -54,7 +55,7 @@ func registerHandlers() {
 }
 
 // initializes and starts web server
-func webStart(wwwpath string) {
+func webStart(wwwpath string) error {
 
     aa.WebInfo = new(WebInfo)
 
@@ -63,8 +64,7 @@ func webStart(wwwpath string) {
 
     // check dir for session files and create it if needed
     if !checkSessDir("") {
-        aa.Log.Critical("Cannot create session folder; cannot continue...\n")
-        return
+        return errors.New("Cannot create session folder; cannot continue.")
     }
 
     // handle static files
@@ -83,6 +83,7 @@ func webStart(wwwpath string) {
     http.ListenAndServeTLS(":8088", "./web/static/cert.pem",
                            "./web/static/key.pem",
                            context.ClearHandler(http.DefaultServeMux))
+    return nil
 }
 
 func checkSessDir(path string) bool {
@@ -115,6 +116,7 @@ func cleanSessDir() bool {
     if aa.WebInfo.SessDir != "" {
         if err := os.RemoveAll(aa.WebInfo.SessDir); err != nil {
             aa.Log.Error(err.Error())
+            //aa.Log.SendMsg("error", err.Error())
             return status
         }
         status = true
@@ -183,6 +185,8 @@ func usersHandler(w http.ResponseWriter, r *http.Request) {
     users, err := getAllUsers()
     if err != nil {
         log.Error(fmt.Sprintf("Problem getting all users: %s", err.Error()))
+        //log.SendMsg("error", 
+        //            fmt.Sprintf("Problem getting all users: %s", err.Error()))
         http.Redirect(w, r, "error404", http.StatusFound)
         return
     }
@@ -226,6 +230,8 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
                 log.Error(err.Error())
             }
             log.Alert(fmt.Sprintf("User %q NOT authenticated.\n", u.Username))
+            //log.SendMsg("alert",
+            //            fmt.Sprintf("User %q NOT authenticated.\n", u.Username))
         }
 
         // if authenticated, redirect to index page; otherwise display login
@@ -233,11 +239,13 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
             http.Redirect(w, r, "index",  http.StatusFound)
         }
         log.Info(fmt.Sprintf("User %q authenticated, OK.\n", u.Username))
+        //log.SendMsg("info", 
+        //            fmt.Sprintf("User %q authenticated, OK.\n", u.Username))
 
     // when HTTP GET is received, just display the default login template
     case "GET":
         if err := templates.ExecuteTemplate(w, "login", nil); err != nil {
-            log.Error("")
+            log.Error("Cannot render the 'login' page.")
         }
     }
 }
