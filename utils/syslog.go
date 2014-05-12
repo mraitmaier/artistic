@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net"
 	"time"
+    "strings"
 )
 
 type Severity int
@@ -46,6 +47,32 @@ func (s Severity) String() string {
 	return ""
 }
 
+// Converts log level given as string into proper Severity value.
+// If invalid string is given, function returns 'UnknownSeverity' value.
+func SeverityFromString(lvl string) Severity {
+    loglvl := UnknownSeverity
+    switch strings.ToUpper(lvl) {
+    case "EMERGENCY":
+        loglvl = Emergency
+    case "ALERT":
+        loglvl = Alert
+    case "CRITICAL":
+        loglvl = Critical
+    case "ERROR":
+        loglvl = Error
+    case "WARNING":
+        loglvl = Warning
+    case "NOTICE":
+        loglvl = Notice
+    case "INFO":
+        loglvl = Informational
+    case "DEBUG":
+        loglvl = Debug
+    }
+    return loglvl
+}
+
+//
 type Facility int
 
 const (
