@@ -244,13 +244,14 @@ func (f *FileHandler) write(sev Severity, msg string) {
 
 // Close the file handler
 func (f *FileHandler) Close() {
-	if f.file != nil { f.file.Close() }
 
     // send a signal to quit goroutine
     if f.stop != nil {
         close(f.logHandler.msgch)
         f.stop <- 1
     }
+
+	if f.file != nil { f.file.Close() }
 }
 
 func (f *FileHandler) String() string {
@@ -270,17 +271,16 @@ func (f *FileHandler) Send(sev Severity, msg string) {
 func (f *FileHandler) Start() error {
     // open logger channels 
     f.logHandler.msgch = make(chan *logmsg, 10)  // message channel (buffered)
-    f.logHandler.stop  = make(chan int)          // stop channel
-
+    f.logHandler.stop  = make(chan int, 1)          // stop channel
     // now start a new goroutine
     go func(f *FileHandler) {
 
         for {
             select {
             // when message is received over channel, write it
-            case m :=<-f.logHandler.msgch:
-                //fmt.Printf("DEBUG, logger: msg=%v\n", m) // DEBUG
-                f.write(m.sev, m.msg)
+            case m, ok :=<-f.logHandler.msgch:
+                //fmt.Printf("DEBUG, file logger: msg=%v\n", m) // DEBUG
+                if ok { f.write(m.sev, m.msg) }
 
             // when data is received over stop channel, just exit the goroutine
             case <- f.logHandler.stop:
@@ -340,7 +340,7 @@ func (s *StreamHandler) Start() error {
 
     // open logger channels 
     s.logHandler.msgch = make(chan *logmsg, 10)  // message channel (buffered)
-    s.logHandler.stop  = make(chan int)          // stop channel
+    s.logHandler.stop  = make(chan int, 1)       // stop channel
 
     // now start a new goroutine
     go func(s *StreamHandler) {
@@ -349,9 +349,9 @@ func (s *StreamHandler) Start() error {
             select {
 
             // when message is received over channel, write it
-            case m := <-s.logHandler.msgch:
+            case m, ok := <-s.logHandler.msgch:
                 //fmt.Printf("DEBUG, logger: msg=%v\n", m) // DEBUG
-                s.write(m.sev, m.msg)
+                if ok { s.write(m.sev, m.msg) }
 
             // when data is received over stop channel, just exit the goroutine
             case <- s.logHandler.stop:
@@ -424,7 +424,7 @@ func (s *SyslogHandler) Start() error {
 
     // open logger channels 
     s.logHandler.msgch = make(chan *logmsg, 10)  // message channel (buffered)
-    s.logHandler.stop  = make(chan int)          // stop channel
+    s.logHandler.stop  = make(chan int, 1)          // stop channel
 
     // now start a new goroutine
     go func(s *SyslogHandler) {
@@ -433,8 +433,8 @@ func (s *SyslogHandler) Start() error {
             select {
 
             // when message is received over channel, write it
-            case m := <-s.logHandler.msgch:
-                s.write(m.sev, m.msg)
+            case m, ok := <-s.logHandler.msgch:
+                if ok { s.write(m.sev, m.msg) }
 
             // when data is received over stop channel, just exit the goroutine
             case <- s.logHandler.stop:
