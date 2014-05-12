@@ -53,6 +53,25 @@ func parseArgs(ac *ArtisticApp, cfgfile *string) {
     flag.Parse()
 }
 
+// Cleanup oprocedure when app is terminated.
+func Cleanup() {
+
+    fmt.Println("DEBUG, cleaup method run.") // DEBUG
+    // close the DB connection
+    if aa.DbSess != nil {
+        db.Close(aa.DbSess)
+        aa.Log.Notice("Connection to MongoDb closed.")
+    }
+
+    // clean the sessions directory
+    cleanSessDir()
+    aa.Log.Info("Sessions folder deleted.")
+
+    // close the log
+    aa.Log.Info("Closing log.")
+    aa.Log.Close()
+}
+
 func main () {
 
     configfile := ""
@@ -75,7 +94,7 @@ func main () {
     aa.createLogs()
 
     // deferring the the cleanup procedure when app is terminated normally
-    defer aa.Cleanup()
+    defer Cleanup()
 
     var err error
     // connect to MongoDB (FIXME: currently hardcoded, should be read from 
@@ -83,22 +102,19 @@ func main () {
     url := db.CreateUrl("localhost", 27017, "artistic", "artistic", "artistic")
     if aa.DbSess, err = db.Connect(url, DatabaseTimeout); err != nil {
         aa.Log.Critical("Connection to MongoDB cannot be established.")
-        //aa.Log.SendMsg("error","Connection to MongoDB cannot be established.")
         fmt.Println("Connection to MongoDB cannot be established.")
         fmt.Println("Exiting...")
         return
     }
-    aa.Log.Notice("Connection to MongoDB established.")
-    //aa.Log.SendMsg("info", "Connection to MongoDB established.")
+    aa.Log.Info("Connection to MongoDB established.")
 
-    // handle CTRL-C signal and perform cleanup before app is terminated
+    // catch CTRL-C signal and perform cleanup before app is terminated
     c := make(chan os.Signal, 1)
     signal.Notify(c, os.Interrupt)
     go func() {
         <-c
         fmt.Println("DEBUG: Received a CTRL-C signal to terminate.") // DEBUG
         aa.Log.Info("Received a CTRL-C signal to terminate.")
-        //aa.Log.SendMsg("info", "Received a CTRL-C signal to terminate.")
         aa.Cleanup()
         os.Exit(0) // CTRL-C is clean exit for this app...
     }()
@@ -106,6 +122,7 @@ func main () {
     // start web interface
     fmt.Println("Serving application on 'localhost:8088'...")
     aa.Log.Info("Serving application on 'localhost:8088'...")
-    //aa.Log.SendMsg("info", "Serving application on 'localhost:8088'...")
-    aa.startWeb(DefWebRoot)
+    if err = aa.startWeb(DefWebRoot); err != nil {
+        aa.Log.Error(err.Error())
+    }
 }

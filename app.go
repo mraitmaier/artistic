@@ -7,6 +7,7 @@ import (
     "fmt"
     "os"
     "runtime"
+//    "time"
 //    "errors"
     "path/filepath"
 //    "bitbucket.org/miranr/artistic/core"
@@ -14,6 +15,8 @@ import (
     "bitbucket.org/miranr/artistic/db"
     "labix.org/v2/mgo"
 )
+
+//var cleanupTime = time.Second * 1
 
 type ArtisticApp struct {
 
@@ -44,12 +47,7 @@ type ArtisticApp struct {
 
 func (a *ArtisticApp) createLogs() { createLog(a) }
 
-func (a *ArtisticApp) startWeb(path string) {
-
-    if err := webStart(path); err != nil {
-        a.Log.Error(err.Error())
-    }
-}
+func (a *ArtisticApp) startWeb(path string) error { return webStart(path) }
 
 func (a *ArtisticApp) HandleConfigFile(cfgfile string) error {
 

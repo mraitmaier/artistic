@@ -116,7 +116,6 @@ func cleanSessDir() bool {
     if aa.WebInfo.SessDir != "" {
         if err := os.RemoveAll(aa.WebInfo.SessDir); err != nil {
             aa.Log.Error(err.Error())
-            //aa.Log.SendMsg("error", err.Error())
             return status
         }
         status = true
