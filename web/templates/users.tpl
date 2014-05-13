@@ -25,7 +25,7 @@
   </head>
 
   <body>
-    {{template "navbar"}}
+    {{template "navbar" .User.Username}}
 
     <div class="container-fluid">
 
@@ -40,7 +40,7 @@
         <div class="col-md-10" id="data-list">
             <h1 id="data-list-header">Users</h1>
 
-            <p> {{template "user-list" .}}</p>
+            <p> {{template "user-list" .Users}}</p>
         </div>
 
     </div> <!-- row -->

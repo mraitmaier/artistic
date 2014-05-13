@@ -8,8 +8,8 @@ import (
     "runtime"
     "fmt"
     "errors"
-    "bytes"
-    "encoding/binary"
+//    "bytes"
+//    "encoding/binary"
     "net/http"
     "path/filepath"
     "html/template"
@@ -17,7 +17,7 @@ import (
  //   "labix.org/v2/mgo"
     "github.com/gorilla/sessions"
     "github.com/gorilla/context"
-//    "bitbucket.org/miranr/artistic/utils"
+    "bitbucket.org/miranr/artistic/utils"
     dbase "bitbucket.org/miranr/artistic/db"
 )
 
@@ -125,31 +125,30 @@ func cleanSessDir() bool {
 // user admin page handler
 func err404Handler(w http.ResponseWriter, r *http.Request) {
 
-/* this is currently not needed yet...
-    if userIsAuthenticated(r) {
-        if err := templates.ExecuteTemplate(w, "users", nil); err != nil {
+    if loggedin, user := userIsAuthenticated(r); loggedin {
+
+        // render the page
+        if err := templates.ExecuteTemplate(w, "error404", user); err != nil {
+            aa.Log.Error("Error rendering the '404' page.")
         }
+
     } else {
         http.Redirect(w, r, "login",  http.StatusFound)
-    }
-*/
-    // render the page
-    if err := templates.ExecuteTemplate(w, "error404", nil); err != nil {
     }
 }
 
 // user admin page handler
 func logoutHandler(w http.ResponseWriter, r *http.Request) {
 
-    if userIsAuthenticated(r) {
+    if loggedin, user := userIsAuthenticated(r); loggedin {
 
         log := aa.Log
 
         // render the page
-        if name, err := logout(w, r); err != nil {
+        if err := logout(w, r); err != nil {
            log.Error(err.Error())
         } else {
-            log.Info(fmt.Sprintf("Logging out user %q.", name))
+            log.Info(fmt.Sprintf("Logging out user %q.", user))
         }
     }
     http.Redirect(w, r, "login",  http.StatusFound)
@@ -159,16 +158,17 @@ func logoutHandler(w http.ResponseWriter, r *http.Request) {
 // license page handler
 func licenseHandler(w http.ResponseWriter, r *http.Request) {
 
-/* this is currently not needed yet...
-    if userIsAuthenticated(r) {
-        if err := templates.ExecuteTemplate(w, "users", nil); err != nil {
+    if loggedin, user := userIsAuthenticated(r); loggedin {
+
+        log := aa.Log
+
+        // render the page
+        if err := templates.ExecuteTemplate(w, "license", user); err != nil {
+            log.Error("Cannot render the 'license' page.")
         }
+
     } else {
         http.Redirect(w, r, "login",  http.StatusFound)
-    }
-*/
-    // render the page
-    if err := templates.ExecuteTemplate(w, "license", nil); err != nil {
     }
 }
 
@@ -176,9 +176,7 @@ func licenseHandler(w http.ResponseWriter, r *http.Request) {
 // Index (home) page handler
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 
-    if userIsAuthenticated(r) {
-
-        user := getUser(r)
+    if loggedin, user := userIsAuthenticated(r); loggedin {
 
         if err := templates.ExecuteTemplate(w, "index", user); err != nil {
         }
@@ -191,30 +189,37 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 // user admin page handler
 func usersHandler(w http.ResponseWriter, r *http.Request) {
 
-    log := aa.Log
-/* this is currently not needed yet...
-    if userIsAuthenticated(r) {
-        if err := templates.ExecuteTemplate(w, "users", nil); err != nil {
+    if loggedin, user := userIsAuthenticated(r); loggedin {
+
+        log := aa.Log
+
+        // get all users from DB
+        users, err := dbase.MongoGetAllUsers(aa.DbSess.DB("artistic"))
+        if err != nil {
+            log.Error(fmt.Sprintf("Problem getting all users: %s", err.Error()))
+            http.Redirect(w, r, "error404", http.StatusFound)
+            return
         }
+
+/*
+        for _, val := range users {
+            fmt.Printf("User: %s\n", val.String()) // DEBUG
+        }
+*/
+        // create temp struct variable to be sent to page template
+        web := new(struct{ User *utils.User
+                           Users []utils.User })
+        web.User = user
+        web.Users = users
+
+        // render the page
+        //if err := templates.ExecuteTemplate(w, "users", users); err != nil {
+        if err := templates.ExecuteTemplate(w, "users", web); err != nil {
+            log.Error("Cannot render the 'users' page.")
+        }
+
     } else {
         http.Redirect(w, r, "login.html",  http.StatusFound)
-    }
-*/
-
-    // get all users from DB
-    users, err := dbase.MongoGetAllUsers(aa.DbSess.DB("artistic"))
-    if err != nil {
-        log.Error(fmt.Sprintf("Problem getting all users: %s", err.Error()))
-        http.Redirect(w, r, "error404", http.StatusFound)
-        return
-    }
-
-    for _, val := range users {
-        fmt.Printf("User: %s\n", val.String()) // DEBUG
-    }
-
-    // render the page
-    if err := templates.ExecuteTemplate(w, "users", users); err != nil {
     }
 }
 
@@ -260,10 +265,12 @@ func faviconHandler(w http.ResponseWriter, r *http.Request) {
     http.ServeFile(w, r, "/static/favicon.ico")
 }
 
+/*
 // Converts 64-bit integer value into byte buffer.
 func int64ToBytes(i int64) []byte {
     buf := new(bytes.Buffer)
     binary.Write(buf, binary.LittleEndian, i)
     return buf.Bytes()
 }
+*/
 

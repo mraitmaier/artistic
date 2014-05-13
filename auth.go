@@ -10,6 +10,9 @@ import (
     "path/filepath"
     "math/rand"
     "crypto/sha512"
+    "bytes"
+    "encoding/binary"
+    "time"
 //    "labix.org/v2/mgo/bson"
  //   "labix.org/v2/mgo"
     "bitbucket.org/miranr/artistic/utils"
@@ -55,13 +58,15 @@ func authenticateUser(u, p string,
     return false, nil // no error, but passwords do not match
 }
 
-func logout(w http.ResponseWriter, r *http.Request) (string, error) {
+func logout(w http.ResponseWriter, r *http.Request) error {
 
     // get current session data; retrieve session ID
     s, err := store.Get(r, "artistic")
-    if err != nil { return "", err }
+    if err != nil {
+        return err
+    }
     id := s.Values["sessid"].(string) // get session ID
-    name := s.Values["user"].(string) // get username
+ //   name := s.Values["user"].(string) // get username
 
     // user has a unique session ID and there should be the file with this ID
     // in the sessions folder. 
@@ -75,37 +80,46 @@ func logout(w http.ResponseWriter, r *http.Request) (string, error) {
         delete(s.Values, "sessid")
         s.Save(r, w)
     }
-    return name, nil
+    return nil
 }
 
 // check if user is already authenticated 
-func userIsAuthenticated(r *http.Request) bool {
+func userIsAuthenticated(r *http.Request) (bool, *utils.User) {
 
     s, err := store.Get(r, "artistic")
     if err != nil {
-        return false
+        return false, nil
     }
-
-    //fmt.Printf("DEBUG Session: %v\n", s) // DEBUG
 
     // get a session ID 
     id := s.Values["sessid"]
 
     f := filepath.Join(aa.WebInfo.SessDir, id.(string))
     if utils.FileExists(f) {
-        return true
+
+        // get user information
+        user, err := db.MongoGetUser(aa.DbSess.DB("artistic"),
+                                  s.Values["user"].(string))
+        if  err != nil { // something is not OK...
+            return false, nil
+        }
+
+        return true, user
     }
-    return false
+    return false, nil
 }
 
+/*
 // get a User instance for current session
 func getUser(r *http.Request) *utils.User {
+
     s, err := store.Get(r, "artistic")
     if err != nil { return nil }
 
     _db := aa.DbSess.DB("artistic")
     u, err := db.MongoGetUser(_db, s.Values["user"].(string))
     if err != nil { return nil }
+
     return u
 }
 
@@ -117,11 +131,13 @@ func getUsername(r *http.Request) string {
 
     return s.Values["user"].(string)
 }
+*/
 
 // generate unique session ID; return it as string
 func newSessId() string {
 
-    // generate pseudo-random int64
+    // generate pseudo-random int64, seed is current time in nanoseconds 
+    rand.Seed(time.Now().UnixNano())
     num := rand.Int63()
 
     // now hash the random int64 value with SHA512
@@ -130,3 +146,9 @@ func newSessId() string {
     return fmt.Sprintf("%x", hash)
 }
 
+// Converts 64-bit integer value into byte buffer.
+func int64ToBytes(i int64) []byte {
+    buf := new(bytes.Buffer)
+    binary.Write(buf, binary.LittleEndian, i)
+    return buf.Bytes()
+}
