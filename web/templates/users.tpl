@@ -86,10 +86,12 @@
                             title="View details">
                     <span class="glyphicon glyphicon-eye-open"></span>
                 </a>
+                &nbsp;
                 <a href="#" data-toggle="tooltip" data-placement="left" 
                             title="Edit">
                     <span class="glyphicon glyphicon-cog" ></span>
                 </a>
+                &nbsp;
                 <a href="#" data-toggle="tooltip" data-placement="left" 
                             title="Delete">
                     <span class="glyphicon glyphicon-trash"></span>

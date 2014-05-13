@@ -201,11 +201,11 @@ func usersHandler(w http.ResponseWriter, r *http.Request) {
             return
         }
 
-/*
+// DEBUG
         for _, val := range users {
             fmt.Printf("User: %s\n", val.String()) // DEBUG
         }
-*/
+
         // create temp struct variable to be sent to page template
         web := new(struct{ User *utils.User
                            Users []utils.User })
@@ -213,7 +213,6 @@ func usersHandler(w http.ResponseWriter, r *http.Request) {
         web.Users = users
 
         // render the page
-        //if err := templates.ExecuteTemplate(w, "users", users); err != nil {
         if err := templates.ExecuteTemplate(w, "users", web); err != nil {
             log.Error("Cannot render the 'users' page.")
         }

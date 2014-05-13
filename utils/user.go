@@ -21,7 +21,7 @@ type User struct {
 	Username  string // username 
 	Password  string // password (should always be hashed, use CreateUser()! ) 
 	Name      string // full name
-    role      string // user role, limited to (guest, user, admin)
+    Role      string // user role, limited to (guest, user, admin)
 	Email     string // e-mail address
 }
 
@@ -30,7 +30,7 @@ var AllowedRoles = []string{"admin", "user", "guest"}
 
 // String representation of the User 
 func (u *User) String() (s string) {
-	s = fmt.Sprintf("%s [%s]: %s %q", u.Username, u.Email, u.Password, u.role)
+	s = fmt.Sprintf("%s [%s]: %s %q", u.Username, u.Email, u.Password, u.Role)
 	return s
 }
 
@@ -46,7 +46,7 @@ func (u *User) Json() (string, error) {
 // Handle roles for users, since this is a bit tricky, we don't allowed direct
 // management of roles, but via method that automates procedure and does some
 // basic error checking.
-func (u *User) Role(role string) error {
+func (u *User) SetRole(role string) error {
 
     role = strings.ToLower(role)
 
@@ -54,15 +54,12 @@ func (u *User) Role(role string) error {
 
     for _, r := range AllowedRoles {
         if role == r {
-            u.role = role
+            u.Role = role
             return nil
         }
     }
     return errors.New("User role value not valid.")
 }
-
-// Since we don't allow direct manipulation of roles, we need a getter method.
-func (u *User) GetRole() string { return u.role }
 
 // Create a new user with username, password and role as mandatory information.
 // This one is used to create a non-existing user (in some sort of DB), so role
@@ -71,7 +68,7 @@ func CreateNewUser(username, password, role string) (*User, error) {
 	p := new(Password)
 	p.Set(password)
     u := &User{username, p.Get(), "", "user", ""}
-    if err := u.Role(role); err != nil { return nil, err }
+    if err := u.SetRole(role); err != nil { return nil, err }
 	return u, nil
 }
 
