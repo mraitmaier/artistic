@@ -130,7 +130,7 @@ func (a *ArtisticApp) Init() error {
 
     // handle CTRL-C signal and perform cleanup before app is terminated
     c := make(chan os.Signal, 1)
-    signal.Notify(c, os.Interrupt)
+    signal.Notify(c, os.Interrupt, os.Kill)
     go func() {
         <-c
         ac.log.Info("Received a CTRL-C signal to terminate.")
