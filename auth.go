@@ -10,7 +10,7 @@ import (
     "path/filepath"
     "math/rand"
     "crypto/sha512"
-    "labix.org/v2/mgo/bson"
+//    "labix.org/v2/mgo/bson"
  //   "labix.org/v2/mgo"
     "bitbucket.org/miranr/artistic/utils"
     "bitbucket.org/miranr/artistic/db"
@@ -25,14 +25,10 @@ func authenticateUser(u, p string,
 //    fmt.Printf("DEBUG: session ID=%q\n", id) // DEBUG
 
     // get information from DB
-    userdb := utils.CreateUser("", "")
-    query := bson.M{ "username" : u }
-    err := aa.DbSess.DB("artistic").C("users").Find(query).One(userdb)
+    userdb, err := db.MongoGetUser(aa.DbSess.DB("artistic"), u)
     if err != nil {
-        //fmt.Printf("ERROR: user=%s\n", u.String()) // DEBUG
         return false, err
     }
-//    fmt.Printf("DEBUG: user=%s\n", userdb.String()) // DEBUG
 
     // if passwords match....
     if utils.ComparePasswords(userdb.Password, p) {
@@ -45,8 +41,9 @@ func authenticateUser(u, p string,
 
         // create a new file in sessions folder to indicate valid session; 
         // we don't care about the descriptor
-        _, err = os.Create(filepath.Join(aa.WebInfo.SessDir, id))
+        f, err := os.Create(filepath.Join(aa.WebInfo.SessDir, id))
         if err != nil { return false, err }
+        f.Close()
 
         // save the session data
         s.Save(r, w)
@@ -58,23 +55,27 @@ func authenticateUser(u, p string,
     return false, nil // no error, but passwords do not match
 }
 
-//func logout(u *utils.User, r *http.Request) error {
-func logout(r *http.Request) error {
+func logout(w http.ResponseWriter, r *http.Request) (string, error) {
 
     // get current session data; retrieve session ID
     s, err := store.Get(r, "artistic")
-    if err != nil { return err }
-    id := s.Values["sessid"]
+    if err != nil { return "", err }
+    id := s.Values["sessid"].(string) // get session ID
+    name := s.Values["user"].(string) // get username
 
     // user has a unique session ID and there should be the file with this ID
     // in the sessions folder. 
     // Delete it, if it exists. 
     // If it doesn't exist, there's probably something wrong: do nothing.
-    f := filepath.Join(aa.WebInfo.SessDir, id.(string))
+    f := filepath.Join(aa.WebInfo.SessDir, id)
     if utils.FileExists(f) {
         os.Remove(f)
+        // remove values from session and save
+        delete(s.Values, "user")
+        delete(s.Values, "sessid")
+        s.Save(r, w)
     }
-    return nil
+    return name, nil
 }
 
 // check if user is already authenticated 
@@ -85,7 +86,7 @@ func userIsAuthenticated(r *http.Request) bool {
         return false
     }
 
-    fmt.Printf("DEBUG Session: %v\n", s) // DEBUG
+    //fmt.Printf("DEBUG Session: %v\n", s) // DEBUG
 
     // get a session ID 
     id := s.Values["sessid"]

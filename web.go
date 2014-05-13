@@ -38,9 +38,6 @@ var (
 
     // global var holding the web session data
     store = sessions.NewCookieStore([]byte(sessKey))
-
-    // aux DB type instance
-    //DB = aa.dbsess.DB("artistic")
 )
 
 // register web page handler functions
@@ -144,22 +141,18 @@ func err404Handler(w http.ResponseWriter, r *http.Request) {
 // user admin page handler
 func logoutHandler(w http.ResponseWriter, r *http.Request) {
 
-    log := aa.Log
-/* this is currently not needed yet...
     if userIsAuthenticated(r) {
-        if err := templates.ExecuteTemplate(w, "users", nil); err != nil {
+
+        log := aa.Log
+
+        // render the page
+        if name, err := logout(w, r); err != nil {
+           log.Error(err.Error())
+        } else {
+            log.Info(fmt.Sprintf("Logging out user %q.", name))
         }
-    } else {
-        http.Redirect(w, r, "login",  http.StatusFound)
     }
-*/
-    // render the page
-    if err := logout(r); err != nil {
-    } else {
-        log.Info("Logging out user.")
-        //templates.ExecuteTemplate(w, "login", nil)
-        http.Redirect(w, r, "login", http.StatusFound)
-    }
+    http.Redirect(w, r, "login",  http.StatusFound)
 }
 
 
