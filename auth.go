@@ -13,10 +13,11 @@ import (
     "labix.org/v2/mgo/bson"
  //   "labix.org/v2/mgo"
     "bitbucket.org/miranr/artistic/utils"
+    "bitbucket.org/miranr/artistic/db"
 )
 
 // authenticate the user with given username and password
-func authenticateUser(u *utils.User,
+func authenticateUser(u, p string,
                       w http.ResponseWriter, r *http.Request) (bool, error) {
 
     // create new session ID
@@ -24,36 +25,41 @@ func authenticateUser(u *utils.User,
 //    fmt.Printf("DEBUG: session ID=%q\n", id) // DEBUG
 
     // get information from DB
-    query := bson.M{ "username" : u.Username }
-    err := aa.DbSess.DB("artistic").C("users").Find(query).One(u)
+    userdb := utils.CreateUser("", "")
+    query := bson.M{ "username" : u }
+    err := aa.DbSess.DB("artistic").C("users").Find(query).One(userdb)
     if err != nil {
-fmt.Printf("ERROR: user=%s\n", u.String()) // DEBUG
+        //fmt.Printf("ERROR: user=%s\n", u.String()) // DEBUG
         return false, err
-    //if cnt, err := ac.dbsess.DB("artistic").C("users").Count(); err != nil {
-    //if err := db.C("users").Find(bson.D{}).All(&u); err != nil {
-    //    fmt.Printf("DEBUG count=%d\n", cnt)
-    //} else {
-    //    fmt.Printf("DEBUG found user=%v\n", u) // DEBUG
     }
-    fmt.Printf("DEBUG: user=%s\n", u.String()) // DEBUG
+//    fmt.Printf("DEBUG: user=%s\n", userdb.String()) // DEBUG
 
-    // get current session data; will create new session with given random ID
-    s, err := store.Get(r, "artistic")
-    if err != nil { return false, err }
-    s.Values["sessid"] = id
+    // if passwords match....
+    if utils.ComparePasswords(userdb.Password, p) {
 
-    // create a new file in sessions folder to indicate valid session; we don't
-    // care about the descriptor
-    _, err = os.Create(filepath.Join(aa.WebInfo.SessDir, id))
-    if err != nil { return false, err }
+        // get current session data; create new session with given random ID
+        s, err := store.Get(r, "artistic")
+        if err != nil { return false, err }
+        s.Values["sessid"] = id
+        s.Values["user"] = u
 
-    // save the session data
-    s.Save(r, w)
+        // create a new file in sessions folder to indicate valid session; 
+        // we don't care about the descriptor
+        _, err = os.Create(filepath.Join(aa.WebInfo.SessDir, id))
+        if err != nil { return false, err }
 
-    return true, nil
+        // save the session data
+        s.Save(r, w)
+
+        fmt.Printf("DEBUG creating Session: %v\n", s) // DEBUG
+
+        return true, nil
+    }
+    return false, nil // no error, but passwords do not match
 }
 
-func logout(u *utils.User, r *http.Request) error {
+//func logout(u *utils.User, r *http.Request) error {
+func logout(r *http.Request) error {
 
     // get current session data; retrieve session ID
     s, err := store.Get(r, "artistic")
@@ -74,16 +80,41 @@ func logout(u *utils.User, r *http.Request) error {
 // check if user is already authenticated 
 func userIsAuthenticated(r *http.Request) bool {
 
-    s, err := store.Get(r, "session")
+    s, err := store.Get(r, "artistic")
     if err != nil {
+        return false
     }
 
-    // get a session ID 
-    sessid := s.Values["session-id"]
-    fmt.Printf("Session ID: %v\n", sessid)
+    fmt.Printf("DEBUG Session: %v\n", s) // DEBUG
 
-    //return false
-    return true
+    // get a session ID 
+    id := s.Values["sessid"]
+
+    f := filepath.Join(aa.WebInfo.SessDir, id.(string))
+    if utils.FileExists(f) {
+        return true
+    }
+    return false
+}
+
+// get a User instance for current session
+func getUser(r *http.Request) *utils.User {
+    s, err := store.Get(r, "artistic")
+    if err != nil { return nil }
+
+    _db := aa.DbSess.DB("artistic")
+    u, err := db.MongoGetUser(_db, s.Values["user"].(string))
+    if err != nil { return nil }
+    return u
+}
+
+// get a username for current session
+func getUsername(r *http.Request) string {
+
+    s, err := store.Get(r, "artistic")
+    if err != nil { return "Error!" }
+
+    return s.Values["user"].(string)
 }
 
 // generate unique session ID; return it as string

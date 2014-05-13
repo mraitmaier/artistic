@@ -71,9 +71,9 @@
           </ul>
         </li>
     -->
-        <li><p class="navbar-text">Logged in as admin</p></li>
+        <li><p class="navbar-text">Logged in as {{.}}</p></li>
         <li>
-            <a href="#"
+            <a href="logout"
                data-toggle="tooltip" data-placement="left" title="Logout">
                 <span class="glyphicon glyphicon-log-out"></span>
             </a>

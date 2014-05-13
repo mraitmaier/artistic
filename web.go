@@ -13,11 +13,12 @@ import (
     "net/http"
     "path/filepath"
     "html/template"
-    "labix.org/v2/mgo/bson"
+//    "labix.org/v2/mgo/bson"
  //   "labix.org/v2/mgo"
     "github.com/gorilla/sessions"
     "github.com/gorilla/context"
-    "bitbucket.org/miranr/artistic/utils"
+//    "bitbucket.org/miranr/artistic/utils"
+    dbase "bitbucket.org/miranr/artistic/db"
 )
 
 type WebInfo struct {
@@ -47,6 +48,7 @@ func registerHandlers() {
 
     http.HandleFunc("/", indexHandler)
     http.HandleFunc("/login", loginHandler)
+    http.HandleFunc("/logout", logoutHandler)
     http.HandleFunc("/index", indexHandler)
     http.HandleFunc("/users", usersHandler)
     http.HandleFunc("/error404", err404Handler)
@@ -139,6 +141,28 @@ func err404Handler(w http.ResponseWriter, r *http.Request) {
     }
 }
 
+// user admin page handler
+func logoutHandler(w http.ResponseWriter, r *http.Request) {
+
+    log := aa.Log
+/* this is currently not needed yet...
+    if userIsAuthenticated(r) {
+        if err := templates.ExecuteTemplate(w, "users", nil); err != nil {
+        }
+    } else {
+        http.Redirect(w, r, "login",  http.StatusFound)
+    }
+*/
+    // render the page
+    if err := logout(r); err != nil {
+    } else {
+        log.Info("Logging out user.")
+        //templates.ExecuteTemplate(w, "login", nil)
+        http.Redirect(w, r, "login", http.StatusFound)
+    }
+}
+
+
 // license page handler
 func licenseHandler(w http.ResponseWriter, r *http.Request) {
 
@@ -160,8 +184,12 @@ func licenseHandler(w http.ResponseWriter, r *http.Request) {
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 
     if userIsAuthenticated(r) {
-        if err := templates.ExecuteTemplate(w, "index", nil); err != nil {
+
+        user := getUser(r)
+
+        if err := templates.ExecuteTemplate(w, "index", user); err != nil {
         }
+
     } else {
         http.Redirect(w, r, "login",  http.StatusFound)
     }
@@ -181,11 +209,9 @@ func usersHandler(w http.ResponseWriter, r *http.Request) {
 */
 
     // get all users from DB
-    users, err := getAllUsers()
+    users, err := dbase.MongoGetAllUsers(aa.DbSess.DB("artistic"))
     if err != nil {
         log.Error(fmt.Sprintf("Problem getting all users: %s", err.Error()))
-        //log.SendMsg("error", 
-        //            fmt.Sprintf("Problem getting all users: %s", err.Error()))
         http.Redirect(w, r, "error404", http.StatusFound)
         return
     }
@@ -203,11 +229,6 @@ func usersHandler(w http.ResponseWriter, r *http.Request) {
 // login page handler - we must authenticate user 
 func loginHandler(w http.ResponseWriter, r *http.Request) {
 
-//    s, err := store.Get(r, "session")
-//    if err != nil {
-//    }
-    //fmt.Printf("DEBUG DB=%v\n", DB) // DEBUG
-
     log := aa.Log // get logger instance
 
     switch r.Method {
@@ -218,28 +239,21 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
         user := r.FormValue("username")
         pwd := r.FormValue("password")
 
-        // create new user instance
-        u := utils.CreateUser(user, pwd)
-
         // authenticate user
-        log.Info(fmt.Sprintf("Trying to authenticate user %q...\n", u.Username))
-        status, err := authenticateUser(u, w, r)
-        if !status && err != nil {
+        log.Info(fmt.Sprintf("Trying to authenticate user %q...\n", user))
+        status, err := authenticateUser(user, pwd, w, r)
+        if !status || err != nil {
             if err = templates.ExecuteTemplate(w, "login", nil); err != nil {
                 log.Error(err.Error())
             }
-            log.Alert(fmt.Sprintf("User %q NOT authenticated.\n", u.Username))
-            //log.SendMsg("alert",
-            //            fmt.Sprintf("User %q NOT authenticated.\n", u.Username))
+            log.Alert(fmt.Sprintf("User %q NOT authenticated.\n", user))
         }
 
         // if authenticated, redirect to index page; otherwise display login
         if status {
             http.Redirect(w, r, "index",  http.StatusFound)
         }
-        log.Info(fmt.Sprintf("User %q authenticated, OK.\n", u.Username))
-        //log.SendMsg("info", 
-        //            fmt.Sprintf("User %q authenticated, OK.\n", u.Username))
+        log.Info(fmt.Sprintf("User %q authenticated, OK.\n", user))
 
     // when HTTP GET is received, just display the default login template
     case "GET":
@@ -258,21 +272,5 @@ func int64ToBytes(i int64) []byte {
     buf := new(bytes.Buffer)
     binary.Write(buf, binary.LittleEndian, i)
     return buf.Bytes()
-}
-
-// retrieves all users from DoB
-func getAllUsers() ([]utils.User, error) {
-
-    db := aa.DbSess.DB("artistic")
-
-    // prepare the empty slice for users
-    u := make([]utils.User, 0)
-
-    // get all users from DB
-    if err := db.C("users").Find(bson.D{}).All(&u); err != nil {
-        return nil, err
-    }
-
-    return u, nil
 }
 

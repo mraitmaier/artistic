@@ -53,25 +53,6 @@ func parseArgs(ac *ArtisticApp, cfgfile *string) {
     flag.Parse()
 }
 
-// Cleanup oprocedure when app is terminated.
-func Cleanup() {
-
-    fmt.Println("DEBUG, cleaup method run.") // DEBUG
-    // close the DB connection
-    if aa.DbSess != nil {
-        db.Close(aa.DbSess)
-        aa.Log.Notice("Connection to MongoDb closed.")
-    }
-
-    // clean the sessions directory
-    cleanSessDir()
-    aa.Log.Info("Sessions folder deleted.")
-
-    // close the log
-    aa.Log.Info("Closing log.")
-    aa.Log.Close()
-}
-
 func main () {
 
     configfile := ""
@@ -94,7 +75,7 @@ func main () {
     aa.createLogs()
 
     // deferring the the cleanup procedure when app is terminated normally
-    defer Cleanup()
+    defer aa.Cleanup()
 
     var err error
     // connect to MongoDB (FIXME: currently hardcoded, should be read from 
@@ -113,7 +94,6 @@ func main () {
     signal.Notify(c, os.Interrupt)
     go func() {
         <-c
-        fmt.Println("DEBUG: Received a CTRL-C signal to terminate.") // DEBUG
         aa.Log.Info("Received a CTRL-C signal to terminate.")
         aa.Cleanup()
         os.Exit(0) // CTRL-C is clean exit for this app...

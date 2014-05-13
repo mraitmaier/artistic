@@ -13,7 +13,6 @@ import (
 
 // Let's define the default log levels for different log handlers
 const (
-  //  numOfLogHandlers int = 2
     defSyslogLevel utils.Severity = utils.Notice
     defFileLevel   utils.Severity = utils.Informational
 )
@@ -40,11 +39,9 @@ func createLog(ac *ArtisticApp) (err error) {
     err = createLoggers(ac, format, ac.Debug)
     if err != nil { return err }
 
-//    ac.Log.Run()
     ac.Log.Start()
 
     ac.Log.Info("Log successfully created.")
- //   ac.Log.SendMsg("info", "Log successfully created - from goroutine.")
 
     return nil
 }
