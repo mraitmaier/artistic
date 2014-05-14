@@ -43,9 +43,9 @@
     </div>
     <div class="panel-collapse collapse" id="other-collapse">
         <div class="panel-body">
-            <p>Datings</p>
-            <p>Techniques</p>
-            <p>Styles</p>
+            <p><a href="datings">Datings</a></p>
+            <p><a href="techniques">Techniques</a></p>
+            <p><a href="styles">Styles</a></p>
         </div>
     </div>
 

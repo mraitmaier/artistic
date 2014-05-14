@@ -39,8 +39,8 @@ func createLog(ac *ArtisticApp) (err error) {
     err = createLoggers(ac, format, ac.Debug)
     if err != nil { return err }
 
+    // start the logger and display the first message...
     ac.Log.Start()
-
     ac.Log.Info("Log successfully created.")
 
     return nil
