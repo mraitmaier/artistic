@@ -4,8 +4,9 @@ import (
 	"fmt"
 )
 
-var AllowedDatings = []string{"L", "S", "A", "a.q.", "a.q.n.". "p.q.",
-                              "p.q.n.", "unknown" }
+var AllowedDatings = []string{ "L", "S", "A",
+                               "a.q.", "a.q.n.", "p.q.", "p.q.n.",
+                               "unknown" }
 
 /**
  * Dating - a structure representing a dating
