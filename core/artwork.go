@@ -98,7 +98,7 @@ func CreateNewWork() *Work {
 	s := make([]string, 0, DefaultWorkCapacity) // sources
 	e := make([]string, 0, DefaultWorkCapacity) // exhibitions
 	n := make([]Note, 0, DefaultWorkCapacity)   // remarks
-	w := &Dating{Dating_Unknown, "Default Description"}
+	w := &Dating{"unknown", "Default Description"}
 	return &Work{"", CreateArtist(), &Technique{"", ""}, "", w, "", "", "",
 		"", "", "", "", "", "", e, s, n, "", creat, creat}
 }
