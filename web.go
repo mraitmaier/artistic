@@ -293,7 +293,7 @@ func datingsHandler(w http.ResponseWriter, r *http.Request) {
         web.Datings = datings
 
         // render the page
-        if err := templates.ExecuteTemplate(w, "datings", user); err != nil {
+        if err := templates.ExecuteTemplate(w, "datings", web); err != nil {
             aa.Log.Error("Error rendering the 'datings' page.")
         }
 
@@ -324,7 +324,7 @@ func stylesHandler(w http.ResponseWriter, r *http.Request) {
         web.Styles = styles
 
         // render the page
-        if err := templates.ExecuteTemplate(w, "styles", user); err != nil {
+        if err := templates.ExecuteTemplate(w, "styles", web); err != nil {
             aa.Log.Error("Error rendering the 'styles' page.")
         }
 
@@ -356,7 +356,7 @@ func techniquesHandler(w http.ResponseWriter, r *http.Request) {
         web.Techniques = tech
 
         // render the page
-        if err := templates.ExecuteTemplate(w, "techniques", user); err != nil {
+        if err := templates.ExecuteTemplate(w, "techniques", web); err != nil {
             aa.Log.Error("Error rendering the 'techniques' page.")
         }
 

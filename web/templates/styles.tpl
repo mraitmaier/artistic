@@ -1,5 +1,5 @@
 
-{{define "users"}}
+{{define "styles"}}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -7,7 +7,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Artistic - Administrate users</title>
+    <title>Artistic - Styles</title>
 
     <!-- Bootstrap -->
   <!--  <link href="css/bootstrap.min.css" rel="stylesheet"> -->
@@ -38,12 +38,13 @@
         </div>
 
         <div class="col-md-10" id="data-list">
-            <h1 id="data-list-header">Users</h1>
+            <h1 id="data-list-header">Styles</h1>
 
-            <p> {{template "user-list" .Users}}</p>
+<!--            <p>Styles</p> -->
+            {{template "style-list" .Styles}}
         </div>
 
-    </div> <!-- row -->
+     </div> <!-- row -->
 
     </div> <!-- container fluid -->
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
@@ -60,15 +61,15 @@
 </html>
 {{end}}
 
-{{define "user-list"}}
+{{define "style-list"}}
+    {{if .}}
     <table class="table table-striped table-hover">
+
     <thead>
         <tr>
             <th>#</th>
-            <th>Username</th>
-            <th>Name</th>
-            <th>Role</th>
-            <th>Email</th>
+            <th>Style</th>
+            <th>Description</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -77,55 +78,30 @@
         {{range $index, $element := .}}
         <tr>
             <td>{{add $index 1}}</td>
-            <td>{{printf "%s" $element.Username}}</td>
             <td>{{printf "%s" $element.Name}}</td>
-            <td>{{printf "%s" $element.Role}}</td>
-            <td>{{printf "%s" $element.Email}}</td>
+            <td>{{printf "%s" $element.Description}}</td>
             <td>
-                <a href="#" data-toggle="tooltip" data-placement="left" 
-                            title="View user details" id="view-user">
+                <a href="#" data-toggle="tooltip" data-placement="left"
+                            title="View style details" id="view-style">
                     <span class="glyphicon glyphicon-eye-open"></span>
                 </a>
                 &nbsp;
-                <a href="#" data-toggle="tooltip" data-placement="left" 
-                            title="Edit user" id="edir-user">
+                <a href="#" data-toggle="tooltip" data-placement="left"
+                            title="Edit style" id="edit-style">
                     <span class="glyphicon glyphicon-cog" ></span>
                 </a>
                 &nbsp;
-                <a href="#" data-toggle="tooltip" data-placement="left" 
-                            title="Delete user" id="delete-user">
+                <a href="#" data-toggle="tooltip" data-placement="left"
+                            title="Delete style" id="delete-style">
                     <span class="glyphicon glyphicon-trash"></span>
                 </a>
             </td>
         </tr>
         {{end}}
     </tbody>
+
     </table>
-{{end}}
-
-{{define "view-user-details"}}
-<div class="modal">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" 
-                              aria-hidden="true">x</button>
-        <h4 class="modal-title">{{.Username}}</h4>
-      </div>
-
-      <div class="modal-body">
-        <p>One fine body</p>
-      </div>
-
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">
-        Close
-        </button>
-      <!-- 
-      <button type="button" class="btn btn-primary">Save changes</button>
-      -->
-      </div>
-    </div>
-  </div>
-</div>
+    {{else}}
+    <p>There are no styles defined yet.</p>
+    {{end}}
 {{end}}
