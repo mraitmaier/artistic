@@ -1,4 +1,3 @@
-
 {{define "index"}}
 <!DOCTYPE html>
 <html lang="en">
@@ -38,15 +37,16 @@
         </div>
 
         <div class="col-md-4" id="data-list">
+            {{template "main-carousel"}}
+    <!--    
             <h1 id="data-list-header">Data list</h1>
-
             <p>List</p>
+    -->
         </div>
 
         <div class="col-md-6" id="data-details">
-            <h1 id="data-details-header">Details</h1>
-
-            <p>Details</p>
+            <h1 id="main-title">Welcome to Artistic.</h1>
+            <h3>Your source for everything regarding art history.</h3>
         </div>
 
     </div> <!-- row -->

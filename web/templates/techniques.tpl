@@ -1,4 +1,3 @@
-
 {{define "techniques"}}
 <!DOCTYPE html>
 <html lang="en">
@@ -63,7 +62,7 @@
 
 {{define "tech-list"}}
     {{if .}}
-    <table class="table table-striped table-hover">
+    <table class="table table-striped table-hover" id="techniques-list-table">
 
     <thead>
         <tr>
@@ -76,8 +75,9 @@
 
     <tbody>
         {{range $index, $element := .}}
-        <tr>
-            <td>{{add $index 1}}</td>
+        {{$id := add $index 1}}
+        <tr id="technique-row-{{$id}}">
+            <td>{{$id}}</td>
             <td>{{printf "%s" $element.Name}}</td>
             <td>{{printf "%s" $element.Description}}</td>
             <td>
@@ -104,4 +104,4 @@
     {{else}}
     <p>There are no techniques defined yet.</p>
     {{end}}
-{{end}
+{{end}}

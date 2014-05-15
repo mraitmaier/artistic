@@ -94,17 +94,20 @@ func userIsAuthenticated(r *http.Request) (bool, *utils.User) {
     // get a session ID 
     id := s.Values["sessid"]
 
-    f := filepath.Join(aa.WebInfo.SessDir, id.(string))
-    if utils.FileExists(f) {
+    // if only the id value is not empty...
+    if id != nil {
+        f := filepath.Join(aa.WebInfo.SessDir, id.(string))
+        if utils.FileExists(f) {
 
-        // get user information
-        user, err := db.MongoGetUser(aa.DbSess.DB("artistic"),
+            // get user information
+            user, err := db.MongoGetUser(aa.DbSess.DB("artistic"),
                                   s.Values["user"].(string))
-        if  err != nil { // something is not OK...
-            return false, nil
-        }
+            if  err != nil { // something is not OK...
+                return false, nil
+            }
 
-        return true, user
+            return true, user
+        }
     }
     return false, nil
 }

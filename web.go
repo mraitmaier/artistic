@@ -39,6 +39,10 @@ var (
 
     // global var holding the web session data
     store = sessions.NewCookieStore([]byte(sessKey))
+
+
+    // Favicon location
+    favicon = "/web/static/favicon.ico"
 )
 
 // register web page handler functions
@@ -267,7 +271,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 
 // favincon handler
 func faviconHandler(w http.ResponseWriter, r *http.Request) {
-    http.ServeFile(w, r, "/static/favicon.ico")
+    http.ServeFile(w, r, favicon)
 }
 
 // datings page handler

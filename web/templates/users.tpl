@@ -61,7 +61,7 @@
 {{end}}
 
 {{define "user-list"}}
-    <table class="table table-striped table-hover">
+    <table class="table table-striped table-hover" id="user-list-table">
     <thead>
         <tr>
             <th>#</th>
@@ -75,8 +75,9 @@
 
     <tbody>
         {{range $index, $element := .}}
-        <tr>
-            <td>{{add $index 1}}</td>
+        {{ $id := add $index 1 }}
+        <tr id="user-row-{{$id}}">
+            <td>{{$id}}</td>
             <td>{{printf "%s" $element.Username}}</td>
             <td>{{printf "%s" $element.Name}}</td>
             <td>{{printf "%s" $element.Role}}</td>

@@ -63,7 +63,7 @@
 
 {{define "dating-list"}}
     {{if .}}
-    <table class="table table-striped table-hover">
+    <table class="table table-striped table-hover" id="dating-list-table">
 
     <thead>
         <tr>
@@ -76,8 +76,9 @@
 
     <tbody>
         {{range $index, $element := .}}
-        <tr>
-            <td>{{add $index 1}}</td>
+        {{$id := add $index 1}}
+        <tr id="dating-row-{{$id}}">
+            <td>{{$id}}</td>
             <td>{{printf "%s" $element.Dating}}</td>
             <td>{{printf "%s" $element.Description}}</td>
             <td>
@@ -90,11 +91,13 @@
                             title="Edit dating" id="edit-dating">
                     <span class="glyphicon glyphicon-cog" ></span>
                 </a>
+<!--
                 &nbsp;
                 <a href="#" data-toggle="tooltip" data-placement="left"
                             title="Delete dating" id="delete-dating">
                     <span class="glyphicon glyphicon-trash"></span>
                 </a>
+-->
             </td>
         </tr>
         {{end}}
