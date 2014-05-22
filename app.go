@@ -1,48 +1,49 @@
 /*
-    app.go -
- */
+   app.go -
+*/
 package main
 
 import (
-    "fmt"
-    "os"
-    "runtime"
-//    "time"
-//    "errors"
-    "path/filepath"
-//    "bitbucket.org/miranr/artistic/core"
-    "bitbucket.org/miranr/artistic/utils"
-    "bitbucket.org/miranr/artistic/db"
-    "labix.org/v2/mgo"
+	"fmt"
+	"os"
+	"runtime"
+	//    "time"
+	//    "errors"
+	"path/filepath"
+	//    "bitbucket.org/miranr/artistic/core"
+	"bitbucket.org/miranr/artistic/db"
+	"bitbucket.org/miranr/artistic/utils"
+//	"labix.org/v2/mgo"
 )
 
 //var cleanupTime = time.Second * 1
 
 type ArtisticApp struct {
 
-    // working folder
-    WorkDir string
+	// working folder
+	WorkDir string
 
-    // a log filename
-    LogFname string
+	// a log filename
+	LogFname string
 
-    // a syslog IP address
-    SyslogIP string
+	// a syslog IP address
+	SyslogIP string
 
-    // a logger
-    Log *utils.Log
+	// a logger
+	Log *utils.Log
 
-    // MongoDB session 
-    DbSess *mgo.Session
+	// MongoDB session
+//	DbSess *mgo.Session
+    DbSess db.DbConnector
 
-    // folder for session files
-    SessDir string
+	// folder for session files
+	SessDir string
 
-    // a web stuff structure instance
-    *WebInfo
+	// a web stuff structure instance
+	*WebInfo
 
-    // a debug flag (only for testing purposes)
-    Debug bool
+	// a debug flag (only for testing purposes)
+	Debug bool
 }
 
 func (a *ArtisticApp) createLogs() { createLog(a) }
@@ -51,50 +52,52 @@ func (a *ArtisticApp) startWeb(path string) error { return webStart(path) }
 
 func (a *ArtisticApp) HandleConfigFile(cfgfile string) error {
 
-    fmt.Printf("DEBUG config file: %q\n", cfgfile) // DEBUG
+	fmt.Printf("DEBUG config file: %q\n", cfgfile) // DEBUG
 
-    return nil
+	return nil
 }
 
 // Define working folder and create it, if it doesn't exist
 func (a *ArtisticApp) SetWorkDir() bool {
 
-    // if working folder is already set in global struct, use it
-    wdir := a.WorkDir
+	// if working folder is already set in global struct, use it
+	wdir := a.WorkDir
 
-    // otherwise, the default working folder is the "artistic" folder in $HOME
-    if wdir == "" {
-        switch runtime.GOOS {
-            case "windows": wdir = os.Getenv("USERPROFILE")
-            default: wdir = os.Getenv("HOME")
-        }
-        a.WorkDir = filepath.Join(wdir, "artistic")
-    }
+	// otherwise, the default working folder is the "artistic" folder in $HOME
+	if wdir == "" {
+		switch runtime.GOOS {
+		case "windows":
+			wdir = os.Getenv("USERPROFILE")
+		default:
+			wdir = os.Getenv("HOME")
+		}
+		a.WorkDir = filepath.Join(wdir, "artistic")
+	}
 
-    // create the working folder, if it doesn't exist
-    if err := os.MkdirAll(a.WorkDir, 0755); err != nil {
-        return false
-    }
+	// create the working folder, if it doesn't exist
+	if err := os.MkdirAll(a.WorkDir, 0755); err != nil {
+		return false
+	}
 
-    return true
+	return true
 }
 
 // Cleanup oprocedure when app is terminated.
-func (a* ArtisticApp) Cleanup() {
+func (a *ArtisticApp) Cleanup() {
 
-    // close the DB connection
-    if a.DbSess != nil {
-        db.Close(a.DbSess)
-        a.Log.Notice("Connection to MongoDb closed.")
-    }
+	// close the DB connection
+	if a.DbSess != nil {
+		a.DbSess.Close()
+		a.Log.Notice("Connection to MongoDb closed.")
+	}
 
-    // clean the sessions directory
-    cleanSessDir()
-    a.Log.Info("Sessions folder deleted.")
+	// clean the sessions directory
+	cleanSessDir()
+	a.Log.Info("Sessions folder deleted.")
 
-    // close the log 
-    a.Log.Info("Closing log.")
-    a.Log.Close()
+	// close the log
+	a.Log.Info("Closing log.")
+	a.Log.Close()
 }
 
 /*
@@ -117,7 +120,7 @@ func (a *ArtisticApp) Init() error {
     //defer a.cleanup()
 
     var err error
-    // connect to MongoDB (FIXME: currently hardcoded, should be read from 
+    // connect to MongoDB (FIXME: currently hardcoded, should be read from
     // config file in the final version)
     url := db.CreateUrl("localhost", 27017, "artistic", "artistic", "artistic")
     if a.DbSess, err = db.Connect(url, DatabaseTimeout); err != nil {
@@ -144,4 +147,4 @@ func (a *ArtisticApp) Init() error {
     webStart(DefWebRoot)
     return nil
 }
-    */
+*/

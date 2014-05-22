@@ -83,18 +83,23 @@
             <td>{{printf "%s" $element.Role}}</td>
             <td>{{printf "%s" $element.Email}}</td>
             <td>
+            <!--
                 <a href="#" data-toggle="tooltip" data-placement="left" 
-                            title="View user details" id="view-user">
+                            title="View user details" id="view-user-{{$id}}">
+                    <span class="glyphicon glyphicon-eye-open"></span>
+            -->
+                <a data-toggle="modal" data-target="#my-modal" 
+                            title="View user details" id="view-user-{{$id}}">
                     <span class="glyphicon glyphicon-eye-open"></span>
                 </a>
                 &nbsp;
                 <a href="#" data-toggle="tooltip" data-placement="left" 
-                            title="Edit user" id="edir-user">
+                            title="Edit user" id="edir-user-{{$id}}">
                     <span class="glyphicon glyphicon-cog" ></span>
                 </a>
                 &nbsp;
                 <a href="#" data-toggle="tooltip" data-placement="left" 
-                            title="Delete user" id="delete-user">
+                            title="Delete user" id="delete-user-{{$id}}">
                     <span class="glyphicon glyphicon-trash"></span>
                 </a>
             </td>
@@ -105,17 +110,21 @@
 {{end}}
 
 {{define "view-user-details"}}
-<div class="modal">
+<div class="modal hide fade" id="view-user-modal">
   <div class="modal-dialog">
     <div class="modal-content">
+
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" 
                               aria-hidden="true">x</button>
-        <h4 class="modal-title">{{.Username}}</h4>
+        <h4 class="modal-title">View {{.Username}} Details</h4>
       </div>
 
       <div class="modal-body">
-        <p>One fine body</p>
+        <p>Username: {{.Username}}</p>
+        <p>Full Name: {{.Name}}</p>
+        <p>Role: {{.Role}}</p>
+        <p>Email Address: {{.Email}}</p>
       </div>
 
       <div class="modal-footer">
@@ -125,7 +134,7 @@
       <!-- 
       <button type="button" class="btn btn-primary">Save changes</button>
       -->
-      </div>
+      </div> <!-- class="modal-content" -->
     </div>
   </div>
 </div>

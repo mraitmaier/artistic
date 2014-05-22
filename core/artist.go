@@ -7,16 +7,11 @@ import (
 	"encoding/json"
 )
 
-/*****************************************************************************
- * type Artist - struct representing the person
- *
- * This type is a basis for all artists: painters, sculptors, writers etc.
- *
- * Implements the Artist interface.
- */
+// type representing the person
+// This type is a basis for all artists: painters, sculptors, writers etc.
 type Artist struct {
 
-	/* name of the person */
+	/* name of the artist */
 	*Name
 
 	/* real name if the person used pseudonim; with artists this is common */
@@ -48,8 +43,13 @@ type Artist struct {
     IsPainter bool
     IsSculptor bool
     IsPrintmaker bool
-    IsArchitect bool
     IsCeramicist bool
+
+    IsArchitect bool
+
+    IsWriter bool
+    IsPoet bool
+    IsPlayWriter bool
 
     // timestamp when an instance was created
     created string
@@ -66,7 +66,7 @@ func CreateArtist() *Artist {
 	s := make([]string, 0, DefaultArtistCapacity)
 	return &Artist{&Name{"", "", ""}, &Name{"", "", ""},
 		"", "", "", s, "", n, "",
-        false, false, false, false, false, creat, creat }
+        false, false, false, false, false,false, false, false, creat, creat }
 }
 
 /*
