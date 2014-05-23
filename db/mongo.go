@@ -22,6 +22,8 @@ type MongoDbConn struct {
     Sess *mgo.Session
 }
 
+/* DbConnector interface implementation */
+
 // Connect to mongoDB with given URL and timeout (in seconds) to stop trying
 // when server is not available.
 func (m *MongoDbConn) Connect(url string, timeout time.Duration) (e error) {
@@ -30,13 +32,16 @@ func (m *MongoDbConn) Connect(url string, timeout time.Duration) (e error) {
     return e
 }
 
-
 // Close the mongoDB connection. 
 func (m *MongoDbConn) Close() {
     if m.Sess != nil {
         m.Sess.Close()
     }
 }
+
+/* DataProvider interface implementation */
+
+///////////////////////////// Users
 
 // Retrieves all users from database.
 func (m *MongoDbConn) GetAllUsers() ([]utils.User, error) {
@@ -58,42 +63,6 @@ func (m *MongoDbConn) GetAllUsers() ([]utils.User, error) {
     return nil,  errors.New("MongoDB descriptor empty.")
 }
 
-/*
-/////#################################################################
-// Create a mongoDB URL from given username/password and other input info.
-func CreateUrl(host string, port int,
-               username, passwd string, dbname string) string {
-    s := fmt.Sprintf("mongodb://%s:%s@%s:%d/%s", username, passwd,
-                                                 host, port, dbname)
-    return s
-}
-
-// Connect to mongoDB with given URL and timeout (in seconds) to stop trying
-// when server is not available.
-func Connect(url string, timeout time.Duration) (*mgo.Session, error) {
-   return mgo.DialWithTimeout(url, timeout)
-}
-
-// Close the mongoDB connection. 
-func Close(dbsess *mgo.Session) {
-    if dbsess != nil {
-        dbsess.Close()
-    }
-}
-
-// Insert a new user into the DB. 
-func MongoInsertUser(db *mgo.Database, u *utils.User) error {
-    // TODO
-    return nil
-}
-
-// Update an existing user in the DB. 
-func MongoUpdateUser(db *mgo.Database, u *utils.User) error {
-    // TODO
-    return nil
-}
-*/
-
 // Get a single user from the DB: we need a username. 
 func (m * MongoDbConn) GetUser(username string) (*utils.User, error) {
 
@@ -104,13 +73,20 @@ func (m * MongoDbConn) GetUser(username string) (*utils.User, error) {
         u := utils.CreateUser("", "") // create empty user
 
         // get all users from DB
-        err := db.C("users").Find(bson.M{"username": username }).One(&u)
+        err := db.C("users").Find(bson.M{ "username": username }).One(&u)
         if err != nil { return nil, err }
 
         return u, nil
     }
     return nil,  errors.New("MongoDB descriptor empty.")
 }
+
+// Update a single user in DB. 
+func (m * MongoDbConn) UpdateUser(u *utils.User) error {
+    return nil
+}
+
+///////////////////////////// Datings
 
 // Retrieves all datings from database.
 func (m *MongoDbConn) GetAllDatings() ([]core.Dating, error) {
@@ -132,6 +108,31 @@ func (m *MongoDbConn) GetAllDatings() ([]core.Dating, error) {
     return nil,  errors.New("MongoDB descriptor empty.")
 }
 
+// Retrieve a single Technique record.
+func (m *MongoDbConn) GetDating(name string) (*core.Dating, error) {
+
+    // get *mgo.Database instance
+    db := m.Sess.DB(m.name)
+
+    if db != nil {
+
+        t := new(core.Dating)
+
+        err := db.C("datings").Find(bson.M{ "dating" : name }).One(&t)
+        if err != nil { return nil, err }
+
+        return t, nil
+    }
+    return nil, errors.New("MongoDb descriptor empty.")
+}
+
+// Update a single user in DB. 
+func (m * MongoDbConn) UpdateDating(d *core.Dating) error {
+    return nil
+}
+
+///////////////////////////// Styles
+
 // Retrieves all styles from DB with given DB descriptor.
 func (m *MongoDbConn) GetAllStyles() ([]core.Style, error) {
 
@@ -152,6 +153,26 @@ func (m *MongoDbConn) GetAllStyles() ([]core.Style, error) {
     return nil,  errors.New("MongoDB descriptor empty.")
 }
 
+// Retrieve a single Style record.
+func (m *MongoDbConn) GetStyle(name string) (*core.Style, error) {
+
+    // get *mgo.Database instance
+    db := m.Sess.DB(m.name)
+
+    if db != nil {
+
+        s := new(core.Style)
+
+        err := db.C("styles").Find(bson.M{ "name" : name }).One(&s)
+        if err != nil { return nil, err }
+
+        return s, nil
+    }
+    return nil, errors.New("MongoDb descriptor empty.")
+}
+
+///////////////////////////// Techniques
+
 // Retrieves all techniques from DB with given DB descriptor.
 func (m *MongoDbConn) GetAllTechniques() ([]core.Technique, error) {
 
@@ -170,5 +191,23 @@ func (m *MongoDbConn) GetAllTechniques() ([]core.Technique, error) {
         return t, nil
     }
     return nil,  errors.New("MongoDB descriptor empty.")
+}
+
+// Retrieve a single Technique record.
+func (m *MongoDbConn) GetTechnique(name string) (*core.Technique, error) {
+
+    // get *mgo.Database instance
+    db := m.Sess.DB(m.name)
+
+    if db != nil {
+
+        t := new(core.Technique)
+
+        err := db.C("techniques").Find(bson.M{ "name" : name }).One(&t)
+        if err != nil { return nil, err }
+
+        return t, nil
+    }
+    return nil, errors.New("MongoDb descriptor empty.")
 }
 

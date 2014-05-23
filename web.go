@@ -202,7 +202,7 @@ func usersHandler(w http.ResponseWriter, r *http.Request) {
 
 		// get all users from DB
 		//users, err := dbase.MongoGetAllUsers(aa.DbSess.DB("artistic"))
-		users, err := aa.DbSess.GetAllUsers()
+		users, err := aa.DataProv.GetAllUsers()
 		if err != nil {
 			log.Error(fmt.Sprintf("Problem getting all users: %s", err.Error()))
 			http.Redirect(w, r, "error404", http.StatusFound)
@@ -284,7 +284,7 @@ func datingsHandler(w http.ResponseWriter, r *http.Request) {
 
 		// get all datings from DB
 		//datings, err := dbase.MongoGetAllDatings(aa.DbSess.DB("artistic"))
-		datings, err := aa.DbSess.GetAllDatings()
+		datings, err := aa.DataProv.GetAllDatings()
 		if err != nil {
 			log.Error(fmt.Sprintf("Problem getting all datings: %s",
 				err.Error()))
@@ -319,7 +319,7 @@ func stylesHandler(w http.ResponseWriter, r *http.Request) {
 
 		// get all styles from DB
 		//styles, err := dbase.MongoGetAllStyles(aa.DbSess.DB("artistic"))
-		styles, err := aa.DbSess.GetAllStyles()
+		styles, err := aa.DataProv.GetAllStyles()
 		if err != nil {
 			log.Error(fmt.Sprintf("Problem getting all styles: %s", err.Error()))
 			http.Redirect(w, r, "error404", http.StatusFound)
@@ -353,7 +353,7 @@ func techniquesHandler(w http.ResponseWriter, r *http.Request) {
 
 		// get all techniques from DB
 		//tech, err := dbase.MongoGetAllTechniques(aa.DbSess.DB("artistic"))
-		tech, err := aa.DbSess.GetAllTechniques()
+		tech, err := aa.DataProv.GetAllTechniques()
 		if err != nil {
 			log.Error(fmt.Sprintf("Problem getting all techniques: %s",
 				err.Error()))

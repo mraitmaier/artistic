@@ -80,7 +80,7 @@ func main() {
     var url string
 	// connect to database (FIXME: currently hardcoded, should be read from
 	// config file in the final version)
-    url, aa.DbSess, err = db.InitDb(db.MongoDB, "localhost", 27017,
+    url, aa.DbSess, aa.DataProv, err = db.InitDb(db.MongoDB, "localhost", 27017,
                               "artistic", "artistic", DbName)
 	if err = aa.DbSess.Connect(url, DatabaseTimeout); err != nil {
 		aa.Log.Critical("Connection to MongoDB cannot be established.")

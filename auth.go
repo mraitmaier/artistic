@@ -29,7 +29,7 @@ func authenticateUser(u, p string,
 
 	// get information from DB
 	//userdb, err := db.MongoGetUser(aa.DbSess.DB("artistic"), u)
-	userdb, err := aa.DbSess.GetUser(u)
+	userdb, err := aa.DataProv.GetUser(u)
 	if err != nil {
 		return false, err
 	}
@@ -105,7 +105,7 @@ func userIsAuthenticated(r *http.Request) (bool, *utils.User) {
 		if utils.FileExists(f) {
 
 			// get user information
-			user, err := aa.DbSess.GetUser(s.Values["user"].(string))
+			user, err := aa.DataProv.GetUser(s.Values["user"].(string))
 			if err != nil { // something is not OK...
 				return false, nil
 			}

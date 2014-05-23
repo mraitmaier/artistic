@@ -13,7 +13,6 @@ import (
 	//    "bitbucket.org/miranr/artistic/core"
 	"bitbucket.org/miranr/artistic/db"
 	"bitbucket.org/miranr/artistic/utils"
-//	"labix.org/v2/mgo"
 )
 
 //var cleanupTime = time.Second * 1
@@ -32,9 +31,11 @@ type ArtisticApp struct {
 	// a logger
 	Log *utils.Log
 
-	// MongoDB session
-//	DbSess *mgo.Session
+	// DB session
     DbSess db.DbConnector
+
+    // DB data provider
+    DataProv db.DataProvider
 
 	// folder for session files
 	SessDir string
@@ -92,8 +93,10 @@ func (a *ArtisticApp) Cleanup() {
 	}
 
 	// clean the sessions directory
-	cleanSessDir()
-	a.Log.Info("Sessions folder deleted.")
+    if a.WebInfo != nil {
+	    cleanSessDir()
+	    a.Log.Info("Sessions folder deleted.")
+    }
 
 	// close the log
 	a.Log.Info("Closing log.")
