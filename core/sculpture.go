@@ -6,6 +6,8 @@ import (
 )
 
 type Sculpture struct {
+
+    // embedded struct
 	*Work
 }
 
@@ -16,7 +18,9 @@ func (s *Sculpture) Json() (string, error) {
 	return string(st[:]), err
 }
 
-func NewSculpture() *Sculpture { return &Sculpture{CreateNewWork()} }
+func NewSculpture() *Sculpture {
+    return &Sculpture{CreateNewWork()}
+}
 
 func (s *Sculpture) Display() string { return s.Work.Display() }
 

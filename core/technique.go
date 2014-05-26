@@ -22,15 +22,3 @@ func (t *Technique) Display() string {
 	return fmt.Sprintf("%s\n%s\n", t.Name, t.Description)
 }
 
-/*
-func (t *Technique) Create(dbconn *DbConn) error {
-
-    // check DB connection; if emtpy, return error
-    if dbconn == nil {
-        return fmt.Errorf("DB connection is empty.")
-    }
-
-    
-    return nil
-}
-*/

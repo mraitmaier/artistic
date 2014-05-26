@@ -13,7 +13,6 @@ type Artwork interface {
     // Create() error
     // Update() error
     // Delete() error
-    
 }
 
 type Work struct {
@@ -103,8 +102,26 @@ func CreateNewWork() *Work {
 	e := make([]string, 0, DefaultWorkCapacity) // exhibitions
 	n := make([]Note, 0, DefaultWorkCapacity)   // remarks
 	w := &Dating{"unknown", "Default Description"}
-	return &Work{"", CreateArtist(), &Technique{"", ""}, "", w, "", "", "",
-		"", "", "", "", "", "", e, s, n, "", creat, creat}
+	return &Work{"", // title
+                CreateArtist(), // artist
+                &Technique{"", ""}, // technique
+                "",     // size
+                w,      // dating
+                "",     // time of creation
+                "",     // motive
+                "",     // signature
+		        "",     // place
+                "",     // location
+                "",     // provenance
+                "",     // condition
+                "",     // condition description
+                "",     // description
+                e,      // exhibitions
+                s,      // sources
+                n,      // notes
+                "",     // picture
+                creat,  // created
+                creat}  // updated
 }
 
 func (w *Work) Display() string {

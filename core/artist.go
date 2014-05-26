@@ -1,9 +1,8 @@
 package core
 
 import (
-	//    "fmt"
-	    "time"
-	//    "net/url"
+	//"fmt"
+	"time"
 	"encoding/json"
 )
 
@@ -21,7 +20,7 @@ type Artist struct {
 	Born string
 
 	/* Date of death */
-	Dead string
+	Died string
 
 	/* his/her nationality */
 	Nationality string
@@ -64,9 +63,25 @@ func CreateArtist() *Artist {
     creat := time.Now().Format("2012-12-15 15:0405")
 	n := make([]Note, 0, DefaultArtistCapacity)
 	s := make([]string, 0, DefaultArtistCapacity)
-	return &Artist{&Name{"", "", ""}, &Name{"", "", ""},
-		"", "", "", s, "", n, "",
-        false, false, false, false, false,false, false, false, creat, creat }
+	return &Artist{&Name{"", "", ""}, // Name
+                   &Name{"", "", ""}, // Real name
+		           "",      // Born
+                   "",      // Died
+                   "",      // Nationality
+                   s,       // Sources
+                   "",      // Biography
+                   n,       // Notes
+                   "",      // Picture
+                   false,   // IsPainter
+                   false,   // IsSculptor
+                   false,   // IsPrintmaker
+                   false,   // IsCeramicist
+                   false,   // IsArchitect
+                   false,   // IsWriter
+                   false,   // IsPoet
+                   false,   // IsPlayWriter
+                   creat,   // created
+                   creat }  // updated
 }
 
 /*
