@@ -28,11 +28,12 @@ func authenticateUser(u, p string,
 	//    fmt.Printf("DEBUG: session ID=%q\n", id) // DEBUG
 
 	// get information from DB
-	//userdb, err := db.MongoGetUser(aa.DbSess.DB("artistic"), u)
 	userdb, err := aa.DataProv.GetUser(u)
 	if err != nil {
 		return false, err
 	}
+
+    if userdb != nil {
 
 	// if passwords match....
 	if utils.ComparePasswords(userdb.Password, p) {
@@ -60,6 +61,7 @@ func authenticateUser(u, p string,
 
 		return true, nil
 	}
+    }
 	return false, nil // no error, but passwords do not match
 }
 

@@ -4,6 +4,7 @@
 package db
 
 import (
+//    "fmt"
     "time"
     "errors"
     "labix.org/v2/mgo"
@@ -29,6 +30,7 @@ type MongoDbConn struct {
 func (m *MongoDbConn) Connect(url string, timeout time.Duration) (e error) {
 
     m.Sess, e = mgo.DialWithTimeout(url, timeout)
+
     return e
 }
 
@@ -46,43 +48,94 @@ func (m *MongoDbConn) Close() {
 // Retrieves all users from database.
 func (m *MongoDbConn) GetAllUsers() ([]utils.User, error) {
 
+    // acquire lock
+    dblock.Lock()
+    defer dblock.Unlock()
+
     // get *mgo.Database instance
     db := m.Sess.DB(m.name)
+    if db == nil { return nil, errors.New("Mongo descriptor empty.") }
 
-    if db != nil {
+    // create channel
+    ch := make(chan []utils.User)
+
+    // start a new goroutine to get users from DB
+    go func(ch chan []utils.User) {
+
+        // check channel
+        if ch == nil { return }
+
         // prepare the empty slice for users
-        u := make([]utils.User, 0)
+        users := make([]utils.User, 0)
 
         // get all users from DB
-        if err := db.C("users").Find(bson.D{}).All(&u); err != nil {
-            return nil, err
+        if err := db.C("users").Find(bson.D{}).All(&users); err != nil {
+            return
         }
 
-        return u, nil
-    }
-    return nil,  errors.New("MongoDB descriptor empty.")
+        // write the users to the channel
+        ch <- users
+
+    }(ch)
+
+    // read the answer from channel
+    users := <-ch
+
+    return users, nil // OK
 }
 
 // Get a single user from the DB: we need a username. 
 func (m * MongoDbConn) GetUser(username string) (*utils.User, error) {
 
+    // acquire lock
+    dblock.Lock()
+    defer dblock.Unlock()
+
     // get *mgo.Database instance
     db := m.Sess.DB(m.name)
+    if db == nil { return nil, errors.New("MongoDB descriptor empty.") }
 
-    if db != nil {
+    // prepare channel
+    ch := make(chan *utils.User)
+
+    // start goroutine to get a user
+    go func(username string, ch chan *utils.User) {
+
         u := utils.CreateUser("", "") // create empty user
 
-        // get all users from DB
+        // get a user from DB
         err := db.C("users").Find(bson.M{ "username": username }).One(&u)
-        if err != nil { return nil, err }
+        if err != nil {
+            return
+        }
 
-        return u, nil
-    }
-    return nil,  errors.New("MongoDB descriptor empty.")
+        // write a user to channel
+        ch <- u
+    }(username, ch)
+
+    // read user from channel
+    user := <-ch
+
+    return user, nil // all OK
 }
 
 // Update a single user in DB. 
 func (m * MongoDbConn) UpdateUser(u *utils.User) error {
+
+    // acquire lock
+    dblock.Lock()
+    defer dblock.Unlock()
+
+    // get *mgo.Database instance
+    db := m.Sess.DB(m.name)
+    if db == nil { return errors.New("MongoDB descriptor empty.") }
+
+    // FIXME: update, not get...
+    err := db.C("users").Find(bson.M{ "username": u.Username }).One(&u)
+
+    if err != nil {
+        return err
+    }
     return nil
 }
 
@@ -91,43 +144,50 @@ func (m * MongoDbConn) UpdateUser(u *utils.User) error {
 // Retrieves all datings from database.
 func (m *MongoDbConn) GetAllDatings() ([]core.Dating, error) {
 
+    // acquire lock
+    dblock.Lock()
+    defer dblock.Unlock()
+
     // get *mgo.Database instance
     db := m.Sess.DB(m.name)
+    if db == nil { return nil,  errors.New("MongoDB descriptor empty.") }
 
-    if db != nil {
-        // prepare the empty slice for users
-        d := make([]core.Dating, 0)
+    // prepare the empty slice for users
+    d := make([]core.Dating, 0)
 
-        // get all users from DB
-        if err := db.C("datings").Find(bson.D{}).All(&d); err != nil {
-            return nil, err
-        }
-
-        return d, nil
+    // get all users from DB
+    if err := db.C("datings").Find(bson.D{}).All(&d); err != nil {
+        return nil, err
     }
-    return nil,  errors.New("MongoDB descriptor empty.")
+    return d, nil
 }
 
 // Retrieve a single Technique record.
 func (m *MongoDbConn) GetDating(name string) (*core.Dating, error) {
 
+    // acquire lock
+    dblock.Lock()
+    defer dblock.Unlock()
+
     // get *mgo.Database instance
     db := m.Sess.DB(m.name)
+    if db != nil { return nil, errors.New("MongoDb descriptor empty.") }
 
-    if db != nil {
+    t := new(core.Dating)
 
-        t := new(core.Dating)
+    err := db.C("datings").Find(bson.M{ "dating" : name }).One(&t)
+    if err != nil { return nil, err }
 
-        err := db.C("datings").Find(bson.M{ "dating" : name }).One(&t)
-        if err != nil { return nil, err }
-
-        return t, nil
-    }
-    return nil, errors.New("MongoDb descriptor empty.")
+    return t, nil
 }
 
-// Update a single user in DB. 
+// Update a single dating in DB. 
 func (m * MongoDbConn) UpdateDating(d *core.Dating) error {
+
+    // acquire lock
+    dblock.Lock()
+    defer dblock.Unlock()
+
     return nil
 }
 
@@ -136,39 +196,41 @@ func (m * MongoDbConn) UpdateDating(d *core.Dating) error {
 // Retrieves all styles from DB with given DB descriptor.
 func (m *MongoDbConn) GetAllStyles() ([]core.Style, error) {
 
+    // acquire lock
+    dblock.Lock()
+    defer dblock.Unlock()
+
     // get *mgo.Database instance
     db := m.Sess.DB(m.name)
+    if db == nil { return nil,  errors.New("MongoDB descriptor empty.") }
 
-    if db != nil {
-        // prepare the empty slice for users
-        s := make([]core.Style, 0)
+    // prepare the empty slice for users
+    s := make([]core.Style, 0)
 
-        // get all users from DB
-        if err := db.C("styles").Find(bson.D{}).All(&s); err != nil {
-            return nil, err
-        }
-
-        return s, nil
+    // get all users from DB
+    if err := db.C("styles").Find(bson.D{}).All(&s); err != nil {
+        return nil, err
     }
-    return nil,  errors.New("MongoDB descriptor empty.")
+    return s, nil
 }
 
 // Retrieve a single Style record.
 func (m *MongoDbConn) GetStyle(name string) (*core.Style, error) {
 
+    // acquire lock
+    dblock.Lock()
+    defer dblock.Unlock()
+
     // get *mgo.Database instance
     db := m.Sess.DB(m.name)
+    if db == nil { return nil, errors.New("MongoDb descriptor empty.") }
 
-    if db != nil {
+    s := new(core.Style)
 
-        s := new(core.Style)
+    err := db.C("styles").Find(bson.M{ "name" : name }).One(&s)
+    if err != nil { return nil, err }
 
-        err := db.C("styles").Find(bson.M{ "name" : name }).One(&s)
-        if err != nil { return nil, err }
-
-        return s, nil
-    }
-    return nil, errors.New("MongoDb descriptor empty.")
+    return s, nil
 }
 
 ///////////////////////////// Techniques
@@ -176,38 +238,41 @@ func (m *MongoDbConn) GetStyle(name string) (*core.Style, error) {
 // Retrieves all techniques from DB with given DB descriptor.
 func (m *MongoDbConn) GetAllTechniques() ([]core.Technique, error) {
 
+    // acquire lock
+    dblock.Lock()
+    defer dblock.Unlock()
+
     // get *mgo.Database instance
     db := m.Sess.DB(m.name)
+    if db == nil { return nil,  errors.New("MongoDB descriptor empty.") }
 
-    if db != nil {
-        // prepare the empty slice for users
-        t := make([]core.Technique, 0)
+    // prepare the empty slice for users
+    t := make([]core.Technique, 0)
 
-        // get all users from DB
-        if err := db.C("techniques").Find(bson.D{}).All(&t); err != nil {
-            return nil, err
-        }
-
-        return t, nil
+    // get all users from DB
+    if err := db.C("techniques").Find(bson.D{}).All(&t); err != nil {
+        return nil, err
     }
-    return nil,  errors.New("MongoDB descriptor empty.")
+
+    return t, nil
 }
 
 // Retrieve a single Technique record.
 func (m *MongoDbConn) GetTechnique(name string) (*core.Technique, error) {
 
+    // acquire lock
+    dblock.Lock()
+    defer dblock.Unlock()
+
     // get *mgo.Database instance
     db := m.Sess.DB(m.name)
+    if db == nil { return nil, errors.New("MongoDb descriptor empty.") }
 
-    if db != nil {
+    t := new(core.Technique)
 
-        t := new(core.Technique)
+    err := db.C("techniques").Find(bson.M{ "name" : name }).One(&t)
+    if err != nil { return nil, err }
 
-        err := db.C("techniques").Find(bson.M{ "name" : name }).One(&t)
-        if err != nil { return nil, err }
-
-        return t, nil
-    }
-    return nil, errors.New("MongoDb descriptor empty.")
+    return t, nil
 }
 

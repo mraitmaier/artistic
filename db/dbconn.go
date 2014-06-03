@@ -6,9 +6,14 @@ package db
 import (
     "fmt"
     "time"
+    "sync"
     "bitbucket.org/miranr/artistic/utils"
     "bitbucket.org/miranr/artistic/core"
 )
+
+
+// DB access is guarded by simple mutex, it's easier than goroutines...
+var dblock sync.Mutex
 
 // let's define DB type enum
 type DbType int
@@ -28,6 +33,7 @@ type DbConnector interface {
 type DataProvider interface {
 
     GetAllUsers() ([]utils.User, error)
+//    GetAllUsers(chan []utils.User) error
     GetUser(username string) (*utils.User, error)
     //CreateUser(*utils.User) error
     UpdateUser(*utils.User) error

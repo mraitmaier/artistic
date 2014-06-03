@@ -16,7 +16,6 @@ import (
 	//    "labix.org/v2/mgo/bson"
     //   "labix.org/v2/mgo"
 	"bitbucket.org/miranr/artistic/core"
-//	dbase "bitbucket.org/miranr/artistic/db"
 	"bitbucket.org/miranr/artistic/utils"
 	"github.com/gorilla/context"
 	"github.com/gorilla/sessions"
@@ -201,7 +200,6 @@ func usersHandler(w http.ResponseWriter, r *http.Request) {
 		log := aa.Log
 
 		// get all users from DB
-		//users, err := dbase.MongoGetAllUsers(aa.DbSess.DB("artistic"))
 		users, err := aa.DataProv.GetAllUsers()
 		if err != nil {
 			log.Error(fmt.Sprintf("Problem getting all users: %s", err.Error()))
@@ -352,7 +350,6 @@ func techniquesHandler(w http.ResponseWriter, r *http.Request) {
 		log := aa.Log // get logger instance
 
 		// get all techniques from DB
-		//tech, err := dbase.MongoGetAllTechniques(aa.DbSess.DB("artistic"))
 		tech, err := aa.DataProv.GetAllTechniques()
 		if err != nil {
 			log.Error(fmt.Sprintf("Problem getting all techniques: %s",
