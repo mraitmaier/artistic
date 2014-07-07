@@ -30,7 +30,7 @@ func createLog(ac *ArtisticApp) (err error) {
 
 	// define the name of the log file
 	if ac.LogFname == "" {
-		ac.LogFname = defineDefLogFname()
+		ac.LogFname = defineDefLogFname(ac.WorkDir)
 	} else {
 		ac.LogFname = filepath.Join(ac.WorkDir, "artistic.log")
 	}
@@ -90,11 +90,12 @@ func createLoggers(ac *ArtisticApp, format string, debug bool) error {
  * taken from '%USERPROFILE%' env variable (this is usually
  * 'c:\Users\<Username>').
  */
-func defineDefLogFname() string {
+func defineDefLogFname(workdir string) string {
 
 	defDir := "/var/log/artistic.log"
 	if runtime.GOOS == "windows" {
-		defDir = path.Join(aa.WorkDir, "artistic.log")
+		//defDir = path.Join(aa.WorkDir, "artistic.log")
+		defDir = path.Join(workdir, "artistic.log")
 	}
 	return filepath.Clean(defDir)
 }

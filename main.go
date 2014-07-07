@@ -11,7 +11,6 @@ import (
 	//    "runtime"
 	"os/signal"
 	//    "path/filepath"
-	//    "net/http"
 	//    "bitbucket.org/miranr/artistic/core"
 	//    "bitbucket.org/miranr/artistic/utils"
 	"bitbucket.org/miranr/artistic/db"
@@ -33,7 +32,7 @@ const (
 )
 
 // create a new Artistic application instance
-var aa = new(ArtisticApp)
+//var aa = new(ArtisticApp)
 
 // Parse the CLI arguments.
 func parseArgs(ac *ArtisticApp, cfgfile *string) {
@@ -53,6 +52,9 @@ func parseArgs(ac *ArtisticApp, cfgfile *string) {
 
 // MAIN: this is where all begins...
 func main() {
+
+    // create a new Artistic application instance
+    var aa = new(ArtisticApp)
 
 	// parse the CLI arguments
 	configfile := ""

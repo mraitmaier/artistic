@@ -13,14 +13,11 @@ import (
 	"os"
 	"path/filepath"
 	"time"
-	//    "labix.org/v2/mgo/bson"
-	//   "labix.org/v2/mgo"
-//	"bitbucket.org/miranr/artistic/db"
 	"bitbucket.org/miranr/artistic/utils"
 )
 
 // authenticate the user with given username and password
-func authenticateUser(u, p string,
+func authenticateUser(u, p string, aa *ArtisticApp,
 	w http.ResponseWriter, r *http.Request) (bool, error) {
 
 	// create new session ID
@@ -33,10 +30,8 @@ func authenticateUser(u, p string,
 		return false, err
 	}
 
-    if userdb != nil {
-
 	// if passwords match....
-	if utils.ComparePasswords(userdb.Password, p) {
+	if userdb != nil && utils.ComparePasswords(userdb.Password, p) {
 
 		// get current session data; create new session with given random ID
 		s, err := store.Get(r, "artistic")
@@ -57,15 +52,13 @@ func authenticateUser(u, p string,
 		// save the session data
 		s.Save(r, w)
 
-		fmt.Printf("DEBUG creating Session: %v\n", s) // DEBUG
-
+		//fmt.Printf("DEBUG creating Session: %v\n", s) // DEBUG
 		return true, nil
 	}
-    }
 	return false, nil // no error, but passwords do not match
 }
 
-func logout(w http.ResponseWriter, r *http.Request) error {
+func logout(aa *ArtisticApp, w http.ResponseWriter, r *http.Request) error {
 
 	// get current session data; retrieve session ID
 	s, err := store.Get(r, "artistic")
@@ -91,7 +84,7 @@ func logout(w http.ResponseWriter, r *http.Request) error {
 }
 
 // check if user is already authenticated
-func userIsAuthenticated(r *http.Request) (bool, *utils.User) {
+func userIsAuthenticated(aa *ArtisticApp, r *http.Request) (bool, *utils.User) {
 
 	s, err := store.Get(r, "artistic")
 	if err != nil {
@@ -117,30 +110,6 @@ func userIsAuthenticated(r *http.Request) (bool, *utils.User) {
 	}
 	return false, nil
 }
-
-/*
-// get a User instance for current session
-func getUser(r *http.Request) *utils.User {
-
-    s, err := store.Get(r, "artistic")
-    if err != nil { return nil }
-
-    _db := aa.DbSess.DB("artistic")
-    u, err := db.MongoGetUser(_db, s.Values["user"].(string))
-    if err != nil { return nil }
-
-    return u
-}
-
-// get a username for current session
-func getUsername(r *http.Request) string {
-
-    s, err := store.Get(r, "artistic")
-    if err != nil { return "Error!" }
-
-    return s.Values["user"].(string)
-}
-*/
 
 // generate unique session ID; return it as string
 func newSessId() string {

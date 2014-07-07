@@ -49,11 +49,12 @@ type ArtisticApp struct {
 
 func (a *ArtisticApp) createLogs() { createLog(a) }
 
-func (a *ArtisticApp) startWeb(path string) error { return webStart(path) }
+func (a *ArtisticApp) startWeb(path string) error { return webStart(a, path) }
 
 func (a *ArtisticApp) HandleConfigFile(cfgfile string) error {
 
 	fmt.Printf("DEBUG config file: %q\n", cfgfile) // DEBUG
+    // TODO
 
 	return nil
 }
@@ -83,7 +84,7 @@ func (a *ArtisticApp) SetWorkDir() bool {
 	return true
 }
 
-// Cleanup oprocedure when app is terminated.
+// Cleanup procedure when app is terminated.
 func (a *ArtisticApp) Cleanup() {
 
 	// close the DB connection
@@ -94,7 +95,7 @@ func (a *ArtisticApp) Cleanup() {
 
 	// clean the sessions directory
     if a.WebInfo != nil {
-	    cleanSessDir()
+	    cleanSessDir(a)
 	    a.Log.Info("Sessions folder deleted.")
     }
 
