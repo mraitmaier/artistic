@@ -2,6 +2,8 @@
  * datings.js - custom JS code dealing with the Datings
  *
  */
+
+/* OBSOLETE
 function createModalHeading(title) {
 
     var hdr = document.createElement('div');
@@ -32,14 +34,14 @@ function createModalHeading(title) {
     hdr.appendChild(btn);
     hdr.appendChild(title);
 
-/*
     <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
         <h4 class="modal-title" id="myModalLabel">Modal title</h4>
-*/
 
     return hdr;
 }
+*/
 
+/* OBSOLETE
 function createViewModalBody(data) {
 
     var id = data.Id;
@@ -74,7 +76,9 @@ function createViewModalBody(data) {
 
     return body;
 }
+*/
 
+/* OBSOLETE
 function createViewWindow(data) {
 
     var modal = document.createElement('div');
@@ -103,53 +107,6 @@ function createViewWindow(data) {
 
     return modal;
 }
-
-function openViewWindow(data) {
-
-    // if input data is empty, do nothing... 
-    if ((data === null) || (data === undefined)) { 
-        alert("openViewWindow: No data received."); // DEBUG
-        return; 
-    }
-
-    /*
-    var parentdiv = document.getElementById('datings-table-div');
-    var win = createViewWindow(data);
-    parentdiv.appendChild(win);
-    */
-    $.get('web/templates/datings.mst', function() {
-
-        var view = {
-                id: data.Id, 
-                dating: data.Dating, 
-                description: data.Description};
-
-        var tmplt = document.getElementById('view-dating-template').innerHtml;
-        var rendered = Mustache.render(tmplt, view);
-       // var parentdiv = document.getElementById('datings-table-div');
-        $('#datings-table-div').html(rendered);
-       // parentdiv.appendChild(win);
-    });
-
-    $('#viewModal').modal('show');
-
-}
-
-function openModifyWindow(data) {
-
-    // if input data is empty, do nothing... 
-    if ((data === null) || (data === undefined)) { 
-        alert("openModifyWindow: No data received."); // DEBUG
-        return; 
-    }
-
-    var id = data.Id;
-    var dating = data.Dating;
-    var descr = data.Description;
-
-    alert ('openModifyWindow: id=' +id+' ' + dating + ': ' + descr);  // DEBUG
-}
-
 
 function createRow(num, rowdata) {
 
@@ -231,57 +188,7 @@ function createTableHeader() {
     tblhdr.appendChild(hdrrow);
     return tblhdr;
 }
-
-// Create a datings table dynamically. 
-// The 'data' must be datings' data in JSON format.
-function createDatingsTable(dat) {
-
-    if ((dat.length === 0) || (dat === null) || (dat === undefined)) {
-        var text = document.createTextElement('p');
-        text.textContent = "No datings defined yet.";
-        return text;        
-    }
-
-    /*
-    // create the table
-    var tbl = document.createElement('table');
-    tbl.setAttribute('class', 'table table-stripped table-hover');
-    tbl.setAttribute('id', 'datings-table');
-
-    // create table body
-    var body = document.createElement('tbody');
-    for (var cnt = 0; cnt < data.length; cnt++) {
-        var row = createRow(cnt+1, data[cnt]);
-        body.appendChild(row);
-    }
-
-    // finally, assemble the complete table...
-    tbl.appendChild(createTableHeader()); // this is table header...
-    tbl.appendChild(body);
-    */
-
-    $.get('templates/mustache/datings.mst', function(dat) {
-
-        var data = {datings: dat,
-
-                    index: function() {
-                        return ++window['INDEX']||(window['INDEX']=0);
-                    }
-   
-                };
-
-        var template = $("#datings-table").html();
-        var tblhtml = Mustache.render(template, data);
-        
-        $("#datings-table-div").html(tblhtml); 
-    })
-        .fail( function(data) {
-            alert('template loading failed.'); // DEBUG
-            $("#datings-table-div").html('No datings defined currently.');
-    });
-
-    //return tbl;
-}
+*/
 
 
 function rerouteDating(id, cmd) {
@@ -294,16 +201,10 @@ function rerouteDating(id, cmd) {
         cmd = ""; // correct the command
     }
     
-    // create new URL
+    // create new URL and redirect to it
     var url = "/dating/" + id ;
-
     if ( (cmd === "view") || (cmd === "modify") ) {
         url = url + "/" + cmd;
     }
-
-    // now redirect to new URL
-    //window.location.replace(url);
-    //window.location = url;
-    //window.location.assign(url);
     window.location.href = url;
 }
