@@ -67,8 +67,9 @@ func main() {
 	}
 
 	// set working directory
-	if !aa.SetWorkDir() {
+	if err := aa.SetWorkDir(); err != nil {
 		fmt.Println("FATAL: cannot create working folder, cannot continue...")
+		fmt.Printf("%s\n", err.Error())
 		return
 	}
 

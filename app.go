@@ -58,7 +58,7 @@ func (a *ArtisticApp) HandleConfigFile(cfgfile string) error {
 }
 
 // Define working folder and create it, if it doesn't exist
-func (a *ArtisticApp) SetWorkDir() bool {
+func (a *ArtisticApp) SetWorkDir() error {
 
 	// if working folder is already set in global struct, use it
 	wdir := a.WorkDir
@@ -76,10 +76,10 @@ func (a *ArtisticApp) SetWorkDir() bool {
 
 	// create the working folder, if it doesn't exist
 	if err := os.MkdirAll(a.WorkDir, 0755); err != nil {
-		return false
+		return err
 	}
 
-	return true
+	return nil
 }
 
 // Cleanup procedure when app is terminated.
