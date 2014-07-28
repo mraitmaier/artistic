@@ -41,3 +41,15 @@ func (p *Painting) DisplayExhibitions() string {
 func (p *Painting) Created() string {
     return p.Work.Created()
 }
+
+
+// serialize a list of paintings into JSON
+func paintingsToJson(items []Painting) (data string, err error) {
+
+    var b []byte
+    if b, err = json.Marshal(items); err != nil {
+        return
+    }
+    data = string(b[:])
+    return
+}

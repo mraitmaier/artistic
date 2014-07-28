@@ -33,3 +33,15 @@ func (s *Sculpture) DisplayExhibitions() string {
 }
 
 func (s *Sculpture) Created() string { return s.Work.Created() }
+
+
+// serialize a list of sculptures into JSON
+func sculpturesToJson(items []Sculpture) (data string, err error) {
+
+    var b []byte
+    if b, err = json.Marshal(items); err != nil {
+        return
+    }
+    data = string(b[:])
+    return
+}

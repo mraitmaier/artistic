@@ -34,7 +34,7 @@ func authenticateUser(u, p string, aa *ArtisticApp,
 	if userdb != nil && utils.ComparePasswords(userdb.Password, p) {
 
 		// get current session data; create new session with given random ID
-		s, err := store.Get(r, "artistic")
+		s, err := aa.WebInfo.store.Get(r, "artistic")
 		if err != nil {
 			return false, err
 		}
@@ -43,7 +43,7 @@ func authenticateUser(u, p string, aa *ArtisticApp,
 
 		// create a new file in sessions folder to indicate valid session;
 		// we don't care about the descriptor
-		f, err := os.Create(filepath.Join(aa.WebInfo.SessDir, id))
+		f, err := os.Create(filepath.Join(aa.WebInfo.sessDir, id))
 		if err != nil {
 			return false, err
 		}
@@ -61,7 +61,7 @@ func authenticateUser(u, p string, aa *ArtisticApp,
 func logout(aa *ArtisticApp, w http.ResponseWriter, r *http.Request) error {
 
 	// get current session data; retrieve session ID
-	s, err := store.Get(r, "artistic")
+	s, err := aa.WebInfo.store.Get(r, "artistic")
 	if err != nil {
 		return err
 	}
@@ -72,7 +72,7 @@ func logout(aa *ArtisticApp, w http.ResponseWriter, r *http.Request) error {
 	// in the sessions folder.
 	// Delete it, if it exists.
 	// If it doesn't exist, there's probably something wrong: do nothing.
-	f := filepath.Join(aa.WebInfo.SessDir, id)
+	f := filepath.Join(aa.WebInfo.sessDir, id)
 	if utils.FileExists(f) {
 		os.Remove(f)
 		// remove values from session and save
@@ -86,7 +86,7 @@ func logout(aa *ArtisticApp, w http.ResponseWriter, r *http.Request) error {
 // check if user is already authenticated
 func userIsAuthenticated(aa *ArtisticApp, r *http.Request) (bool, *utils.User) {
 
-	s, err := store.Get(r, "artistic")
+	s, err := aa.WebInfo.store.Get(r, "artistic")
 	if err != nil {
 		return false, nil
 	}
@@ -96,7 +96,7 @@ func userIsAuthenticated(aa *ArtisticApp, r *http.Request) (bool, *utils.User) {
 
 	// if only the id value is not empty...
 	if id != nil {
-		f := filepath.Join(aa.WebInfo.SessDir, id.(string))
+		f := filepath.Join(aa.WebInfo.sessDir, id.(string))
 		if utils.FileExists(f) {
 
 			// get user information

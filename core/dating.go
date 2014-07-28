@@ -2,6 +2,8 @@ package core
 
 import (
 	"fmt"
+    "encoding/json"
+    "labix.org/v2/mgo/bson"
 )
 
 var AllowedDatings = []string{ "L", "S", "A",
@@ -12,11 +14,13 @@ var AllowedDatings = []string{ "L", "S", "A",
  * Dating - a structure representing a dating
  */
 type Dating struct {
+    // ID is created by DB automatically and is only a RO property
+    Id bson.ObjectId `bson:"_id"`
 
-    /* a dating value is defined (as enum) above */
+    // a dating value is defined (as enum) above 
 	Dating string
 
-    /* this is description of a dating */
+    // this is description of a dating
 	Description string
 }
 
@@ -29,3 +33,13 @@ func (d *Dating) Display() string {
 	return s
 }
 
+// serialize the list of datings into JSON
+func DatingsToJson(datings []Dating) (data string, err error) {
+
+    var b []byte
+    if b, err = json.Marshal(datings); err != nil {
+        return
+    }
+    data = string(b[:])
+    return
+}

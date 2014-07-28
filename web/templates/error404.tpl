@@ -11,7 +11,7 @@
 
     <!-- Bootstrap -->
   <!--  <link href="css/bootstrap.min.css" rel="stylesheet"> -->
-    <link href="static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -21,7 +21,7 @@
     <![endif]-->
 
     <!-- custom CSS, additional to CSS -->
-    <link href="static/css/custom.css" rel="stylesheet">
+    <link href="/static/css/custom.css" rel="stylesheet">
   </head>
 
   <body>
@@ -40,7 +40,7 @@
         <div class="col-md-4" id="data-list">
             <h1 id="data-list-header">Error 404</h1>
 
-            <p>This URL has not been found!</p>
+            <p>This page has not been found!</p>
         </div>
 
         <div class="col-md-6" id="data-details">
@@ -53,10 +53,10 @@
  <!--   <script 
         src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js">
     </script> -->
-    <script  src="static/js/jquery.min.js"></script>
+    <script  src="/static/js/jquery.min.js"></script>
 
 <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="static/js/bootstrap.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
 
     <script> </script>
   </body>

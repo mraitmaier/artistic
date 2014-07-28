@@ -5,7 +5,7 @@
   <div class="container-fluid">
     <!-- Brand and toggle get grouped for better mobile display -->
     <div class="navbar-header">
-      <a class="navbar-brand" href="index"
+      <a class="navbar-brand" href="/index"
          data-toggle="tooltip" data-placement="left" title="Home">Artistic
 <!--         <span class="glyphicon glyphicon-home"></span> -->
       </a>
@@ -32,7 +32,7 @@
           Admin<b class="caret"></b>
           </a>
           <ul class="dropdown-menu">
-            <li><a href="users">Users</a></li>
+            <li><a href="/users">Users</a></li>
           </ul>
         </li>
  
@@ -49,7 +49,7 @@
             </a>
         </li>
         <li>
-            <a href="license"
+            <a href="/license"
                data-toggle="tooltip" data-placement="left" title="License">
                 <span class="glyphicon glyphicon-copyright-mark"></span>
             </a>
@@ -73,7 +73,7 @@
     -->
         <li><p class="navbar-text">Logged in as {{.}}</p></li>
         <li>
-            <a href="logout"
+            <a href="/logout"
                data-toggle="tooltip" data-placement="left" title="Logout">
                 <span class="glyphicon glyphicon-log-out"></span>
             </a>

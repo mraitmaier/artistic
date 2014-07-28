@@ -99,6 +99,17 @@ func (p *Artist) Json() (string, error) {
 	return string(s[:]), err
 }
 
+
+// serialize a list of artists into JSON
+func artistsToJson(items []Artist) (data string, err error) {
+
+    var b []byte
+    if b, err = json.Marshal(items); err != nil {
+        return
+    }
+    data = string(b[:])
+    return
+}
 /**
     ArtistList - this is type representing a list of persons
 */

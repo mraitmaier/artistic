@@ -29,3 +29,15 @@ func (p *Print) DisplayExhibitions() string {
 }
 
 func (p *Print) Created() string { return p.Work.Created() }
+
+
+// serialize a list of prints into JSON
+func printsToJson(items []Print) (data string, err error) {
+
+    var b []byte
+    if b, err = json.Marshal(items); err != nil {
+        return
+    }
+    data = string(b[:])
+    return
+}

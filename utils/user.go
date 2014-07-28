@@ -79,3 +79,14 @@ func CreateUser(username, password string) *User {
 	p.Set(password)
     return &User{username, p.Get(), "", "user", ""}
 }
+
+// serialize the list of users into JSON
+func UsersToJson(users []User) (data string, err error) {
+
+    var b []byte
+	if b, err = json.Marshal(users); err != nil {
+		return
+	}
+    data = string(b[:])
+    return
+}

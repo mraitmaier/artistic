@@ -44,3 +44,15 @@ func (p *Ceramic) DisplayExhibitions() string {
 func (p *Ceramic) Created() string {
     return p.Work.Created()
 }
+
+
+// serialize a list of ceramics into JSON
+func ceramicsToJson(items []Ceramic) (data string, err error) {
+
+    var b []byte
+    if b, err = json.Marshal(items); err != nil {
+        return
+    }
+    data = string(b[:])
+    return
+}

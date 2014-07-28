@@ -104,7 +104,7 @@ func main() {
 	// start web interface
 	fmt.Println("Serving application on 'localhost:8088'...")
 	aa.Log.Info("Serving application on 'localhost:8088'...")
-	if err = aa.startWeb(DefWebRoot); err != nil {
+	if err = webStart(aa, DefWebRoot); err != nil {
 		aa.Log.Error(err.Error())
 	}
 }

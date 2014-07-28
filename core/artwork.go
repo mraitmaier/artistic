@@ -101,7 +101,7 @@ func CreateNewWork() *Work {
 	s := make([]string, 0, DefaultWorkCapacity) // sources
 	e := make([]string, 0, DefaultWorkCapacity) // exhibitions
 	n := make([]Note, 0, DefaultWorkCapacity)   // remarks
-	w := &Dating{"unknown", "Default Description"}
+	w := &Dating{"", "unknown", "Default Description"}
 	return &Work{"", // title
                 CreateArtist(), // artist
                 &Technique{"", ""}, // technique
@@ -165,6 +165,17 @@ func (w *Work) DisplayExhibitions() string {
 	return s
 }
 
+
+// serialize a list of artworks into JSON
+func artworksToJson(items []Artwork) (data string, err error) {
+
+    var b []byte
+    if b, err = json.Marshal(items); err != nil {
+        return
+    }
+    data = string(b[:])
+    return
+}
 /* WorkList - a list of Works */
 type WorkList []Work
 

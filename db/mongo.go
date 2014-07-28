@@ -159,11 +159,12 @@ func (m *MongoDbConn) GetAllDatings() ([]core.Dating, error) {
     if err := db.C("datings").Find(bson.D{}).All(&d); err != nil {
         return nil, err
     }
+    //fmt.Printf("DEBUG: %v\n", d) // DEBUG
     return d, nil
 }
 
-// Retrieve a single Technique record.
-func (m *MongoDbConn) GetDating(name string) (*core.Dating, error) {
+// Retrieve a single Dating record by ID.
+func (m *MongoDbConn) GetDating(id string) (*core.Dating, error) {
 
     // acquire lock
     dblock.Lock()
@@ -171,11 +172,11 @@ func (m *MongoDbConn) GetDating(name string) (*core.Dating, error) {
 
     // get *mgo.Database instance
     db := m.Sess.DB(m.name)
-    if db != nil { return nil, errors.New("MongoDb descriptor empty.") }
+    if db == nil { return nil, errors.New("MongoDb descriptor empty.") }
 
     t := new(core.Dating)
 
-    err := db.C("datings").Find(bson.M{ "dating" : name }).One(&t)
+    err := db.C("datings").Find(bson.M{ "_id": bson.ObjectIdHex(id) }).One(&t)
     if err != nil { return nil, err }
 
     return t, nil

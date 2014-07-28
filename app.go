@@ -49,8 +49,6 @@ type ArtisticApp struct {
 
 func (a *ArtisticApp) createLogs() { createLog(a) }
 
-func (a *ArtisticApp) startWeb(path string) error { return webStart(a, path) }
-
 func (a *ArtisticApp) HandleConfigFile(cfgfile string) error {
 
 	fmt.Printf("DEBUG config file: %q\n", cfgfile) // DEBUG
@@ -98,6 +96,9 @@ func (a *ArtisticApp) Cleanup() {
 	    cleanSessDir(a)
 	    a.Log.Info("Sessions folder deleted.")
     }
+
+    // close the websockets connection
+    //if a.WebInfo.wsConn != nil { a.WebInfo.wsConn.Close() }
 
 	// close the log
 	a.Log.Info("Closing log.")
