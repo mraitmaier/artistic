@@ -16,6 +16,7 @@ var AllowedDatings = []string{ "L", "S", "A",
 type Dating struct {
     // ID is created by DB automatically and is only a RO property
     Id bson.ObjectId `bson:"_id"`
+    //Id string `bson:"_id"`
 
     // a dating value is defined (as enum) above 
 	Dating string

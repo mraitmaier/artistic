@@ -4,7 +4,7 @@
 package db
 
 import (
-//    "fmt"
+    "fmt"
     "time"
     "errors"
     "labix.org/v2/mgo"
@@ -41,7 +41,19 @@ func (m *MongoDbConn) Close() {
     }
 }
 
+
+
 /* DataProvider interface implementation */
+
+// Convert BSON Object ID to string hex representation.
+func MongoIdToString(id bson.ObjectId) string {
+    return id.Hex()
+}
+
+// Convert ID from hex string representation to BSON Object ID.
+func MongoStringToId(id string) bson.ObjectId {
+    return bson.ObjectIdHex(id)
+}
 
 ///////////////////////////// Users
 
@@ -150,7 +162,9 @@ func (m *MongoDbConn) GetAllDatings() ([]core.Dating, error) {
 
     // get *mgo.Database instance
     db := m.Sess.DB(m.name)
-    if db == nil { return nil,  errors.New("MongoDB descriptor empty.") }
+    if db == nil {
+        return nil,  errors.New("Get all datings: MongoDB descriptor empty.")
+    }
 
     // prepare the empty slice for users
     d := make([]core.Dating, 0)
@@ -172,11 +186,14 @@ func (m *MongoDbConn) GetDating(id string) (*core.Dating, error) {
 
     // get *mgo.Database instance
     db := m.Sess.DB(m.name)
-    if db == nil { return nil, errors.New("MongoDb descriptor empty.") }
+    if db == nil {
+        return nil, errors.New("Get a dating: MongoDb descriptor empty.")
+    }
 
     t := new(core.Dating)
 
-    err := db.C("datings").Find(bson.M{ "_id": bson.ObjectIdHex(id) }).One(&t)
+    //err := db.C("datings").Find(bson.M{ "_id": bson.ObjectIdHex(id) }).One(&t)
+    err := db.C("datings").Find(bson.M{ "_id": MongoStringToId(id) }).One(&t)
     if err != nil { return nil, err }
 
     return t, nil
@@ -188,6 +205,20 @@ func (m * MongoDbConn) UpdateDating(d *core.Dating) error {
     // acquire lock
     dblock.Lock()
     defer dblock.Unlock()
+
+    if d == nil {
+        return fmt.Errorf("Update a dating: cannot update empty dating.")
+    }
+
+    db := m.Sess.DB(m.name)
+    if db == nil {
+        return  fmt.Errorf("Update a dating: MongoDB descriptor empty.")
+    }
+
+    // update the dating in DB
+    if err := db.C("datings").Update(bson.M{ "_id": d.Id }, d); err != nil {
+        return err
+    }
 
     return nil
 }

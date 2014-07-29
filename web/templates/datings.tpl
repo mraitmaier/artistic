@@ -252,12 +252,35 @@
 
 {{define "single-dating-modify"}}
 <div id="modify-dating-table-div">
-    <!-- XXX TODO! -->
-    <table id="modify-dating-table" class="table table-hover">
-    <tbody>
-        <tr> <td>Name</td><td>{{.Dating}}</td> </tr>
-        <tr> <td>Description</td><td>{{.Description}}</td> </tr>
-    </tbody>
-    </table>
+
+    <form class="form-vertical" role="form" method="post"
+                                id="dating-modify-form">
+    <fieldset>
+
+    <div class="form-group"> 
+        <label for="dating-name" class="col-lg-2 control-label">Name</label>
+        <div class="col-lg-10">
+        <input type="text" class="form-control" id="dating-name"
+               name="dating-name" value="{{.Dating}}" readonly></input>
+        </div>
+    </div>
+    <div class="form-group"> 
+        <label for="dating-description" class="col-lg-2 control-label">
+        Description</label>
+        <div class="col-lg-10">
+        <textarea type="text" class="form-control"  rows="5"
+        id="dating-description" name="dating-description">
+        {{.Description}}
+        </textarea>
+        </div>
+    </div>
+    <div class="form-group">
+        <button class="btn btn-primary" type="submit" 
+                id="dating-submit">Modify</button>
+    </div>
+
+    </fieldset>
+    </form>
+
 </div>
 {{end}}

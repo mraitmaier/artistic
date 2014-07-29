@@ -37,16 +37,19 @@ type DataProvider interface {
     GetUser(username string) (*utils.User, error)
     //CreateUser(*utils.User) error
     UpdateUser(*utils.User) error
+    //DeleteUser(*utils.User) error
 
     GetAllTechniques() ([]core.Technique, error)
     GetTechnique(name string) (*core.Technique, error)
     //CreateTechnique(*core.Technique) error
     //UpdateTechnique(*core.Technique) error
+    //DeleteTechnique(*core.Technique) error
 
     GetAllStyles() ([]core.Style, error)
     GetStyle(name string) (*core.Style, error)
     //CreateStyle(*core.Style) error
     //UpdateStyle(*core.Style) error
+    //DeleteStyle(*core.Style) error
 
     GetAllDatings() ([]core.Dating, error)
     GetDating(name string) (*core.Dating, error)
