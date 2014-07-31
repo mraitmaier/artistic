@@ -67,6 +67,8 @@ func registerHandlers(aa *ArtisticApp) {
 	r.Handle("/technique/{cmd}/{id}", techniqueHandler(aa) )
 	r.Handle("/technique/{cmd}/", techniqueHandler(aa) )
 	r.Handle("/styles", stylesHandler(aa) )
+	r.Handle("/style/{cmd}/{id}", styleHandler(aa) )
+	r.Handle("/style/{cmd}/", styleHandler(aa) )
 	r.Handle("/datings", datingsHandler(aa) )
 	r.Handle("/dating/{id}/{cmd}", datingHandler(aa) )
 	r.Handle("/error404", err404Handler(aa) )
@@ -465,6 +467,142 @@ func stylesHandler(aa *ArtisticApp) http.Handler {
 		http.Redirect(w, r, "/login", http.StatusFound)
 	}
     }) // return handler closure
+}
+
+// a single style handler
+func styleHandler(aa *ArtisticApp) http.Handler {
+    return http.HandlerFunc( func(w http.ResponseWriter, r *http.Request) {
+
+	if loggedin, user := userIsAuthenticated(aa, r); loggedin {
+
+	    log := aa.Log // get logger instance
+
+        switch r.Method {
+
+        case "GET":
+            if err := getStyleHandler(w, r, aa, user); err != nil {
+                log.Error(err.Error())
+			    http.Redirect(w, r, "/styles", http.StatusFound)
+            }
+
+        case "POST":
+            if err := postStyleHandler(w, r, aa); err != nil {
+                log.Error(err.Error())
+            }
+			http.Redirect(w, r, "/styles", http.StatusFound)
+
+        case "DELETE":
+            id := mux.Vars(r)["id"]
+            cmd := mux.Vars(r)["cmd"]
+            t := new(core.Style)
+            t.Id = db.MongoStringToId(id) // only valid ID needed to delete 
+            if err := aa.DataProv.DeleteStyle(t); err != nil {
+                msg := fmt.Sprintf(
+                    "%s style id=%q, DB returned %q.", cmd, id, err)
+                log.Error(msg)
+                return
+            }
+            log.Info(fmt.Sprintf("Successfully deleted style %q.", t.Id))
+	        http.Redirect(w, r, "/styles", http.StatusFound)
+
+        case "PUT":
+            fmt.Printf("received PUT request. :)\n")
+        }
+
+	} else {
+		http.Redirect(w, r, "/login", http.StatusFound)
+	}
+    }) // return handler closure
+}
+
+func getStyleHandler(w http.ResponseWriter, r *http.Request,
+                        aa *ArtisticApp, user *utils.User) error {
+
+    id := mux.Vars(r)["id"]
+    cmd := mux.Vars(r)["cmd"]
+
+    log := aa.Log
+    var err error
+    s := new(core.Style)
+
+    switch cmd {
+
+    case "view", "modify":
+	    // get a style from DB
+	    s, err = aa.DataProv.GetStyle(id)
+	    if err != nil {
+		    return fmt.Errorf(
+                "%s style id=%q, DB returned %q.", cmd, id, err)
+	    }
+
+    case "create":
+        // do nothing here...
+
+    case "delete":
+        s.Id = db.MongoStringToId(id) // only valid ID needed to delete 
+        if err = aa.DataProv.DeleteStyle(s); err != nil {
+            return fmt.Errorf(
+                "%s style id=%q, DB returned %q.", cmd, id, err)
+        }
+        log.Info(fmt.Sprintf("Successfully deleted style %q.", s.Id))
+	    http.Redirect(w, r, "/styles", http.StatusFound)
+        return nil //  this is all about deleting items...
+
+    default:
+        return fmt.Errorf("GET Style handler: unknown command %q", cmd)
+    }
+
+	// create ad-hoc struct to be sent to page template
+    var web = struct {
+		User  *utils.User
+        Cmd   string        // "view", "modify", "create" or "delete"...
+		Style *core.Style
+    }{ user, cmd, s }
+
+    // render the page
+	err = aa.WebInfo.templates.ExecuteTemplate(w, "style", &web)
+    if err != nil {
+	    log.Error("Error rendering the 'technique' page.")
+	}
+
+    return err
+}
+
+func postStyleHandler(w http.ResponseWriter, r *http.Request,
+                            aa *ArtisticApp) error {
+
+    // get data to modify 
+	id := mux.Vars(r)["id"]
+    cmd := mux.Vars(r)["cmd"]
+
+    // get POST form values and create a struct
+	name := strings.TrimSpace(r.FormValue("style-name"))
+	descr := strings.TrimSpace(r.FormValue("style-description"))
+    t := &core.Style{ db.MongoStringToId(id), name, descr }
+
+    var err error = nil
+
+    switch cmd {
+
+    case "create":
+        if err = aa.DataProv.CreateStyle(t); err != nil {
+            return err
+        }
+        aa.Log.Info(fmt.Sprintf("Successfully created style %q.", name))
+
+    case "modify":
+        if err = aa.DataProv.UpdateStyle(t); err != nil {
+            return err
+        }
+        aa.Log.Info(fmt.Sprintf("Successfully updated style %q.", name))
+
+    default:
+	    http.Redirect(w, r, "/styles", http.StatusFound)
+        err = fmt.Errorf(
+            "Invalid command %q for style. Redirecting to default page.", cmd)
+    }
+
+    return err
 }
 
 // techniques page handler

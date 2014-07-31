@@ -40,6 +40,11 @@
             <h1 id="data-list-header">Techniques</h1>
 
             {{template "tech-list" .Techniques}}
+
+            <button type="button" class="btn btn-primary"
+                    onclick="rerouteUsingGet('technique', 'create', '');">
+            Add New Technique
+            </button>
         </div>
 
      </div> <!-- row -->
@@ -53,9 +58,7 @@
 
 <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="/static/js/bootstrap.min.js"></script>
-<!-- custom tecnique JS code -->
-    <script src="/static/js/techniques.js"></script>
-
+    <script src="/static/js/artistic.js"></script>
     <script> </script>
   </body>
 </html>
@@ -110,12 +113,6 @@
     {{else}}
     <p>There are no techniques defined yet.</p>
     {{end}}
-
-    <button type="button" class="btn btn-primary"
-                          onclick="rerouteUsingGet('technique', 'create', '');">
-                          <!--onclick="rerouteTechnique('', 'create');"-->
-    Add New Technique
-    </button>
 
 {{end}}
 
@@ -186,7 +183,7 @@
 
 <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="/static/js/bootstrap.min.js"></script>
-    <script src="/static/js/techniques.js"></script>
+    <script src="/static/js/artistic.js"></script>
     <script>
 
     // when page is ready...

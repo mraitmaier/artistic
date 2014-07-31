@@ -49,7 +49,7 @@ type DataProvider interface {
     GetStyle(string) (*core.Style, error)
     CreateStyle(*core.Style) error
     UpdateStyle(*core.Style) error
-    //DeleteStyle(*core.Style) error
+    DeleteStyle(*core.Style) error
 
     GetAllDatings() ([]core.Dating, error)
     GetDating(string) (*core.Dating, error)

@@ -315,6 +315,10 @@ func (m * MongoDbConn) UpdateStyle(s *core.Style) error {
 
 // Create a new style in DB. 
 func (m * MongoDbConn) CreateStyle(s *core.Style) error {
+    // check the ID of the item to be inserted into DB
+    if s.Id == "" {
+        s.Id = NewId()
+    }
     return m.adminStyle(DBCmdCreate, s)
 }
 
@@ -343,7 +347,7 @@ func (m *MongoDbConn) adminStyle(cmd DbCommand, s *core.Style) error {
     switch cmd {
 
         case DBCmdUpdate:
-            err = coll.Update(bson.M { "_id" : s.Id }, s)
+            err = coll.UpdateId(s.Id, s)
 
         case DBCmdCreate:
             err = coll.Insert(s)
@@ -396,7 +400,6 @@ func (m *MongoDbConn) GetTechnique(id string) (*core.Technique, error) {
     }
 
     t := new(core.Technique)
-    //err := db.C("techniques").Find(bson.M{ "_id": MongoStringToId(id) }).One(&t)
     err := db.C("techniques").Find(bson.M{ "_id": MongoStringToId(id) }).One(&t)
     if err != nil {
         return nil, err
@@ -444,7 +447,6 @@ func (m *MongoDbConn) adminTechnique(cmd DbCommand, t *core.Technique) error {
 
     case DBCmdUpdate:
         err = coll.UpdateId(t.Id, t)
-        //err = coll.Update(bson.M { "_id" : MongoIdToString(t.Id) }, t)
 
     case DBCmdCreate:
         err = coll.Insert(t)
