@@ -3,7 +3,8 @@ package core
 import (
 	"fmt"
     "encoding/json"
-    "labix.org/v2/mgo/bson"
+//    "labix.org/v2/mgo/bson"
+    "gopkg.in/mgo.v2/bson"
 )
 
 var AllowedDatings = []string{ "L", "S", "A",
@@ -15,6 +16,7 @@ var AllowedDatings = []string{ "L", "S", "A",
  */
 type Dating struct {
     // ID is created by DB automatically and is only a RO property
+    //Id db.DbIdentifier `bson:"_id"`
     Id bson.ObjectId `bson:"_id"`
     //Id string `bson:"_id"`
 

@@ -3,18 +3,25 @@ package core
 import (
 	"fmt"
     "encoding/json"
+//    "labix.org/v2/mgo/bson"
+    "gopkg.in/mgo.v2/bson"
 )
 
-/*
- * Technique - a type representing an art technique
- */
+// Technique - a type representing an art technique
 type Technique struct {
 
-	/* name of the technique */
+    //
+    Id bson.ObjectId `bson:"_id"`
+
+	// name of the technique
 	Name string
 
-	/* description of the technique */
+	// description of the technique
 	Description string
+}
+
+func NewTechnique(name, description string) *Technique {
+    return &Technique{ bson.NewObjectId(), name, description }
 }
 
 func (t *Technique) String() string { return t.Name }

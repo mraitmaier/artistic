@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"os"
 	"runtime"
+    "strings"
     //    "strconv"
 	//    "bytes"
 	//    "encoding/binary"
@@ -17,7 +18,6 @@ import (
 	"bitbucket.org/miranr/artistic/core"
 	"bitbucket.org/miranr/artistic/utils"
 	"bitbucket.org/miranr/artistic/db"
-//	"github.com/gorilla/context"
 	"github.com/gorilla/sessions"
 	"github.com/gorilla/mux"
 )
@@ -35,6 +35,9 @@ type WebInfo struct {
 
     // websocket connection
     //wsConn *websocket.Conn
+
+    // (error) message to be displayed on page
+    LastMsg string
 }
 
 const (
@@ -60,6 +63,9 @@ func registerHandlers(aa *ArtisticApp) {
 	r.Handle("/index", indexHandler(aa) )
 	r.Handle("/users", usersHandler(aa))
 	r.Handle("/techniques", techniquesHandler(aa) )
+//	r.Handle("/technique/{cmd}/{id:[a-fA-F0-9]+|^$}", techniqueHandler(aa) )
+	r.Handle("/technique/{cmd}/{id}", techniqueHandler(aa) )
+	r.Handle("/technique/{cmd}/", techniqueHandler(aa) )
 	r.Handle("/styles", stylesHandler(aa) )
 	r.Handle("/datings", datingsHandler(aa) )
 	r.Handle("/dating/{id}/{cmd}", datingHandler(aa) )
@@ -111,6 +117,10 @@ func webStart(aa *ArtisticApp, wwwpath string) error {
 	return nil
 }
 
+func SetMessage(wi *WebInfo, msg string) {
+    wi.LastMsg = msg
+}
+
 func checkSessDir(path string, aa *ArtisticApp) bool {
 
 	basedir := path
@@ -128,7 +138,6 @@ func checkSessDir(path string, aa *ArtisticApp) bool {
 	// if path does not exits, create it...
 	if err := os.MkdirAll(aa.WebInfo.sessDir, 0755); err != nil {
 		fmt.Println("FATAL: Cannot create path. Cannot continue...")
-		//fmt.Println(err.Error()) // DEBUG
 		return false
 	}
 
@@ -215,9 +224,6 @@ func indexHandler(aa *ArtisticApp) http.Handler {
 
 	if loggedin, user := userIsAuthenticated(aa, r); loggedin {
 
-   //     u := context.Get(r, LoggedUser)
-   //     fmt.Printf("DEBUG context=%v\n", u) // DEBUG
-
 		err := aa.WebInfo.templates.ExecuteTemplate(w, "index", user)
         if err != nil {
 			aa.Log.Error("Cannot render the 'index' page.")
@@ -245,12 +251,6 @@ func usersHandler(aa *ArtisticApp) http.Handler {
 			http.Redirect(w, r, "/error404", http.StatusFound)
 			return
 		}
-
-		/* DEBUG
-		   for _, val := range users {
-		       fmt.Printf("User: %s\n", val.String()) // DEBUG
-		   }
-		*/
 
 		// create ad-hoc struct to be sent to page template
 		var web = struct {
@@ -334,14 +334,10 @@ func datingsHandler(aa *ArtisticApp) http.Handler {
 			return
 		}
 
- //       ghhjhg, _ := core.DatingsToJson(datings)
-
 		// create ad-hoc struct to be sent to page template
         var web = struct {
 			User    *utils.User
 			Datings []core.Dating
-//            Json string
- //       } { user, datings, ghhjhg}
         } { user, datings}
 
 		// render the page
@@ -365,10 +361,6 @@ func postDatingHandler(w http.ResponseWriter, r *http.Request,
 	name := r.FormValue("dating-name")
 	descr := r.FormValue("dating-description")
 
-//    fmt.Printf("DEBUG dating ID=%q\n", id) // DEBUG
-//    fmt.Printf("DEBUG dating name=%q\n", name) // DEBUG
-//    fmt.Printf("DEBUG dating description=%q\n", descr) // DEBUG
-
     d := &core.Dating {db.MongoStringToId(id), name, descr}
 
     if err := aa.DataProv.UpdateDating(d); err != nil {
@@ -389,22 +381,23 @@ func getDatingHandler(w http.ResponseWriter, r *http.Request,
 	// get a dating with given ID from DB
 	dating, err := aa.DataProv.GetDating(id)
 	if err != nil {
-		http.Redirect(w, r, "/error404", http.StatusFound)
+		//http.Redirect(w, r, "/error", http.StatusFound) 
+		http.Redirect(w, r, "/datings", http.StatusFound) // FIXME?
 		return err
 	}
 
 	// create ad-hoc struct to be sent to page template
     var web = struct {
 		User    *utils.User
-           Cmd     string // "view" or "modify"; we don't allow "delete"...
+        Cmd     string // "view" or "modify"; we don't allow "delete"...
 		Dating  *core.Dating
     } { user, cmd, dating }
 
 	// render the page
 	err = aa.WebInfo.templates.ExecuteTemplate(w, "dating", &web)
     if err != nil {
-            return fmt.Errorf("Error rendering the 'dating' page: %q.\n",
-                err.Error())
+        return fmt.Errorf("Error rendering the 'dating' page: %q.\n",
+            err.Error())
 	}
     return nil
 }
@@ -498,7 +491,6 @@ func techniquesHandler(aa *ArtisticApp) http.Handler {
         }{ user, tech }
 
 		// render the page
-		//err = aa.WebInfo.templates.ExecuteTemplate(w, "techniques", web)
 		err = aa.WebInfo.templates.ExecuteTemplate(w, "techniques", &web)
         if err != nil {
 			aa.Log.Error("Error rendering the 'techniques' page.")
@@ -508,6 +500,143 @@ func techniquesHandler(aa *ArtisticApp) http.Handler {
 		http.Redirect(w, r, "/login", http.StatusFound)
 	}
     }) // return handler closure
+}
+
+// a single technique handler
+func techniqueHandler(aa *ArtisticApp) http.Handler {
+    return http.HandlerFunc( func(w http.ResponseWriter, r *http.Request) {
+
+	if loggedin, user := userIsAuthenticated(aa, r); loggedin {
+
+	    log := aa.Log // get logger instance
+
+        switch r.Method {
+
+        case "GET":
+            if err := getTechniqueHandler(w, r, aa, user); err != nil {
+                log.Error(err.Error())
+			    http.Redirect(w, r, "/techniques", http.StatusFound)
+            }
+
+        case "POST":
+            if err := postTechniqueHandler(w, r, aa); err != nil {
+                log.Error(err.Error())
+            }
+			http.Redirect(w, r, "/techniques", http.StatusFound)
+
+        case "DELETE":
+            id := mux.Vars(r)["id"]
+            cmd := mux.Vars(r)["cmd"]
+            t := new(core.Technique)
+            t.Id = db.MongoStringToId(id) // only valid ID needed to delete 
+            if err := aa.DataProv.DeleteTechnique(t); err != nil {
+                msg := fmt.Sprintf(
+                    "%s technique id=%q, DB returned %q.", cmd, id, err)
+                log.Error(msg)
+                return
+            }
+            log.Info(fmt.Sprintf("Successfully deleted technique %q.", t.Id))
+	        http.Redirect(w, r, "/techniques", http.StatusFound)
+
+        case "PUT":
+            fmt.Printf("received PUT request. :)\n")
+        }
+
+	} else {
+		http.Redirect(w, r, "/login", http.StatusFound)
+	}
+    }) // return handler closure
+}
+
+func getTechniqueHandler(w http.ResponseWriter, r *http.Request,
+                        aa *ArtisticApp, user *utils.User) error {
+
+    id := mux.Vars(r)["id"]
+    cmd := mux.Vars(r)["cmd"]
+
+    log := aa.Log
+    var err error
+    tech := new(core.Technique)
+
+    switch cmd {
+
+    case "view", "modify":
+	    // get a technique from DB
+	    tech, err = aa.DataProv.GetTechnique(id)
+	    if err != nil {
+		    return fmt.Errorf(
+                "%s technique id=%q, DB returned %q.", cmd, id, err)
+	    }
+
+    case "create":
+        // do nothing here...
+
+    case "delete":
+        tech.Id = db.MongoStringToId(id) // only valid ID needed to delete 
+        if err = aa.DataProv.DeleteTechnique(tech); err != nil {
+            return fmt.Errorf(
+                "%s technique id=%q, DB returned %q.", cmd, id, err)
+        }
+        log.Info(fmt.Sprintf("Successfully deleted technique %q.", tech.Id))
+	    http.Redirect(w, r, "/techniques", http.StatusFound)
+        return nil //  this is all about deleting items...
+
+    default:
+        return fmt.Errorf("GET Technique handler: unknown command %q", cmd)
+    }
+
+	// create ad-hoc struct to be sent to page template
+    var web = struct {
+		User      *utils.User
+        Cmd       string        // "view", "modify", "create" or "delete"...
+		Technique *core.Technique
+    }{ user, cmd, tech }
+
+    // render the page
+	err = aa.WebInfo.templates.ExecuteTemplate(w, "technique", &web)
+    if err != nil {
+	    log.Error("Error rendering the 'technique' page.")
+	}
+
+    return err
+}
+
+func postTechniqueHandler(w http.ResponseWriter, r *http.Request,
+                            aa *ArtisticApp) error {
+
+    // get data to modify 
+	id := mux.Vars(r)["id"]
+    cmd := mux.Vars(r)["cmd"]
+
+    // get POST form values and create a struct
+	name := strings.TrimSpace(r.FormValue("technique-name"))
+	descr := strings.TrimSpace(r.FormValue("technique-description"))
+    t := &core.Technique {db.MongoStringToId(id), name, descr}
+
+    var err error = nil
+
+    switch cmd {
+
+    case "create":
+        if err = aa.DataProv.CreateTechnique(t); err != nil {
+            return err
+        }
+        aa.Log.Info(fmt.Sprintf("Successfully created technique %q.", name))
+
+    case "modify":
+        if err = aa.DataProv.UpdateTechnique(t); err != nil {
+            return err
+        }
+        aa.Log.Info(fmt.Sprintf("Successfully updated technique %q.", name))
+
+    default:
+	    http.Redirect(w, r, "/techniques", http.StatusFound)
+        err = fmt.Errorf(
+            "Invalid command %q for technique. Redirecting to default page.",
+            cmd)
+    }
+
+    return err
 }
 
 /*

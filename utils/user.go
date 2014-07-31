@@ -12,12 +12,15 @@ import (
 	"fmt"
 	"strings"
     "errors"
+//    "labix.org/v2/mgo/bson"
+    "gopkg.in/mgo.v2/bson"
 )
 
 /*
  * User
  */
 type User struct {
+    Id        bson.ObjectId `bson:"_id"`
 	Username  string // username 
 	Password  string // password (should always be hashed, use CreateUser()! ) 
 	Name      string // full name
@@ -67,7 +70,7 @@ func (u *User) SetRole(role string) error {
 func CreateNewUser(username, password, role string) (*User, error) {
 	p := new(Password)
 	p.Set(password)
-    u := &User{username, p.Get(), "", "user", ""}
+    u := &User{bson.NewObjectId(), username, p.Get(), "", "user", ""}
     if err := u.SetRole(role); err != nil { return nil, err }
 	return u, nil
 }
@@ -77,7 +80,7 @@ func CreateNewUser(username, password, role string) (*User, error) {
 func CreateUser(username, password string) *User {
 	p := new(Password)
 	p.Set(password)
-    return &User{username, p.Get(), "", "user", ""}
+    return &User{bson.NewObjectId(), username, p.Get(), "", "user", ""}
 }
 
 // serialize the list of users into JSON

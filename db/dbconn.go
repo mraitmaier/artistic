@@ -34,25 +34,25 @@ type DataProvider interface {
 
     GetAllUsers() ([]utils.User, error)
 //    GetAllUsers(chan []utils.User) error
-    GetUser(username string) (*utils.User, error)
-    //CreateUser(*utils.User) error
+    GetUser(string) (*utils.User, error)
+    CreateUser(*utils.User) error
     UpdateUser(*utils.User) error
     //DeleteUser(*utils.User) error
 
     GetAllTechniques() ([]core.Technique, error)
-    GetTechnique(name string) (*core.Technique, error)
-    //CreateTechnique(*core.Technique) error
-    //UpdateTechnique(*core.Technique) error
-    //DeleteTechnique(*core.Technique) error
+    GetTechnique(string) (*core.Technique, error)
+    CreateTechnique(*core.Technique) error
+    UpdateTechnique(*core.Technique) error
+    DeleteTechnique(*core.Technique) error
 
     GetAllStyles() ([]core.Style, error)
-    GetStyle(name string) (*core.Style, error)
-    //CreateStyle(*core.Style) error
-    //UpdateStyle(*core.Style) error
+    GetStyle(string) (*core.Style, error)
+    CreateStyle(*core.Style) error
+    UpdateStyle(*core.Style) error
     //DeleteStyle(*core.Style) error
 
     GetAllDatings() ([]core.Dating, error)
-    GetDating(name string) (*core.Dating, error)
+    GetDating(string) (*core.Dating, error)
     UpdateDating(*core.Dating) error
 }
 
@@ -93,4 +93,20 @@ func initMongo(host string, port int, username, passwd,
 
     return s, db, db
 }
+///////////////
+type DbCommand int
+const (
+    DBCmdGetOne DbCommand = iota // get a single record from DB
+    DBCmdUpdate                  // update a single record in DB
+    DBCmdCreate                  // create a new record in DB
+    DBCmdDelete                  // delete a single record in DB
+)
 
+///////////////////////////// EXPERIMENTAL ///////////////////
+// NOTE: how to abstract away the DB ID (for differents DBs)? By implementing
+// a type that satisfies the interface...
+//
+type DbIdentifier interface {
+    IdToString(interface{}) string
+    StringToId(string) interface{}
+}

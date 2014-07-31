@@ -25,6 +25,9 @@ type Work struct {
 	/* This artwork is made in which technique? */
 	*Technique
 
+    // artwork style
+    *Style
+
 	/* Size: dimensions, measures of the artwork */
 	Size string
 
@@ -104,7 +107,8 @@ func CreateNewWork() *Work {
 	w := &Dating{"", "unknown", "Default Description"}
 	return &Work{"", // title
                 CreateArtist(), // artist
-                &Technique{"", ""}, // technique
+                NewTechnique("", ""), // technique
+                NewStyle("", ""), // style
                 "",     // size
                 w,      // dating
                 "",     // time of creation
