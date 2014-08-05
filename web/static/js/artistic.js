@@ -3,6 +3,42 @@
  *
  */
 
+function validateUserForm() {
+
+    var pwd = document.getElementById("password").value;
+    var pwd2 = document.getElementById("password2").value;
+
+    if (pwd !== pwd2) { 
+        alert("Passwords do not match!");
+        return false; 
+    }
+
+    return true;
+}
+
+// check 
+function checkPasswords(pwd1, pwd2) {
+    var status = false;
+
+    if (pwd1 === pwd2) { return true; }
+
+    return status;
+}
+
+
+function validatePasswordChange() {
+
+    var old = document.getElementById("oldpassword").value;
+    var pwd = document.getElementById("newpassword").value;
+    var pwd2 = document.getElementById("newpassword2").value;
+
+    if (!checkPasswords(pwd, pwd)) { 
+        return false;
+    }
+
+    return true;
+}
+
 // send a HTTP request (GET, POST, DELETE, PUT...)
 function sendRequest(method, url) {
 

@@ -25,7 +25,7 @@ func authenticateUser(u, p string, aa *ArtisticApp,
 	//    fmt.Printf("DEBUG: session ID=%q\n", id) // DEBUG
 
 	// get information from DB
-	userdb, err := aa.DataProv.GetUser(u)
+	userdb, err := aa.DataProv.GetUserByUsername(u)
 	if err != nil {
 		return false, err
 	}
@@ -100,7 +100,7 @@ func userIsAuthenticated(aa *ArtisticApp, r *http.Request) (bool, *utils.User) {
 		if utils.FileExists(f) {
 
 			// get user information
-			user, err := aa.DataProv.GetUser(s.Values["user"].(string))
+			user,err := aa.DataProv.GetUserByUsername(s.Values["user"].(string))
 			if err != nil { // something is not OK...
 				return false, nil
 			}

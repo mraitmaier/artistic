@@ -62,6 +62,8 @@ func registerHandlers(aa *ArtisticApp) {
 	r.Handle("/logout", logoutHandler(aa) )
 	r.Handle("/index", indexHandler(aa) )
 	r.Handle("/users", usersHandler(aa))
+	r.Handle("/user/{cmd}/{id}", userHandler(aa) )
+	r.Handle("/user/{cmd}/", userHandler(aa) )
 	r.Handle("/techniques", techniquesHandler(aa) )
 //	r.Handle("/technique/{cmd}/{id:[a-fA-F0-9]+|^$}", techniqueHandler(aa) )
 	r.Handle("/technique/{cmd}/{id}", techniqueHandler(aa) )
@@ -106,7 +108,11 @@ func webStart(aa *ArtisticApp, wwwpath string) error {
 
 	//web page templates, with defined additional functions
 	funcs := template.FuncMap{
-		"add": func(x, y int) int { return x + y }}
+		"add": func(x, y int) int { return x + y },
+        "allowedroles": func() []string { return utils.AllowedRoles },
+        "totitle": func(s string) string { return strings.Title(s) },
+        "toupper": func(s string) string { return strings.ToUpper(s) },
+        "tolower": func(s string) string { return strings.ToLower(s) }}
 	t := filepath.Join(wwwpath, "templates", "*.tpl")
 	aa.WebInfo.templates = template.Must(
             template.New("").Funcs(funcs).ParseGlob(t))
@@ -229,41 +235,6 @@ func indexHandler(aa *ArtisticApp) http.Handler {
 		err := aa.WebInfo.templates.ExecuteTemplate(w, "index", user)
         if err != nil {
 			aa.Log.Error("Cannot render the 'index' page.")
-		}
-
-	} else {
-		http.Redirect(w, r, "/login", http.StatusFound)
-	}
-    }) // return handler closure
-}
-
-// user admin page handler
-func usersHandler(aa *ArtisticApp) http.Handler {
-
-    return http.HandlerFunc( func (w http.ResponseWriter, r *http.Request) {
-
-	if loggedin, user := userIsAuthenticated(aa, r); loggedin {
-
-		log := aa.Log
-
-		// get all users from DB
-		users, err := aa.DataProv.GetAllUsers()
-		if err != nil {
-			log.Error(fmt.Sprintf("Problem getting all users: %s", err.Error()))
-			http.Redirect(w, r, "/error404", http.StatusFound)
-			return
-		}
-
-		// create ad-hoc struct to be sent to page template
-		var web = struct {
-			User  *utils.User
-			Users []utils.User
-		} { user, users }
-
-		// render the page
-		err = aa.WebInfo.templates.ExecuteTemplate(w, "users", &web)
-        if err != nil {
-			log.Error("Cannot render the 'users' page.")
 		}
 
 	} else {

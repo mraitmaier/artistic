@@ -33,11 +33,11 @@ type DbConnector interface {
 type DataProvider interface {
 
     GetAllUsers() ([]utils.User, error)
-//    GetAllUsers(chan []utils.User) error
     GetUser(string) (*utils.User, error)
+    GetUserByUsername(string) (*utils.User, error)
     CreateUser(*utils.User) error
     UpdateUser(*utils.User) error
-    //DeleteUser(*utils.User) error
+    DeleteUser(*utils.User) error
 
     GetAllTechniques() ([]core.Technique, error)
     GetTechnique(string) (*core.Technique, error)

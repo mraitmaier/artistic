@@ -40,6 +40,13 @@ function rerouteTechnique(method, cmd, id) {
 // - commands (cmd) are "view", "create", "delete" and "modify" 
 // - id is the DB ID of the item
 function rerouteUsingGet(item, cmd, id) {
+
+    if (cmd === "delete") {
+        if (!(confirm("Do you really want to delete " + item + "?"))) { 
+            return;
+        }
+    }
+
     var url = "/" + item + "/" + cmd + "/" + id;
     window.location.href = url;
 }

@@ -108,7 +108,7 @@ func (m *MongoDbConn) GetAllUsers() ([]utils.User, error) {
 }
 
 // Get a single user from the DB: we need a username. 
-func (m * MongoDbConn) GetUser(username string) (*utils.User, error) {
+func (m * MongoDbConn) GetUserByUsername(username string) (*utils.User, error) {
 
     // acquire lock
     dblock.Lock()
@@ -142,6 +142,42 @@ func (m * MongoDbConn) GetUser(username string) (*utils.User, error) {
     return user, nil // all OK
 }
 
+// Get a single user from the DB: we need an ID . 
+func (m * MongoDbConn) GetUser(id string) (*utils.User, error) {
+
+    // acquire lock
+    dblock.Lock()
+    defer dblock.Unlock()
+
+    // get *mgo.Database instance
+    db := m.Sess.DB(m.name)
+    if db == nil { return nil, errors.New("MongoDB descriptor empty.") }
+
+    // prepare channel
+    ch := make(chan *utils.User)
+
+    // start goroutine to get a user
+    go func(id string, ch chan *utils.User) {
+
+        u := utils.CreateUser("", "") // create empty user
+
+        // get a user from DB
+        err := db.C("users").Find(bson.M{ "_id": MongoStringToId(id) }).One(&u)
+        if err != nil {
+            return
+        }
+
+        // write a user to channel
+        ch <- u
+    }(id, ch)
+
+    // read user from channel
+    user := <-ch
+
+    return user, nil // all OK
+}
+
+
 // Update a single user in DB. 
 func (m *MongoDbConn) UpdateUser(u *utils.User) error {
     return m.adminUser(DBCmdUpdate, u)
@@ -149,6 +185,10 @@ func (m *MongoDbConn) UpdateUser(u *utils.User) error {
 
 // Create a new user in DB. 
 func (m *MongoDbConn) CreateUser(u *utils.User) error {
+    // check the ID of the item to be inserted into DB
+    if u.Id == "" {
+        u.Id = NewId()
+    }
     return m.adminUser(DBCmdCreate, u)
 }
 
@@ -175,22 +215,21 @@ func (m *MongoDbConn) adminUser(cmd DbCommand, u *utils.User) error {
     var err error
     switch cmd {
 
-        case DBCmdUpdate:
-            err = coll.Update(bson.M { "_id" : u.Id }, u)
+    case DBCmdUpdate:
+        err = coll.UpdateId(u.Id, u)
 
-        case DBCmdCreate:
-            err = coll.Insert(u)
+    case DBCmdCreate:
+        err = coll.Insert(u)
 
-        case DBCmdDelete:
-             err = coll.RemoveId(u.Id)
+    case DBCmdDelete:
+         err = coll.RemoveId(u.Id)
 
-        default:
-            err = fmt.Errorf("Handling styles: Unknown command.")
+    default:
+        err = fmt.Errorf("Handling users: Unknown command.")
     }
 
     return err
 }
-
 
 ///////////////////////////// Datings
 
@@ -455,7 +494,7 @@ func (m *MongoDbConn) adminTechnique(cmd DbCommand, t *core.Technique) error {
          err = coll.RemoveId(t.Id)
 
     default:
-        err = fmt.Errorf("Handling styles: Unknown command.")
+        err = fmt.Errorf("Handling techniques: Unknown command.")
     }
 
     return err

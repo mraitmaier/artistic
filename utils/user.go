@@ -12,13 +12,10 @@ import (
 	"fmt"
 	"strings"
     "errors"
-//    "labix.org/v2/mgo/bson"
     "gopkg.in/mgo.v2/bson"
 )
 
-/*
- * User
- */
+// User
 type User struct {
     Id        bson.ObjectId `bson:"_id"`
 	Username  string // username 
@@ -64,6 +61,20 @@ func (u *User) SetRole(role string) error {
     return errors.New("User role value not valid.")
 }
 
+// Compare passwords: new (change) is plain-text...
+func (u *User) ComparePassword(change string) bool {
+    p := new(Password)
+    p.Set(change)
+    return p.Get() == u.Password
+}
+
+// Set a new password to an existing user.
+func (u *User) SetPassword(newpwd string) {
+    p := new(Password)
+    p.Set(newpwd)
+    u.Password = p.Get()
+}
+
 // Create a new user with username, password and role as mandatory information.
 // This one is used to create a non-existing user (in some sort of DB), so role
 // is a vital information about the user.
@@ -82,6 +93,7 @@ func CreateUser(username, password string) *User {
 	p.Set(password)
     return &User{bson.NewObjectId(), username, p.Get(), "", "user", ""}
 }
+
 
 // serialize the list of users into JSON
 func UsersToJson(users []User) (data string, err error) {
