@@ -63,9 +63,12 @@ func (u *User) SetRole(role string) error {
 
 // Compare passwords: new (change) is plain-text...
 func (u *User) ComparePassword(change string) bool {
-    p := new(Password)
-    p.Set(change)
-    return p.Get() == u.Password
+    //FIXME: there's a bug here...
+//    p := new(Password)
+ //   p.Set(change)
+  //  fmt.Printf("DEBUG ComparePassword(): %q =? %q\n", p.Get(), u.Password) //
+   // return p.Get() == u.Password
+   return ComparePasswords(u.Password, change)
 }
 
 // Set a new password to an existing user.
@@ -78,7 +81,7 @@ func (u *User) SetPassword(newpwd string) {
 // Create a new user with username, password and role as mandatory information.
 // This one is used to create a non-existing user (in some sort of DB), so role
 // is a vital information about the user.
-func CreateNewUser(username, password, role string) (*User, error) {
+func NewUser(username, password, role string) (*User, error) {
 	p := new(Password)
 	p.Set(password)
     u := &User{bson.NewObjectId(), username, p.Get(), "", "user", ""}
@@ -86,14 +89,12 @@ func CreateNewUser(username, password, role string) (*User, error) {
 	return u, nil
 }
 
-// Create a user with username and password. This one is used to authenticate
-// the existing user (role is stored in some DB...)
+// Create a user with username and password. 
+// This one is used to authenticate the existing user (role is stored in 
+// some DB...)
 func CreateUser(username, password string) *User {
-	p := new(Password)
-	p.Set(password)
-    return &User{bson.NewObjectId(), username, p.Get(), "", "user", ""}
+    return &User{bson.NewObjectId(), username, password, "", "user", ""}
 }
-
 
 // serialize the list of users into JSON
 func UsersToJson(users []User) (data string, err error) {

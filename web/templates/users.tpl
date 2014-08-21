@@ -42,7 +42,7 @@
             <p> {{template "user-list" .Users}}</p>
 
             <button type="button" class="btn btn-primary"
-                    onclick="rerouteUsingGet('user', 'create', '');">
+                    onclick="rerouteUsingGet('user', 'insert', '');">
             Add New User
             </button>
         </div>
@@ -96,7 +96,7 @@
                 </a>
                 &nbsp;
                 <a href="#" data-toggle="tooltip" data-placement="left" 
-                            title="Edit user" id="edir-user-{{$id}}"
+                            title="Edit user" id="edit-user-{{$id}}"
         onclick="return rerouteUsingGet('user', 'modify', {{$element.Id}});">
                     <span class="glyphicon glyphicon-cog" ></span>
                 </a>
@@ -106,6 +106,13 @@
         onclick="return rerouteUsingGet('user', 'delete', {{$element.Id}});">
                     <span class="glyphicon glyphicon-trash"></span>
                 </a>
+                &nbsp;
+                <a href="#" data-toggle="tooltip" data-placement="left" 
+                            title="Change user password" id="pwd-{{$id}}"
+        onclick="return rerouteUsingGet('user', 'changepwd', {{$element.Id}});">
+                    <span class="glyphicon glyphicon-random"></span>
+                </a>
+
             </td>
         </tr>
         {{end}}
@@ -121,7 +128,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Artistic - Style</title>
+    <title>Artistic - User</title>
 
     <!-- Bootstrap -->
   <!--  <link href="css/bootstrap.min.css" rel="stylesheet"> -->
@@ -158,13 +165,13 @@
         {{else if eq .Cmd "modify"}}
             <h1 id="data-list-header">Modify User</h1>
             {{template "single-user-modify" .UserProfile}}
-        {{else if eq .Cmd "create"}}
+        {{else if eq .Cmd "insert"}}
             <h1 id="data-list-header">Create New User</h1>
             <p>Please enter the data to create a new user.</p>
             {{template "user-create"}}
         {{else if eq .Cmd "changepwd"}} 
             <h1 id="data-list-header">Change User Password</h1>
-            {{template "change-passwd"}}
+            {{template "change-passwd" .UserProfile}}
         {{else if eq .Cmd ""}} 
             <h1 id="data-list-header">View User</h1>
             {{template "single-user-view" .UserProfile}}
@@ -203,7 +210,8 @@
 {{end}}
 
 {{define "single-user-view"}}
-<div id="view-user-table-div">
+<div class="container-fluid" id="view-user-table-div">
+    <div class="row">
     <table id="view-user-table" class="table table-hover">
     <tbody>
         <tr> <td class="col-md-2"><b>Username<b/></td>
@@ -218,35 +226,49 @@
              <td class="col-md-10">{{.Email}}</td>      </tr>
     </tbody>
     </table>
+    </div>
+
+    <div class="row">
+        <div class="col-md-1 col-md-offset-7">
+    <a type="button" class="btn btn-primary" href="/users">
+        <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;&nbsp;Back
+    </a>
+        </div>
+    </div>
 </div>
 {{end}}
 
 {{define "single-user-modify"}}
-<div id="modify-user-table-div">
+<div class="container-fluid" id="modify-user-form-div">
     <form class="form-vertical" role="form" method="post"
                                 id="user-modify-form">
     <fieldset>
 
+    <div class="row">
     <div class="form-group"> 
         <label for="username" class="col-md-2 control-label">Username</label>
-        <div class="col-md-10">
+        <div class="col-md-6">
         <input type="text" class="form-control" id="username"
-               name="username" value="{{.Username}}"></input>
+               name="username" value="{{.Username}}" readonly></input>
         </div>
     </div>
+    </div>
 
+    <div class="row">
     <div class="form-group"> 
         <label for="password" class="col-md-2 control-label">Password</label> 
-        <div class="col-md-10">
+        <div class="col-md-6">
         <input type="text" class="form-control" id="password"   
                            name="password" value="{{.Password}}" readonly>
         </input>
         </div>
     </div>
+    </div>
 
+    <div class="row">
     <div class="form-group"> 
         <label for="role" class="col-md-2 control-label">User Role</label>
-        <div class="col-md-10">
+        <div class="col-md-6">
         <select class="form-control" name="role" id="role">
         {{ $roles := allowedroles }}
         {{ $current := .Role}}
@@ -260,78 +282,103 @@
         </select>
         </div>
     </div>
+    </div>
 
+    <div class="row">
     <div class="form-group"> 
         <label for="fullname" class="col-md-2 control-label">Full Name</label>
-        <div class="col-md-10">
+        <div class="col-md-6">
         <input type="text" class="form-control" id="fullname"
                name="fullname" value="{{.Name}}"></input>
         </div>
     </div>
+    </div>
 
+    <div class="row">
     <div class="form-group"> 
         <label for="email" class="col-md-2 control-label">E-mail Address</label>
-        <div class="col-md-10">
+        <div class="col-md-6">
         <input type="email" class="form-control" id="email"
                name="email" value="{{.Email}}"></input>
         </div>
     </div>
+    </div>
 
+    <div class="row">&nbsp;<!-- empty row --></div>
+
+    <div class="row">
     <div class="form-group">
+        <div class="col-md-4">
         <button class="btn btn-primary" type="submit" 
                 id="user-submit">Modify User</button>
 
         <button class="btn btn-danger" type="button" 
                 onclick="return rerouteUsingGet('user', 'changepwd', {{.Id}});"
                 id="user-changepwd">Change Password</button>
-    </div>
+        </div>
+
+        <div class="col-md-1 col-md-offset-3">
+    <a type="button" class="btn btn-primary" href="/users">
+        <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;&nbsp;Back
+    </a>
+        </div>
+    </div> <!-- form-group -->
+    </div> <!-- row -->
 
     </fieldset>
     </form>
-</div>
+</div> <!-- container-fluid -->
+
 {{end}}
 
 {{define "user-create"}}
-    <div id="create-user-form-div">
+<div class="container-fluid" id="create-user-form-div">
     <form class="form-vertical" role="form" method="post"
                 onsubmit="validateUserForm();"
-                id="create-user-form" action="/user/create/">
+                id="create-user-form" action="/user/insert/">
         <fieldset>
 
+        <div class="row">
         <div class="form-group">
             <label for="username" 
                    class="col-md-2 control-label">Username</label>
-            <div class="col-md-10">
+            <div class="col-md-6">
             <input type="text" class="form-control" id="username"
                    name="username" value="" placeholder="username" required>
             </input>
             </div>
         </div>
+        </div>
         
+        <div class="row">
         <div class="form-group">
             <label for="password" 
                    class="col-md-2 control-label">Password</label>
-            <div class="col-md-10">
+            <div class="col-md-6">
             <input type="password" class="form-control" id="password"
                    name="password" value="" placeholder="password" required>
             </input>
             </div>
         </div>
+        </div>
 
+        <div class="row">
         <div class="form-group">
             <label for="password2" 
                    class="col-md-2 control-label">Retype Password</label>
-            <div class="col-md-10">
+            <div class="col-md-6">
             <input type="password" class="form-control" id="password2"
                    name="password2" value="" 
                    placeholder="retype password" required>
             </input>
             </div>
         </div>
+        </div>
 
+        <div class="row">
         <div class="form-group">
             <label for="role" class="col-md-2 control-label">User Role</label>
-            <div class="col-md-10">
+            <div class="col-md-6">
             <select class="form-control" name="role" id="role" required>
             {{ $roles := allowedroles }}
             {{range $role := $roles}}
@@ -344,82 +391,130 @@
             </select>
             </div>
         </div>
+        </div>
 
+        <div class="row">
         <div class="form-group">
             <label for="fullname" 
                    class="col-md-2 control-label">Full Name</label>
-            <div class="col-md-10">
+            <div class="col-md-6">
             <input type="text" class="form-control" name="fullname" 
                     id="fullname" placeholder="enter full name">
             </input>
             </div>
         </div>
+        </div>
 
+        <div class="row">
         <div class="form-group">
             <label for="email" 
                    class="col-md-2 control-label">Email Address</label>
-            <div class="col-md-10">
+            <div class="col-md-6">
             <input type="email" class="form-control" id="email"
                    name="email" placeholder="e-mail address">
             </input>
+            </div>
+        </div>
         </div>
 
+        <div class="row">&nbsp;<!-- empty row --></div>
+
+        <div class="row">
         <div class="form-group">
+            <div class="col-md-2">
             <button class="btn btn-primary" type="submit" 
                     id="user-submit">Create</button>
             <button class="btn btn-default" type="reset">Clear</button>
+            </div>
+
+            <div class="col-md-1 col-md-offset-5">
+    <a type="button" class="btn btn-primary" href="/users">
+        <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;&nbsp;Back
+    </a>
+            </div>
         </div>
+        </div>
+
         </fieldset>
     </form>
-    </div>
+</div> <!-- container-fluid -->
 {{end}}
 
 {{define "change-passwd"}}
-    <div id="change-pwd-form-div">
+<div class="container-fluid" id="change-pwd-form-div">
     <form class="form-vertical" role="form" method="post"
                 onsubmit="validatePasswordChange();"
-                id="change-pwd-form" action="/user/changepwd/success">
+                id="change-pwd-form"> 
+    <!--
+    <form class="form-vertical" role="form" method="post"
+                onsubmit="validatePasswordChange();"
+                action="/user/changepwd/{{urlquery .Id}}"> 
+    -->
         <fieldset>
 
+    <div class="row">
         <div class="form-group">
             <label for="oldpassword" 
                    class="col-md-2 control-label">Old Password</label>
-            <div class="col-md-10">
+            <div class="col-md-6">
             <input type="password" class="form-control" id="oldpassword"
                    name="oldpassword" value="" 
                    placeholder="enter old password" required>
             </input>
             </div>
         </div>
+    </div>
  
+    <div class="row">
         <div class="form-group">
             <label for="newpassword" 
                    class="col-md-2 control-label">New Password</label>
-            <div class="col-md-10">
+            <div class="col-md-6">
             <input type="password" class="form-control" id="newpassword"
                    name="newpassword" value="" 
                    placeholder="enter new password" required>
             </input>
             </div>
         </div>
+    </div>
 
+    <div class="row">
         <div class="form-group">
             <label for="newpassword2" 
                    class="col-md-2 control-label">Retype New Password</label>
-            <div class="col-md-10">
+            <div class="col-md-6">
             <input type="password" class="form-control" id="newpassword2"
                    name="newpassword2" value="" 
                    placeholder="retype new password" required>
             </input>
             </div>
         </div>
+    </div>
 
+    <div class="row">&nbsp;</div>
+
+    <div class="row">
         <div class="form-group">
+            <div class="col-md-4">
+            <button class="btn btn-primary" type="button" 
+                    onclick="return postForm('change-pwd-form', 
+                                    createURL('changepwd', 'user', {{.Id}}));"
+                    id="pwd-submit">Change Password</button>
+            <!--
             <button class="btn btn-primary" type="submit" 
                     id="pwd-submit">Change Password</button>
+             -->
             <button class="btn btn-default" type="reset">Clear</button>
+            </div>
+            <div class="col-md-1 col-md-offset-3">
+            <a type="button" class="btn btn-primary" href="/users">
+        <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;&nbsp;Back
+            </a>
+            </div>
         </div>
+    </div>
+
         </fieldset>
     </form>
-    </div>
+</div>
 {{end}}

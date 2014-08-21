@@ -35,19 +35,19 @@ type DataProvider interface {
     GetAllUsers() ([]utils.User, error)
     GetUser(string) (*utils.User, error)
     GetUserByUsername(string) (*utils.User, error)
-    CreateUser(*utils.User) error
+    InsertUser(*utils.User) error
     UpdateUser(*utils.User) error
     DeleteUser(*utils.User) error
 
     GetAllTechniques() ([]core.Technique, error)
     GetTechnique(string) (*core.Technique, error)
-    CreateTechnique(*core.Technique) error
+    InsertTechnique(*core.Technique) error
     UpdateTechnique(*core.Technique) error
     DeleteTechnique(*core.Technique) error
 
     GetAllStyles() ([]core.Style, error)
     GetStyle(string) (*core.Style, error)
-    CreateStyle(*core.Style) error
+    InsertStyle(*core.Style) error
     UpdateStyle(*core.Style) error
     DeleteStyle(*core.Style) error
 
@@ -98,7 +98,7 @@ type DbCommand int
 const (
     DBCmdGetOne DbCommand = iota // get a single record from DB
     DBCmdUpdate                  // update a single record in DB
-    DBCmdCreate                  // create a new record in DB
+    DBCmdInsert                  // insert a new record in DB
     DBCmdDelete                  // delete a single record in DB
 )
 

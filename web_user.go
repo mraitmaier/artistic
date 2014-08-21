@@ -94,7 +94,7 @@ func userHandler(aa *ArtisticApp) http.Handler {
     }) // return handler closure
 }
 
-// 
+//  HTTP GET handler for "/user/<cmd>" URLs.
 func getUserHandler(w http.ResponseWriter, r *http.Request,
                         aa *ArtisticApp, user *utils.User) error {
 
@@ -108,14 +108,15 @@ func getUserHandler(w http.ResponseWriter, r *http.Request,
     switch cmd {
 
     case "view", "modify", "changepwd":
-	    // get a style from DB
+
+	    // get a user from DB
 	    s, err = aa.DataProv.GetUser(id)
 	    if err != nil {
-		    return fmt.Errorf("%s user id=%q, DB returned %q.", cmd, id, err)
+		    err = fmt.Errorf("%s user id=%q, DB returned %q.", cmd, id, err)
+            return err
 	    }
 
-    case "create":
-        // do nothing here...
+    case "insert": // do nothing here...
 
     case "delete":
         s.Id = db.MongoStringToId(id) // only valid ID needed to delete 
@@ -130,11 +131,10 @@ func getUserHandler(w http.ResponseWriter, r *http.Request,
         return fmt.Errorf("GET User handler: unknown command %q", cmd)
     }
 
-    //fmt.Printf("DEBUG: user=%v\n", s) // DEBUG
 	// create ad-hoc struct to be sent to page template
     var web = struct {
 		User  *utils.User
-        Cmd   string   // "view", "modify", "create" or "delete"...
+        Cmd   string   // "view", "modify", "insert" or "delete"...
 		UserProfile *utils.User
     }{ user, cmd, s }
 
@@ -157,8 +157,8 @@ func postUserHandler(w http.ResponseWriter, r *http.Request,
 
     switch cmd {
 
-    case "create":
-        if err = createNewUser(w, r, aa) ; err != nil {
+    case "insert":
+        if err = insertNewUser(w, r, aa) ; err != nil {
             err = fmt.Errorf("Error creating user: %q.", err)
         }
 
@@ -190,7 +190,6 @@ func modifyExistingUser(
     // get POST form values and create a struct
 	name  := strings.TrimSpace(r.FormValue("username"))
 	pwd   := strings.TrimSpace(r.FormValue("password"))
-	pwd2  := strings.TrimSpace(r.FormValue("password2"))
 	role  := strings.TrimSpace(r.FormValue("role"))
 	full  := strings.TrimSpace(r.FormValue("fullname"))
 	email := strings.TrimSpace(r.FormValue("email"))
@@ -199,10 +198,7 @@ func modifyExistingUser(
 
     // create a user and check passwords
     t := utils.CreateUser(name, pwd)
-    // check password first and return error they not match
-    if !t.ComparePassword(pwd2) {
-        return fmt.Errorf("passwords do not match.")
-    }
+
     if err = t.SetRole(role); err != nil {
         return fmt.Errorf("invalid role.")
     }
@@ -215,10 +211,12 @@ func modifyExistingUser(
     if err = aa.DataProv.UpdateUser(t); err != nil {
         return err
     }
+    aa.Log.Info(fmt.Sprintf("Successfully inserted new user %q.", name))
     return err
 }
+
 // create new user handler function.
-func createNewUser(
+func insertNewUser(
             w http.ResponseWriter, r *http.Request, aa *ArtisticApp) error {
 
     // get data to modify 
@@ -238,24 +236,21 @@ func createNewUser(
 
     var err error = nil
     // create a user and check passwords
-    t := utils.CreateUser(name, pwd)
-    // check password first and return error they not match
-    if !t.ComparePassword(pwd2) {
-        return fmt.Errorf("passwords do not match.")
+    u, err := utils.NewUser(name, pwd, role);
+    if err != nil {
+        return err
     }
-    if err = t.SetRole(role); err != nil {
-        return fmt.Errorf("invalid role.")
-    }
-    t.Id = db.MongoStringToId(id)
-    t.Name = full
-    t.Role = role
-    t.Email = email
+    u.Id = db.MongoStringToId(id)
+    u.Name = full
+    u.Role = role
+    u.Email = email
 
     // do it...
-    if err = aa.DataProv.CreateUser(t); err != nil {
+    if err = aa.DataProv.InsertUser(u); err != nil {
        return err
     }
 
+    aa.Log.Info(fmt.Sprintf("Successfully modified existing user %q.", name))
     return err
 }
 
@@ -278,7 +273,7 @@ func changeUserPassword(
 		return fmt.Errorf("Get user id=%q, DB returned %q.", id, err)
 	}
 
-    // check password first and return error they're not valid
+    // check password first and return error if they're not valid
     if pwd != pwd2 {
         return fmt.Errorf("new passwords do not match.")
     }
@@ -292,6 +287,8 @@ func changeUserPassword(
         return err
     }
 
+    aa.Log.Info(fmt.Sprintf(
+            "Successfully changed password for existing user %q.", u.Username))
     return err
 }
 

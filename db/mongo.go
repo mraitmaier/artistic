@@ -44,7 +44,6 @@ func (m *MongoDbConn) Close() {
 }
 
 
-
 /* DataProvider interface implementation */
 
 // Convert BSON Object ID to string hex representation.
@@ -141,7 +140,7 @@ func (m * MongoDbConn) GetUserByUsername(username string) (*utils.User, error) {
 
     return user, nil // all OK
 }
-
+/*
 // Get a single user from the DB: we need an ID . 
 func (m * MongoDbConn) GetUser(id string) (*utils.User, error) {
 
@@ -176,7 +175,30 @@ func (m * MongoDbConn) GetUser(id string) (*utils.User, error) {
 
     return user, nil // all OK
 }
+*/
 
+func (m * MongoDbConn) GetUser(id string) (*utils.User, error) {
+
+    // acquire lock
+    dblock.Lock()
+    defer dblock.Unlock()
+
+    // get *mgo.Database instance
+    db := m.Sess.DB(m.name)
+    if db == nil {
+        return nil, errors.New("MongoDB descriptor empty.")
+    }
+
+    u := utils.CreateUser("", "") // create empty user
+
+    // get a user from DB
+    err := db.C("users").Find(bson.M{ "_id": MongoStringToId(id) }).One(&u)
+    if err != nil {
+        return nil, err
+    }
+
+    return u, nil // all OK
+}
 
 // Update a single user in DB. 
 func (m *MongoDbConn) UpdateUser(u *utils.User) error {
@@ -184,12 +206,12 @@ func (m *MongoDbConn) UpdateUser(u *utils.User) error {
 }
 
 // Create a new user in DB. 
-func (m *MongoDbConn) CreateUser(u *utils.User) error {
+func (m *MongoDbConn) InsertUser(u *utils.User) error {
     // check the ID of the item to be inserted into DB
     if u.Id == "" {
         u.Id = NewId()
     }
-    return m.adminUser(DBCmdCreate, u)
+    return m.adminUser(DBCmdInsert, u)
 }
 
 // Delete a single user in DB. 
@@ -218,7 +240,7 @@ func (m *MongoDbConn) adminUser(cmd DbCommand, u *utils.User) error {
     case DBCmdUpdate:
         err = coll.UpdateId(u.Id, u)
 
-    case DBCmdCreate:
+    case DBCmdInsert:
         err = coll.Insert(u)
 
     case DBCmdDelete:
@@ -227,7 +249,6 @@ func (m *MongoDbConn) adminUser(cmd DbCommand, u *utils.User) error {
     default:
         err = fmt.Errorf("Handling users: Unknown command.")
     }
-
     return err
 }
 
@@ -353,12 +374,12 @@ func (m * MongoDbConn) UpdateStyle(s *core.Style) error {
 }
 
 // Create a new style in DB. 
-func (m * MongoDbConn) CreateStyle(s *core.Style) error {
+func (m * MongoDbConn) InsertStyle(s *core.Style) error {
     // check the ID of the item to be inserted into DB
     if s.Id == "" {
         s.Id = NewId()
     }
-    return m.adminStyle(DBCmdCreate, s)
+    return m.adminStyle(DBCmdInsert, s)
 }
 
 // Delete a single style in DB
@@ -388,7 +409,7 @@ func (m *MongoDbConn) adminStyle(cmd DbCommand, s *core.Style) error {
         case DBCmdUpdate:
             err = coll.UpdateId(s.Id, s)
 
-        case DBCmdCreate:
+        case DBCmdInsert:
             err = coll.Insert(s)
 
         case DBCmdDelete:
@@ -453,12 +474,12 @@ func (m * MongoDbConn) UpdateTechnique(t *core.Technique) error {
 }
 
 // Create a new technique in DB. 
-func (m * MongoDbConn) CreateTechnique(t *core.Technique) error {
+func (m * MongoDbConn) InsertTechnique(t *core.Technique) error {
     // check the ID of the item to be inserted into DB
     if t.Id == "" {
         t.Id = NewId()
     }
-    return m.adminTechnique(DBCmdCreate, t)
+    return m.adminTechnique(DBCmdInsert, t)
 }
 
 // Delete a new technique in DB. 
@@ -487,7 +508,7 @@ func (m *MongoDbConn) adminTechnique(cmd DbCommand, t *core.Technique) error {
     case DBCmdUpdate:
         err = coll.UpdateId(t.Id, t)
 
-    case DBCmdCreate:
+    case DBCmdInsert:
         err = coll.Insert(t)
 
     case DBCmdDelete:

@@ -41,7 +41,7 @@
 
             {{template "style-list" .Styles}}
             <button type="button" class="btn btn-primary"
-                    onclick="rerouteUsingGet('style', 'create', '');">
+                    onclick="rerouteUsingGet('style', 'insert', '');">
             Add New Style
             </button>
         </div>
@@ -158,7 +158,7 @@
         {{else if eq .Cmd "modify"}}
             <h1 id="data-list-header">Modify Style</h1>
             {{template "single-style-modify" .Style}}
-        {{else if eq .Cmd "create"}}
+        {{else if eq .Cmd "insert"}}
             <h1 id="data-list-header">Create New Style</h1>
             <p>Please enter the data to create a new style.</p>
             {{template "style-create"}}
@@ -242,7 +242,7 @@
 {{define "style-create"}}
     <div id="create-style-form-div">
     <form class="form-vertical" role="form" method="post"
-                id="create-style-form" action="/style/create/">
+                id="create-style-form" action="/style/insert/">
         <fieldset>
         <div class="form-group">
             <label for="style-name" 

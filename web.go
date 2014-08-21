@@ -506,7 +506,7 @@ func getStyleHandler(w http.ResponseWriter, r *http.Request,
                 "%s style id=%q, DB returned %q.", cmd, id, err)
 	    }
 
-    case "create":
+    case "insert":
         // do nothing here...
 
     case "delete":
@@ -555,8 +555,8 @@ func postStyleHandler(w http.ResponseWriter, r *http.Request,
 
     switch cmd {
 
-    case "create":
-        if err = aa.DataProv.CreateStyle(t); err != nil {
+    case "insert":
+        if err = aa.DataProv.InsertStyle(t); err != nil {
             return err
         }
         aa.Log.Info(fmt.Sprintf("Successfully created style %q.", name))
@@ -677,7 +677,7 @@ func getTechniqueHandler(w http.ResponseWriter, r *http.Request,
                 "%s technique id=%q, DB returned %q.", cmd, id, err)
 	    }
 
-    case "create":
+    case "insert":
         // do nothing here...
 
     case "delete":
@@ -697,7 +697,7 @@ func getTechniqueHandler(w http.ResponseWriter, r *http.Request,
 	// create ad-hoc struct to be sent to page template
     var web = struct {
 		User      *utils.User
-        Cmd       string        // "view", "modify", "create" or "delete"...
+        Cmd       string        // "view", "modify", "insert" or "delete"...
 		Technique *core.Technique
     }{ user, cmd, tech }
 
@@ -726,8 +726,8 @@ func postTechniqueHandler(w http.ResponseWriter, r *http.Request,
 
     switch cmd {
 
-    case "create":
-        if err = aa.DataProv.CreateTechnique(t); err != nil {
+    case "insert":
+        if err = aa.DataProv.InsertTechnique(t); err != nil {
             return err
         }
         aa.Log.Info(fmt.Sprintf("Successfully created technique %q.", name))

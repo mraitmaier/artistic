@@ -42,7 +42,7 @@
             {{template "tech-list" .Techniques}}
 
             <button type="button" class="btn btn-primary"
-                    onclick="rerouteUsingGet('technique', 'create', '');">
+                    onclick="rerouteUsingGet('technique', 'insert', '');">
             Add New Technique
             </button>
         </div>
@@ -161,7 +161,7 @@
         {{else if eq .Cmd "modify"}}
             <h1 id="data-list-header">Modify Technique</h1>
             {{template "single-technique-modify" .Technique}}
-        {{else if eq .Cmd "create"}}
+        {{else if eq .Cmd "insert"}}
             <h1 id="data-list-header">Create New Technique</h1>
             <p>Please enter the data to create a new technique.</p>
             {{template "technique-create"}}
@@ -249,7 +249,7 @@
 {{define "technique-create"}}
     <div id="create-technique-form-div">
     <form class="form-vertical" role="form" method="post"
-                id="create-technique-form" action="/technique/create/">
+                id="create-technique-form" action="/technique/insert/">
         <fieldset>
         <div class="form-group">
             <label for="technique-name" 

@@ -30,6 +30,7 @@ func authenticateUser(u, p string, aa *ArtisticApp,
 		return false, err
 	}
 
+   // fmt.Printf("DEBUG authenticateUser(): %v\n", userdb) // DEBUG
 	// if passwords match....
 	if userdb != nil && utils.ComparePasswords(userdb.Password, p) {
 
@@ -52,10 +53,9 @@ func authenticateUser(u, p string, aa *ArtisticApp,
 		// save the session data
 		s.Save(r, w)
 
-		//fmt.Printf("DEBUG creating Session: %v\n", s) // DEBUG
 		return true, nil
 	}
-	return false, nil // no error, but passwords do not match
+	return false, fmt.Errorf("Passwords do not match.")
 }
 
 func logout(aa *ArtisticApp, w http.ResponseWriter, r *http.Request) error {

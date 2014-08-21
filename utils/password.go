@@ -9,7 +9,6 @@
 package utils
 
 import (
-	"fmt"
     "code.google.com/p/go.crypto/bcrypt"
 )
 
@@ -40,7 +39,7 @@ func (p *Password) Set(passwd string) (e error) {
 /*
  * Password.Get - return a stored hashed password
  */
-func (p *Password) Get() string { return fmt.Sprintf("%x", p.pwd) }
+func (p *Password) Get() string { return string(p.pwd) }
 
 /*
  * Password.Cmp - compare arbitrary password to the one stored 
@@ -66,6 +65,7 @@ func HashPassword(passwd string) (string) {
 
 
 func ComparePasswords(hashed, plain string) bool {
+
     status := false
     err := bcrypt.CompareHashAndPassword([]byte(hashed), []byte(plain))
     if err == nil {

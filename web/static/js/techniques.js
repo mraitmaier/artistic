@@ -20,7 +20,7 @@ function createURL(operation, item, id) {
 
 // send a DELETE HTTP request for:
 // - items are users, styles, artists, artworks, techniques....
-// - commands (cmd) are "view", "create", "delete" and "modify" 
+// - commands (cmd) are "view", "insert", "delete" and "modify" 
 // - id is the DB ID of the item
 function sendDeleteReq(item, cmd, id ) {
 
@@ -37,7 +37,7 @@ function rerouteTechnique(method, cmd, id) {
 
 // reroute to URL using ordinary GET HTTP request, used as "onclick" callback
 // - items are users, styles, artists, artworks, techniques....
-// - commands (cmd) are "view", "create", "delete" and "modify" 
+// - commands (cmd) are "view", "insert", "delete" and "modify" 
 // - id is the DB ID of the item
 function rerouteUsingGet(item, cmd, id) {
 
