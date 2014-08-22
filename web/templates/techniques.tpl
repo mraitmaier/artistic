@@ -201,43 +201,80 @@
 {{end}}
 
 {{define "single-technique-view"}}
-<div id="view-technique-table-div">
+<div id="view-technique-table-div" class="container-fluid">
+    <div class="row">
     <table id="view-technique-table" class="table table-hover">
     <tbody>
-        <tr> <td>Name</td><td>{{.Name}}</td> </tr>
-        <tr> <td>Description</td><td>{{.Description}}</td> </tr>
+        <tr> 
+        <td class="col-md-2">Name</td>
+        <td class="col-md-10">{{.Name}}</td> 
+        </tr>
+        <tr> 
+        <td class="col-md-2">Description</td>
+        <td class="col-md-10">{{.Description}}</td> 
+        </tr>
     </tbody>
     </table>
+    </div>
+
+    <div class="row">&nbsp;</div> <!-- empty row -->
+
+    <div class="row">
+        <div class="col-md-1 col-md-offset-7">
+            <a type="button" class="btn btn-primary" href="/techniques">
+            <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;&nbsp;Back
+            </a>
+        </div>
+    </div>
 </div>
 {{end}}
 
 {{define "single-technique-modify"}}
-<div id="modify-technique-table-div">
+<div id="modify-technique-table-div" class="container-fluid">
 
     <form class="form-vertical" role="form" method="post"
                                 id="technique-modify-form">
     <fieldset>
 
+    <div class="row">
     <div class="form-group"> 
         <label for="technique-name" class="col-md-2 control-label">Name</label>
-        <div class="col-md-10">
+        <div class="col-md-6">
         <input type="text" class="form-control" id="technique-name"
                name="technique-name" value="{{.Name}}"></input>
         </div>
     </div>
+    </div>
+
+    <div class="row">
     <div class="form-group"> 
         <label for="technique-description" class="col-md-2 control-label">
         Description</label>
-        <div class="col-md-10">
+        <div class="col-md-6">
         <textarea type="text" class="form-control"  rows="5"
         id="technique-description" name="technique-description">
         {{.Description}}
         </textarea>
         </div>
     </div>
+    </div>
+
+    <div class="row">&nbsp;</div> <!-- empty row -->
+
+    <div class="row">
     <div class="form-group">
-        <button class="btn btn-primary" type="submit" 
-                id="technique-submit">Modify</button>
+        <div class="col-md-2">
+            <button class="btn btn-primary" type="submit" 
+                    id="technique-submit">Modify</button>
+
+        </div>
+        <div class="col-md-1 col-md-offset-5">
+            <a type="button" class="btn btn-primary" href="/techniques">
+            <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;&nbsp;Back
+            </a>
+        </div>
+
+    </div>
     </div>
 
     </fieldset>
@@ -247,37 +284,54 @@
 {{end}}
 
 {{define "technique-create"}}
-    <div id="create-technique-form-div">
+<div id="create-technique-form-div" class="container-fluid">
     <form class="form-vertical" role="form" method="post"
                 id="create-technique-form" action="/technique/insert/">
         <fieldset>
+
+        <div class="row">
         <div class="form-group">
             <label for="technique-name" 
                    class="col-md-2 control-label">Name</label>
-            <div class="col-md-10">
+            <div class="col-md-6">
             <input type="text" class="form-control" id="technique-name"
                     name="technique-name" value="{{.Name}}" required></input>
             </div>
         </div>
+        </div>
         
+        <div class="row">
         <div class="form-group">
             <label for="technique-description" 
                    class="col-md-2 control-label">Description</label>
-            <div class="col-md-10">
+            <div class="col-md-6">
             <textarea type="text" class="form-control" rows="10"
                       name="technique-description"
                       id="technique-description">{{.Description}}</textarea>
                       </div>
         </div>
+        </div>
 
+        <div class="row">&nbsp;</div> <!-- empty row -->
+
+        <div class="row">
         <div class="form-group">
+            <div class="col-md-2">
             <button class="btn btn-primary" type="submit"
                     id="technique-submit">Create</button>
             <button class="btn btn-default" type="reset">Clear</button>
+            </div>
+            <div class="col-md-1 col-md-offset-5">
+            <a type="button" class="btn btn-primary" href="/techniques">
+            <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;&nbsp;Back
+            </a>
+            </div>
         </div>
+        </div>
+
         </fieldset>
     </form>
-    </div>
+</div>
 {{end}}
 
 

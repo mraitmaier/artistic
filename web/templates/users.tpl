@@ -231,7 +231,7 @@
     <div class="row">
         <div class="col-md-1 col-md-offset-7">
     <a type="button" class="btn btn-primary" href="/users">
-        <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;&nbsp;Back
+    <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;&nbsp;Back
     </a>
         </div>
     </div>
