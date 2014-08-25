@@ -55,7 +55,7 @@
             </a>
         </li>
         <li>
-            <a href="#"
+            <a href="/userprofile"
                data-toggle="tooltip" data-placement="left" title="User profile">
                 <span class="glyphicon glyphicon-user"></span>
             </a>

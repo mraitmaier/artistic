@@ -74,6 +74,9 @@ func registerHandlers(aa *ArtisticApp) {
 	r.Handle("/dating/{cmd}/{id}", datingHandler(aa) )
 	r.Handle("/error404", err404Handler(aa) )
 	r.Handle("/license", licenseHandler(aa) )
+    r.Handle("/userprofile", profileHandler(aa) )
+    r.Handle("/userprofile/{cmd}", profileHandler(aa) )
+    r.Handle("/userprofile/{cmd}/{id}", profileHandler(aa) )
 	r.HandleFunc("/favicon.ico", faviconHandler)
     // websocket handler
     //r.Handle("/ws", wsHandler(aa) )

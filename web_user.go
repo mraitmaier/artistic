@@ -292,3 +292,104 @@ func changeUserPassword(
     return err
 }
 
+// a user profile handler
+func profileHandler(aa *ArtisticApp) http.Handler {
+    return http.HandlerFunc( func(w http.ResponseWriter, r *http.Request) {
+
+	if loggedin, user := userIsAuthenticated(aa, r); loggedin {
+
+	    log := aa.Log // get logger instance
+
+        switch r.Method {
+
+        case "GET":
+            if err := getProfileHandler(w, r, aa, user); err != nil {
+                log.Error(err.Error())
+			    http.Redirect(w, r, "/users", http.StatusFound)
+            }
+
+        case "POST":
+            if err := postProfileHandler(w, r, aa); err != nil {
+                log.Error(err.Error())
+            }
+			http.Redirect(w, r, "/users", http.StatusFound)
+        }
+
+	} else {
+		http.Redirect(w, r, "/login", http.StatusFound)
+	}
+    }) // return handler closure
+}
+
+//  HTTP GET handler for "/userprofile/<cmd>" URLs.
+func getProfileHandler(w http.ResponseWriter, r *http.Request,
+                        aa *ArtisticApp, user *utils.User) error {
+
+//    id := mux.Vars(r)["id"]
+    cmd := mux.Vars(r)["cmd"]
+
+    log := aa.Log
+    var err error
+
+/*
+    switch cmd {
+
+    case "view", "modify", "changepwd":
+
+	    // get a user from DB
+	    s, err = aa.DataProv.GetUser(id)
+	    if err != nil {
+		    err = fmt.Errorf("%s profile id=%q, DB returned %q.", cmd, id, err)
+            return err
+	    }
+
+    default:
+        return fmt.Errorf("GET User Profile handler: unknown command %q", cmd)
+    }
+*/
+
+	// create ad-hoc struct to be sent to page template
+    var web = struct {
+		User  *utils.User
+        Cmd   string   // "view", "modify", "changepwd"...
+    }{ user, cmd }
+
+    // render the page
+	err = aa.WebInfo.templates.ExecuteTemplate(w, "userprofile", &web)
+    if err != nil {
+	    log.Error("Error rendering the 'userprofile' page.")
+	}
+
+    return err
+}
+
+func postProfileHandler(w http.ResponseWriter, r *http.Request,
+                            aa *ArtisticApp) error {
+
+    // get data to modify 
+    cmd := mux.Vars(r)["cmd"]
+
+    var err error = nil
+
+    switch cmd {
+
+    case "modify":
+        if err = modifyExistingUser(w, r, aa); err != nil {
+            err = fmt.Errorf("Modifying user: %q.", err)
+        }
+
+    case "changepwd":
+        if err = changeUserPassword(w, r, aa); err != nil {
+            err = fmt.Errorf("Changing password for user failed: %q.", err)
+        }
+
+    default:
+        err = fmt.Errorf(
+            "Invalid command %q for user profile. Redirecting to default page.",
+            cmd)
+    }
+
+    return err
+}
+
+
