@@ -4,11 +4,15 @@ import (
 	//"fmt"
 	"time"
 	"encoding/json"
+    "gopkg.in/mgo.v2/bson"
 )
 
 // type representing the person
 // This type is a basis for all artists: painters, sculptors, writers etc.
 type Artist struct {
+
+    // ID from DB
+    Id bson.ObjectId `bson:"_id"`
 
 	/* name of the artist */
 	*Name
@@ -39,16 +43,16 @@ type Artist struct {
 	Picture string
 
     /* artist flags, a person can be many things at once */
-    IsPainter bool
-    IsSculptor bool
-    IsPrintmaker bool
-    IsCeramicist bool
+    IsPainter bool      `bson:"is_painter"`
+    IsSculptor bool     `bson:"is_sculptor"`
+    IsPrintmaker bool   `bson:"is_printmaker" `
+    IsCeramicist bool   `bson:"is_ceramicist"`
 
-    IsArchitect bool
+    IsArchitect bool    `bson:"is_architect"`
 
-    IsWriter bool
-    IsPoet bool
-    IsPlayWriter bool
+    IsWriter bool       `bson:"is_writer"`
+    IsPoet bool         `bson:"is_poet"`
+    IsPlayWriter bool   `bson:"is_playwriter"`
 
     // timestamp when an instance was created
     created string
@@ -63,7 +67,8 @@ func CreateArtist() *Artist {
     creat := time.Now().Format("2012-12-15 15:0405")
 	n := make([]Note, 0, DefaultArtistCapacity)
 	s := make([]string, 0, DefaultArtistCapacity)
-	return &Artist{&Name{"", "", ""}, // Name
+	return &Artist{bson.NewObjectId(),
+                   &Name{"", "", ""}, // Name
                    &Name{"", "", ""}, // Real name
 		           "",      // Born
                    "",      // Died
@@ -114,3 +119,34 @@ func artistsToJson(items []Artist) (data string, err error) {
     ArtistList - this is type representing a list of persons
 */
 type ArtistList []Artist
+
+//
+type ArtistType int
+const (
+    ArtistTypeUnknown ArtistType = iota
+    ArtistTypePainter
+    ArtistTypeSculptor
+    ArtistTypeArchitect
+    ArtistTypePrintmaker
+    ArtistTypeCeramicist
+    ArtistTypeWriter
+    ArtistTypePoet
+    ArtistTypePlaywriter
+)
+
+func (t ArtistType) String() string {
+    var s string
+    switch t {
+    case ArtistTypePainter: s = "Painter"
+    case ArtistTypeSculptor: s = "Sculptor"
+    case ArtistTypeArchitect: s = "Architect"
+    case ArtistTypePrintmaker: s = "Printmaker"
+    case ArtistTypeCeramicist: s = "Ceramicist"
+    case ArtistTypeWriter: s = "Writer"
+    case ArtistTypePoet: s = "Poet"
+    case ArtistTypePlaywriter: s = "Playwriter"
+    default: s = "Unknown Artist Type"
+    }
+    return s
+}
+
