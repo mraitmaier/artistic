@@ -11,11 +11,11 @@
     </div>
     <div class="panel-collapse collapse in" id="artists-collapse">
         <div class="panel-body">
-                <p>Painters</p>
-                <p>Sculptors</p>
-                <p>Printmakes</p>
-                <p>Architects</p>
-                <p>Ceramicists</p>
+                <p><a href="/painters">Painters</a></p>
+                <p><a href="/sculptors">Sculptors</a></p>
+                <p><a href="/printmakers">Printmakers</a></p>
+                <p><a href="/architects">Architects</a></p>
+                <p><a href="/ceramicists">Ceramicists<a></p>
         </div>
     </div>    
 
