@@ -218,6 +218,7 @@ func (m *MongoDbConn) InsertUser(u *utils.User) error {
 func (m *MongoDbConn) DeleteUser(u *utils.User) error {
     return m.adminUser(DBCmdDelete, u)
 }
+
 // Aux method that administers the user records in DB
 func (m *MongoDbConn) adminUser(cmd DbCommand, u *utils.User) error {
 
@@ -519,6 +520,55 @@ func (m *MongoDbConn) adminTechnique(cmd DbCommand, t *core.Technique) error {
     }
 
     return err
+}
+
+///////////////////////////// Painters
+func (m *MongoDbConn) GetAllArtists(t core.ArtistType) ([]core.Artist, error) {
+
+    // acquire DB lock
+    dblock.Lock()
+    defer dblock.Unlock()
+
+    // get *mgo.Database instance
+    db := m.Sess.DB(m.name)
+    if db == nil { return nil, errors.New("Mongo descriptor empty.") }
+
+    // create channel
+    ch := make(chan []core.Artist)
+
+    // start a new goroutine to get users from DB
+    go func(ch chan []core.Artist) {
+
+        // check channel
+        if ch == nil { return }
+
+        // prepare the empty slice for users
+        artists := make([]core.Artist, 0)
+        var err error
+
+        // get all artists from DB
+        switch t {
+
+        case core.ArtistTypePainter:
+            err = db.C("artists").Find(
+                        bson.M{ "is_painter" : true }).All(&artists)
+            if err != nil { return }
+
+        case core.ArtistTypeSculptor:
+        case core.ArtistTypeArchitect:
+        case core.ArtistTypePrintmaker:
+        case core.ArtistTypeCeramicist:
+        }
+
+        // write the users to the channel
+        ch <- artists
+
+    }(ch)
+
+    // read the answer from channel
+    artists := <-ch
+
+    return artists, nil // OK
 }
 
 

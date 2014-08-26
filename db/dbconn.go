@@ -39,6 +39,12 @@ type DataProvider interface {
     UpdateUser(*utils.User) error
     DeleteUser(*utils.User) error
 
+    GetAllArtists(core.ArtistType) ([]core.Artist, error)
+    //GetArtist(core.ArtistType, string) (*core.Artist, error)
+    //InsertArtist(core.ArtistType, *core.Artist) error
+    //UpdateArtist(core.ArtistType, *core.Artist) error
+    //DeleteArtist(core.ArtistType, *core.Artist) error
+
     GetAllTechniques() ([]core.Technique, error)
     GetTechnique(string) (*core.Technique, error)
     InsertTechnique(*core.Technique) error
