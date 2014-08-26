@@ -77,6 +77,11 @@ func registerHandlers(aa *ArtisticApp) {
     r.Handle("/userprofile", profileHandler(aa) )
     r.Handle("/userprofile/{cmd}", profileHandler(aa) )
     r.Handle("/userprofile/{cmd}/{id}", profileHandler(aa) )
+    r.Handle("/painters", artistsHandler(aa, core.ArtistTypePainter) )
+    r.Handle("/sculptors", artistsHandler(aa, core.ArtistTypeSculptor) )
+    r.Handle("/printmakers", artistsHandler(aa, core.ArtistTypePrintmaker) )
+    r.Handle("/ceramicists", artistsHandler(aa, core.ArtistTypeCeramicist) )
+    r.Handle("/architects", artistsHandler(aa, core.ArtistTypeArchitect) )
 	r.HandleFunc("/favicon.ico", faviconHandler)
     // websocket handler
     //r.Handle("/ws", wsHandler(aa) )
@@ -112,6 +117,9 @@ func webStart(aa *ArtisticApp, wwwpath string) error {
 	funcs := template.FuncMap{
 		"add": func(x, y int) int { return x + y },
         "allowedroles": func() []string { return utils.AllowedRoles },
+        "get_artist_type": func(t core.ArtistType) string {
+                return t.String()
+                },
         "totitle": func(s string) string { return strings.Title(s) },
         "toupper": func(s string) string { return strings.ToUpper(s) },
         "tolower": func(s string) string { return strings.ToLower(s) }}
