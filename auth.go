@@ -17,8 +17,7 @@ import (
 )
 
 // authenticate the user with given username and password
-func authenticateUser(u, p string, aa *ArtisticApp,
-	w http.ResponseWriter, r *http.Request) (bool, error) {
+func authenticateUser(u, p string, aa *ArtisticApp, w http.ResponseWriter, r *http.Request) (bool, error) {
 
 	// create new session ID
 	id := newSessId()

@@ -15,7 +15,7 @@
                 <p><a href="/sculptors">Sculptors</a></p>
                 <p><a href="/printmakers">Printmakers</a></p>
                 <p><a href="/architects">Architects</a></p>
-                <p><a href="/ceramicists">Ceramicists<a></p>
+                <p><a href="/ceramicists">Ceramicists</a></p>
         </div>
     </div>    
 

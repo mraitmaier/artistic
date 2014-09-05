@@ -7,9 +7,7 @@ import (
     "gopkg.in/mgo.v2/bson"
 )
 
-var AllowedDatings = []string{ "L", "S", "A",
-                               "a.q.", "a.q.n.", "p.q.", "p.q.n.",
-                               "unknown" }
+var AllowedDatings = []string{ "L", "S", "A", "a.q.", "a.q.n.", "p.q.", "p.q.n.", "unknown" }
 
 /**
  * Dating - a structure representing a dating
@@ -18,7 +16,6 @@ type Dating struct {
     // ID is created by DB automatically and is only a RO property
     //Id db.DbIdentifier `bson:"_id"`
     Id bson.ObjectId `bson:"_id"`
-    //Id string `bson:"_id"`
 
     // a dating value is defined (as enum) above 
 	Dating string

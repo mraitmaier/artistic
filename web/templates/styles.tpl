@@ -1,7 +1,6 @@
 {{define "styles"}}
 <!DOCTYPE html>
 <html lang="en">
-
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -32,18 +31,13 @@
 
         <div class="col-md-2" id="menu">
             <h1 id="menu-header"></h1>
-
             {{template "accordion"}}
         </div>
 
         <div class="col-md-10" id="data-list">
             <h1 id="data-list-header">Styles</h1>
-
             {{template "style-list" .Styles}}
-            <button type="button" class="btn btn-primary"
-                    onclick="rerouteUsingGet('style', 'insert', '');">
-            Add New Style
-            </button>
+            <button type="button" class="btn btn-primary" onclick="rerouteUsingGet('style', 'insert', '');">Add New Style</button>
         </div>
 
      </div> <!-- row -->
@@ -85,21 +79,18 @@
             <td>{{printf "%s" $element.Name}}</td>
             <td>{{printf "%s" $element.Description}}</td>
             <td>
-                <a href="#" data-toggle="tooltip" data-placement="left"
-                            title="View style details" id="view-style"
+                <a href="#" data-toggle="tooltip" data-placement="left" title="View style details" id="view-style"
                    onclick="rerouteUsingGet('style', 'view', {{$element.Id}});">
                     <span class="glyphicon glyphicon-eye-open"></span>
                 </a>
                 &nbsp;
-                <a href="#" data-toggle="tooltip" data-placement="left"
-                            title="Edit style" id="edit-style"
-                 onclick="rerouteUsingGet('style', 'modify', {{$element.Id}});">
+                <a href="#" data-toggle="tooltip" data-placement="left" title="Edit style" id="edit-style"
+                   onclick="rerouteUsingGet('style', 'modify', {{$element.Id}});">
                     <span class="glyphicon glyphicon-cog" ></span>
                 </a>
                 &nbsp;
-                <a href="#" data-toggle="tooltip" data-placement="left"
-                            title="Delete style" id="delete-style"
-                 onclick="rerouteUsingGet('style', 'delete', {{$element.Id}});">
+                <a href="#" data-toggle="tooltip" data-placement="left" title="Delete style" id="delete-style"
+                   onclick="rerouteUsingGet('style', 'delete', {{$element.Id}});">
                     <span class="glyphicon glyphicon-trash"></span>
                 </a>
             </td>
@@ -144,10 +135,8 @@
     <div class="container-fluid">
 
     <div class="row">
-
         <div class="col-md-2" id="menu">
             <h1 id="menu-header"></h1>
-
             {{template "accordion"}}
         </div>
 
@@ -169,7 +158,6 @@
         </div>
 
      </div> <!-- row -->
-
     </div> <!-- container fluid -->
 
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
@@ -202,21 +190,15 @@
     <div class="row">
     <table id="view-style-table" class="table table-hover">
     <tbody>
-        <tr> 
-        <td class="col-md-2">Name</td>
-        <td class="col-md-10">{{.Name}}</td> 
-        </tr>
-        <tr> 
-        <td class="col-md-2">Description</td>
-        <td class="col-md-10">{{.Description}}</td> 
-        </tr>
+        <tr> <td class="col-md-2">Name</td> <td class="col-md-10">{{.Name}}</td> </tr>
+        <tr> <td class="col-md-2">Description</td> <td class="col-md-10">{{.Description}}</td> </tr>
     </tbody>
     </table>
     </div>
     <div class="row">
         <div class="col-md-1 col-md-offset-7">
         <a type="button" class="btn btn-primary" href="/styles">
-        <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;&nbsp;Back
+          <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;&nbsp;Back
         </a>
         </div>
     </div>
@@ -225,29 +207,25 @@
 
 {{define "single-style-modify"}}
 <div id="modify-style-table-div" class="container-fluid">
-    <form class="form-vertical" role="form" method="post"
-                                id="style-modify-form">
+    <form class="form-vertical" role="form" method="post" id="style-modify-form">
     <fieldset>
 
     <div class="row">
     <div class="form-group"> 
         <label for="style-name" class="col-md-2 control-label">Name</label>
         <div class="col-md-6">
-        <input type="text" class="form-control" id="style-name"
-               name="style-name" value="{{.Name}}"></input>
+            <input type="text" class="form-control" id="style-name" name="style-name" value="{{.Name}}"></input>
         </div>
     </div>
     </div>
 
     <div class="row">
     <div class="form-group"> 
-        <label for="style-description" class="col-md-2 control-label">
-        Description</label>
+        <label for="style-description" class="col-md-2 control-label">Description</label>
         <div class="col-md-6">
-        <textarea type="text" class="form-control"  rows="5"
-        id="style-description" name="style-description">
-        {{.Description}}
-        </textarea>
+            <textarea type="text" class="form-control"  rows="5" id="style-description" name="style-description">
+            {{.Description}}
+            </textarea>
         </div>
     </div>
     </div>
@@ -257,12 +235,11 @@
     <div class="row">
     <div class="form-group">
         <div class="col-md-2">
-            <button class="btn btn-primary" type="submit" 
-                    id="style-submit">Modify Style</button>
+            <button class="btn btn-primary" type="submit" id="style-submit">Modify Style</button>
         </div>
         <div class="col-md-1 col-md-offset-5">
             <a type="button" class="btn btn-primary" href="/styles">
-            <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;&nbsp;Back
+                <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;&nbsp;Back
             </a>
          </div>
     </div>
@@ -275,30 +252,26 @@
 
 {{define "style-create"}}
     <div id="create-style-form-div" class="container-fluid">
-    <form class="form-vertical" role="form" method="post"
-                id="create-style-form" action="/style/insert/">
+    <form class="form-vertical" role="form" method="post" id="create-style-form" action="/style/insert/">
         <fieldset>
 
         <div class="row">
         <div class="form-group">
-            <label for="style-name" 
-                   class="col-md-2 control-label">Name</label>
+            <label for="style-name" class="col-md-2 control-label">Name</label>
             <div class="col-md-6">
-            <input type="text" class="form-control" id="style-name"
-                    name="style-name" value="{{.Name}}" required></input>
+                <input type="text" class="form-control" id="style-name" name="style-name" value="{{.Name}}" required></input>
             </div>
         </div>
         </div>
         
         <div class="row">
         <div class="form-group">
-            <label for="style-description" 
-                   class="col-md-2 control-label">Description</label>
+            <label for="style-description" class="col-md-2 control-label">Description</label>
             <div class="col-md-6">
-            <textarea type="text" class="form-control" rows="10"
-                      name="style-description"
-                      id="style-description">{{.Description}}</textarea>
-                      </div>
+                <textarea type="text" class="form-control" rows="10" name="style-description" id="style-description">
+                {{.Description}}
+                </textarea>
+            </div>
         </div>
         </div>
 
@@ -307,14 +280,12 @@
         <div class="row">
         <div class="form-group">
             <div class="col-md-2">
-                <button class="btn btn-primary" type="submit"
-                        id="style-submit">Create</button>
+                <button class="btn btn-primary" type="submit" id="style-submit">Create</button>
                 <button class="btn btn-default" type="reset">Clear</button>
             </div>
             <div class="col-md-1 col-md-offset-5">
                 <a type="button" class="btn btn-primary" href="/styles">
-                <span class="glyphicon glyphicon-arrow-left"></span>
-                &nbsp;&nbsp;Back
+                    <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;&nbsp;Back
                 </a>
             </div>
         </div>

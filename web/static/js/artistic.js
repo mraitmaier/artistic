@@ -32,9 +32,7 @@ function validatePasswordChange() {
     var pwd = document.getElementById("newpassword").value;
     var pwd2 = document.getElementById("newpassword2").value;
 
-    if (!checkPasswords(pwd, pwd)) { 
-        return false;
-    }
+    if (!checkPasswords(pwd, pwd)) { return false; }
 
     return true;
 }
@@ -91,9 +89,7 @@ function rerouteTechnique(method, cmd, id) {
 function rerouteUsingGet(item, cmd, id) {
 
     if (cmd === "delete") {
-        if (!(confirm("Do you really want to delete " + item + "?"))) {
-            return;
-        }
+        if (!(confirm("Do you really want to delete " + item + "?"))) { return; }
     }
 
     var url = "/" + item + "/" + cmd + "/" + id;

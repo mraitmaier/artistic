@@ -27,7 +27,7 @@ func CopyS(a string) string {
 }
 */
 
-// Deep copy a string by manipulating strings as byte slices and using built-in // copy function. As basic as it gets...
+// Deep copy a string by manipulating strings as byte slices and using built-in copy function. As basic as it gets...
 func CopyS(s string) string {
     a := []byte(s)
     b := []byte("")

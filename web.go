@@ -1,6 +1,6 @@
-/*
-   web.go
-*/
+//
+//   web.go
+//
 package main
 
 import (
@@ -9,9 +9,6 @@ import (
 	"os"
 	"runtime"
     "strings"
-    //    "strconv"
-	//    "bytes"
-	//    "encoding/binary"
 	"html/template"
 	"net/http"
 	"path/filepath"
@@ -77,11 +74,14 @@ func registerHandlers(aa *ArtisticApp) {
     r.Handle("/userprofile", profileHandler(aa) )
     r.Handle("/userprofile/{cmd}", profileHandler(aa) )
     r.Handle("/userprofile/{cmd}/{id}", profileHandler(aa) )
+    r.Handle("/artists", artistsHandler(aa, core.ArtistTypeArtist) )
     r.Handle("/painters", artistsHandler(aa, core.ArtistTypePainter) )
     r.Handle("/sculptors", artistsHandler(aa, core.ArtistTypeSculptor) )
     r.Handle("/printmakers", artistsHandler(aa, core.ArtistTypePrintmaker) )
     r.Handle("/ceramicists", artistsHandler(aa, core.ArtistTypeCeramicist) )
     r.Handle("/architects", artistsHandler(aa, core.ArtistTypeArchitect) )
+    r.Handle("/artist/{cmd}/", artistHandler(aa) )
+    r.Handle("/artist/{cmd}/{id}", artistHandler(aa) )
 	r.HandleFunc("/favicon.ico", faviconHandler)
     // websocket handler
     //r.Handle("/ws", wsHandler(aa) )
@@ -110,27 +110,22 @@ func webStart(aa *ArtisticApp, wwwpath string) error {
 
 	// handle static files
 	path := filepath.Join(wwwpath, "static")
-	http.Handle("/static/", http.StripPrefix("/static/",
-		http.FileServer(http.Dir(path))))
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir(path))))
 
 	//web page templates, with defined additional functions
 	funcs := template.FuncMap{
 		"add": func(x, y int) int { return x + y },
         "allowedroles": func() []string { return utils.AllowedRoles },
-        "get_artist_type": func(t core.ArtistType) string {
-                return t.String()
-                },
+        "get_artist_type": func(t core.ArtistType) string { return t.String() },
         "totitle": func(s string) string { return strings.Title(s) },
         "toupper": func(s string) string { return strings.ToUpper(s) },
         "tolower": func(s string) string { return strings.ToLower(s) }}
 	t := filepath.Join(wwwpath, "templates", "*.tpl")
-	aa.WebInfo.templates = template.Must(
-            template.New("").Funcs(funcs).ParseGlob(t))
+	aa.WebInfo.templates = template.Must(template.New("").Funcs(funcs).ParseGlob(t))
 
 	// finally, start web server, we're using HTTPS
 	// http.ListenAndServe(":8088", context.ClearHandler(http.DefaultServeMux))
-	http.ListenAndServeTLS(":8088", "./web/static/cert.pem",
-		"./web/static/key.pem", nil)
+	http.ListenAndServeTLS(":8088", "./web/static/cert.pem", "./web/static/key.pem", nil)
 //		"./web/static/key.pem", context.ClearHandler(http.DefaultServeMux))
 	return nil
 }
@@ -311,8 +306,7 @@ func datingsHandler(aa *ArtisticApp) http.Handler {
 		// get all datings from DB
 		datings, err := aa.DataProv.GetAllDatings()
 		if err != nil {
-			log.Error(fmt.Sprintf("Problem getting all datings: %s",
-				err.Error()))
+			log.Error(fmt.Sprintf("Problem getting all datings: %s", err.Error()))
 			http.Redirect(w, r, "/error404", http.StatusFound)
 			return
 		}
@@ -379,8 +373,7 @@ func getDatingHandler(w http.ResponseWriter, r *http.Request,
 	// render the page
 	err = aa.WebInfo.templates.ExecuteTemplate(w, "dating", &web)
     if err != nil {
-        return fmt.Errorf("Error rendering the 'dating' page: %q.\n",
-            err.Error())
+        return fmt.Errorf("Error rendering the 'dating' page: %q.\n", err.Error())
 	}
     return nil
 }
@@ -426,8 +419,7 @@ func stylesHandler(aa *ArtisticApp) http.Handler {
 		//styles, err := dbase.MongoGetAllStyles(aa.DbSess.DB("artistic"))
 		styles, err := aa.DataProv.GetAllStyles()
 		if err != nil {
-			log.Error(
-                fmt.Sprintf("Problem getting all styles: %s", err.Error()))
+			log.Error(fmt.Sprintf("Problem getting all styles: %s", err.Error()))
 			http.Redirect(w, r, "/error404", http.StatusFound)
 			return
 		}
@@ -478,8 +470,7 @@ func styleHandler(aa *ArtisticApp) http.Handler {
             t := new(core.Style)
             t.Id = db.MongoStringToId(id) // only valid ID needed to delete 
             if err := aa.DataProv.DeleteStyle(t); err != nil {
-                msg := fmt.Sprintf(
-                    "%s style id=%q, DB returned %q.", cmd, id, err)
+                msg := fmt.Sprintf("%s style id=%q, DB returned %q.", cmd, id, err)
                 log.Error(msg)
                 return
             }
@@ -512,8 +503,7 @@ func getStyleHandler(w http.ResponseWriter, r *http.Request,
 	    // get a style from DB
 	    s, err = aa.DataProv.GetStyle(id)
 	    if err != nil {
-		    return fmt.Errorf(
-                "%s style id=%q, DB returned %q.", cmd, id, err)
+		    return fmt.Errorf("%s style id=%q, DB returned %q.", cmd, id, err)
 	    }
 
     case "insert":
@@ -522,8 +512,7 @@ func getStyleHandler(w http.ResponseWriter, r *http.Request,
     case "delete":
         s.Id = db.MongoStringToId(id) // only valid ID needed to delete 
         if err = aa.DataProv.DeleteStyle(s); err != nil {
-            return fmt.Errorf(
-                "%s style id=%q, DB returned %q.", cmd, id, err)
+            return fmt.Errorf("%s style id=%q, DB returned %q.", cmd, id, err)
         }
         log.Info(fmt.Sprintf("Successfully deleted style %q.", s.Id))
 	    http.Redirect(w, r, "/styles", http.StatusFound)
@@ -579,8 +568,7 @@ func postStyleHandler(w http.ResponseWriter, r *http.Request,
 
     default:
 	    http.Redirect(w, r, "/styles", http.StatusFound)
-        err = fmt.Errorf(
-            "Invalid command %q for style. Redirecting to default page.", cmd)
+        err = fmt.Errorf("Invalid command %q for style. Redirecting to default page.", cmd)
     }
 
     return err
@@ -597,8 +585,7 @@ func techniquesHandler(aa *ArtisticApp) http.Handler {
 		// get all techniques from DB
 		tech, err := aa.DataProv.GetAllTechniques()
 		if err != nil {
-			log.Error(fmt.Sprintf("Problem getting all techniques: %s",
-				err.Error()))
+			log.Error(fmt.Sprintf("Problem getting all techniques: %s", err.Error()))
 			http.Redirect(w, r, "/error404", http.StatusFound)
 			return
 		}
@@ -649,8 +636,7 @@ func techniqueHandler(aa *ArtisticApp) http.Handler {
             t := new(core.Technique)
             t.Id = db.MongoStringToId(id) // only valid ID needed to delete 
             if err := aa.DataProv.DeleteTechnique(t); err != nil {
-                msg := fmt.Sprintf(
-                    "%s technique id=%q, DB returned %q.", cmd, id, err)
+                msg := fmt.Sprintf("%s technique id=%q, DB returned %q.", cmd, id, err)
                 log.Error(msg)
                 return
             }
@@ -683,8 +669,7 @@ func getTechniqueHandler(w http.ResponseWriter, r *http.Request,
 	    // get a technique from DB
 	    tech, err = aa.DataProv.GetTechnique(id)
 	    if err != nil {
-		    return fmt.Errorf(
-                "%s technique id=%q, DB returned %q.", cmd, id, err)
+		    return fmt.Errorf("%s technique id=%q, DB returned %q.", cmd, id, err)
 	    }
 
     case "insert":
@@ -693,8 +678,7 @@ func getTechniqueHandler(w http.ResponseWriter, r *http.Request,
     case "delete":
         tech.Id = db.MongoStringToId(id) // only valid ID needed to delete 
         if err = aa.DataProv.DeleteTechnique(tech); err != nil {
-            return fmt.Errorf(
-                "%s technique id=%q, DB returned %q.", cmd, id, err)
+            return fmt.Errorf("%s technique id=%q, DB returned %q.", cmd, id, err)
         }
         log.Info(fmt.Sprintf("Successfully deleted technique %q.", tech.Id))
 	    http.Redirect(w, r, "/techniques", http.StatusFound)
@@ -750,48 +734,9 @@ func postTechniqueHandler(w http.ResponseWriter, r *http.Request,
 
     default:
 	    http.Redirect(w, r, "/techniques", http.StatusFound)
-        err = fmt.Errorf(
-            "Invalid command %q for technique. Redirecting to default page.",
-            cmd)
+        err = fmt.Errorf("Invalid command %q for technique. Redirecting to default page.", cmd)
     }
 
     return err
 }
 
-/*
-const wsBuffer int = 1024
-func wsHandler(aa *ArtisticApp) http.Handler {
-    return http.HandlerFunc( func (w http.ResponseWriter, r *http.Request) {
-
-	//if loggedin, user := userIsAuthenticated(aa, r); loggedin {
-	if loggedin, _ := userIsAuthenticated(aa, r); loggedin {
-
-        if r.Method != "GET" {
-            http.Error(w, "Method not allowed", 405)
-            return
-        }
-        if r.Header.Get("Origin") != "http://" + r.Host {
-            http.Error(w, "Origin not allowed", 403)
-            return
-        }
-
-		log := aa.Log // get logger instance
-
-        ws, err := websocket.Upgrade(w, r, nil, wsBuffer, wsBuffer)
-        if _, ok := err.(websocket.HandshakeError); ok {
-            http.Error(w, "Not a websocket handshake", 400)
-            return
-        } else if err != nil {
-            log.Error(err.Error())
-            return
-        }
-        aa.WebInfo.wsConn = ws
-
-        fmt.Printf("DEBUG websocket: %v\n", ws)
-	} else {
-		http.Redirect(w, r, "login", http.StatusFound)
-	}
-
-    }) // return handler closure
-}
-*/

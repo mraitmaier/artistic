@@ -85,7 +85,9 @@ func NewUser(username, password, role string) (*User, error) {
 	p := new(Password)
 	p.Set(password)
     u := &User{bson.NewObjectId(), username, p.Get(), "", "user", ""}
-    if err := u.SetRole(role); err != nil { return nil, err }
+    if err := u.SetRole(role); err != nil {
+        return nil, err
+    }
 	return u, nil
 }
 

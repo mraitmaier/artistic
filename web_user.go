@@ -1,13 +1,12 @@
-/*
-   web_user.go
-*/
+//
+//   web_user.go
+//
 package main
 
 import (
 	"fmt"
     "strings"
 	"net/http"
-//	"bitbucket.org/miranr/artistic/core"
 	"bitbucket.org/miranr/artistic/utils"
 	"bitbucket.org/miranr/artistic/db"
 	"github.com/gorilla/mux"
@@ -76,8 +75,7 @@ func userHandler(aa *ArtisticApp) http.Handler {
             t := new(utils.User)
             t.Id = db.MongoStringToId(id) // only valid ID needed to delete 
             if err := aa.DataProv.DeleteUser(t); err != nil {
-                msg := fmt.Sprintf(
-                    "%s user id=%q, DB returned %q.", cmd, id, err)
+                msg := fmt.Sprintf("%s user id=%q, DB returned %q.", cmd, id, err)
                 log.Error(msg)
                 return
             }
@@ -95,8 +93,7 @@ func userHandler(aa *ArtisticApp) http.Handler {
 }
 
 //  HTTP GET handler for "/user/<cmd>" URLs.
-func getUserHandler(w http.ResponseWriter, r *http.Request,
-                        aa *ArtisticApp, user *utils.User) error {
+func getUserHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp, user *utils.User) error {
 
     id := mux.Vars(r)["id"]
     cmd := mux.Vars(r)["cmd"]
@@ -147,8 +144,7 @@ func getUserHandler(w http.ResponseWriter, r *http.Request,
     return err
 }
 
-func postUserHandler(w http.ResponseWriter, r *http.Request,
-                            aa *ArtisticApp) error {
+func postUserHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp) error {
 
     // get data to modify 
     cmd := mux.Vars(r)["cmd"]
@@ -181,8 +177,7 @@ func postUserHandler(w http.ResponseWriter, r *http.Request,
 }
 
 // modify an existing user handler function.
-func modifyExistingUser(
-            w http.ResponseWriter, r *http.Request, aa *ArtisticApp) error {
+func modifyExistingUser(w http.ResponseWriter, r *http.Request, aa *ArtisticApp) error {
 
     // get data to modify 
 	id  := mux.Vars(r)["id"]
@@ -255,8 +250,7 @@ func insertNewUser(
 }
 
 // Change password for existing user handler function.
-func changeUserPassword(
-            w http.ResponseWriter, r *http.Request, aa *ArtisticApp) error {
+func changeUserPassword(w http.ResponseWriter, r *http.Request, aa *ArtisticApp) error {
 
     var err error = nil
 
@@ -287,8 +281,7 @@ func changeUserPassword(
         return err
     }
 
-    aa.Log.Info(fmt.Sprintf(
-            "Successfully changed password for existing user %q.", u.Username))
+    aa.Log.Info(fmt.Sprintf("Successfully changed password for existing user %q.", u.Username))
     return err
 }
 
@@ -322,8 +315,7 @@ func profileHandler(aa *ArtisticApp) http.Handler {
 }
 
 //  HTTP GET handler for "/userprofile/<cmd>" URLs.
-func getProfileHandler(w http.ResponseWriter, r *http.Request,
-                        aa *ArtisticApp, user *utils.User) error {
+func getProfileHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp, user *utils.User) error {
 
 //    id := mux.Vars(r)["id"]
     cmd := mux.Vars(r)["cmd"]
@@ -363,8 +355,7 @@ func getProfileHandler(w http.ResponseWriter, r *http.Request,
     return err
 }
 
-func postProfileHandler(w http.ResponseWriter, r *http.Request,
-                            aa *ArtisticApp) error {
+func postProfileHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp) error {
 
     // get data to modify 
     cmd := mux.Vars(r)["cmd"]
@@ -391,5 +382,4 @@ func postProfileHandler(w http.ResponseWriter, r *http.Request,
 
     return err
 }
-
 

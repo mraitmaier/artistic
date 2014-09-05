@@ -1,6 +1,6 @@
-/*
-   web_artist.go
-*/
+//
+//   web_artist.go
+//
 package main
 
 import (
@@ -26,8 +26,7 @@ func artistsHandler(aa *ArtisticApp, t core.ArtistType) http.Handler {
         // get all painters from DB
         artists, err := aa.DataProv.GetAllArtists(t)
         if err != nil {
-            log.Error(fmt.Sprintf("Problem getting painters from DB: %q",
-                  err.Error()))
+            log.Error(fmt.Sprintf("Problem getting painters from DB: %q", err.Error()))
             http.Redirect(w, r, "/error404", http.StatusFound)
             return
         }
@@ -51,8 +50,9 @@ func artistsHandler(aa *ArtisticApp, t core.ArtistType) http.Handler {
     }) // return handler closure
 }
 
-// a single painter handler
-func painterHandler(aa *ArtisticApp) http.Handler {
+//
+//func artistHandler(aa *ArtisticApp, at core.ArtistType) http.Handler {
+func artistHandler(aa *ArtisticApp) http.Handler {
     return http.HandlerFunc( func(w http.ResponseWriter, r *http.Request) {
 
 	if loggedin, user := userIsAuthenticated(aa, r); loggedin {
@@ -62,33 +62,22 @@ func painterHandler(aa *ArtisticApp) http.Handler {
         switch r.Method {
 
         case "GET":
-            if err := getUserHandler(w, r, aa, user); err != nil {
-                log.Error(err.Error())
-			    http.Redirect(w, r, "/users", http.StatusFound)
+            if err := getArtistHandler(w, r, aa, user); err != nil {
+                log.Error(fmt.Sprintf("Artist GET handler: %q", err.Error()))
+			    http.Redirect(w, r, "/artists", http.StatusFound)
             }
 
         case "POST":
-            if err := postUserHandler(w, r, aa); err != nil {
-                log.Error(err.Error())
+            if err := postArtistHandler(w, r, aa); err != nil {
+                log.Error(fmt.Sprintf("Artist POST handler: %q", err.Error()))
             }
-			http.Redirect(w, r, "/users", http.StatusFound)
+			http.Redirect(w, r, "/artists", http.StatusFound)
 
         case "DELETE":
-            id := mux.Vars(r)["id"]
-            cmd := mux.Vars(r)["cmd"]
-            t := new(utils.User)
-            t.Id = db.MongoStringToId(id) // only valid ID needed to delete 
-            if err := aa.DataProv.DeleteUser(t); err != nil {
-                msg := fmt.Sprintf(
-                    "%s user id=%q, DB returned %q.", cmd, id, err)
-                log.Error(msg)
-                return
-            }
-            log.Info(fmt.Sprintf("Successfully deleted user %q.", t.Id))
-	        http.Redirect(w, r, "/users", http.StatusFound)
+            log.Warning("received DELETE request. :)")
 
         case "PUT":
-            fmt.Printf("received PUT request. :)\n")
+            log.Warning("received PUT request. :)")
         }
 
 	} else {
@@ -97,62 +86,64 @@ func painterHandler(aa *ArtisticApp) http.Handler {
     }) // return handler closure
 }
 
-//  HTTP GET handler for "/painter/<cmd>" URLs.
-func getPainterHandler(w http.ResponseWriter, r *http.Request,
-                        aa *ArtisticApp, user *utils.User) error {
+//  HTTP GET handler for "/artist/<cmd>" URLs.
+func getArtistHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp, user *utils.User) error {
+//                      at core.ArtistType, user *utils.User) error {
 
-    id := mux.Vars(r)["id"]
+//    id := mux.Vars(r)["id"]
     cmd := mux.Vars(r)["cmd"]
 
-    log := aa.Log
+//    log := aa.Log
     var err error
-    s := new(utils.User)
+
+    // create new artist instance
+    a := new(core.Artist)
 
     switch cmd {
 
     case "view", "modify", "changepwd":
 
 	    // get a user from DB
-	    s, err = aa.DataProv.GetUser(id)
+        /*
+	    s, err = aa.DataProv.GetArtist(id)
 	    if err != nil {
 		    err = fmt.Errorf("%s user id=%q, DB returned %q.", cmd, id, err)
             return err
 	    }
+        */
 
     case "insert": // do nothing here...
 
     case "delete":
+    /*
         s.Id = db.MongoStringToId(id) // only valid ID needed to delete 
         if err = aa.DataProv.DeleteUser(s); err != nil {
             return fmt.Errorf("%s user id=%q, DB returned %q.", cmd, id, err)
         }
-        log.Info(fmt.Sprintf("Successfully deleted user %q.", s.Id))
-	    http.Redirect(w, r, "/users", http.StatusFound)
+        log.Info(fmt.Sprintf("Successfully deleted artist %q.", s.Name))
+	    http.Redirect(w, r, "/artists", http.StatusFound)
         return nil //  this is all about deleting items...
+    */
 
     default:
-        return fmt.Errorf("GET User handler: unknown command %q", cmd)
+        return fmt.Errorf("GET artist handler: unknown command %q", cmd)
     }
 
 	// create ad-hoc struct to be sent to page template
     var web = struct {
 		User  *utils.User
         Cmd   string   // "view", "modify", "insert" or "delete"...
-		UserProfile *utils.User
-    }{ user, cmd, s }
+		Artist *core.Artist
+    }{ user, cmd, a }
 
     // render the page
-	err = aa.WebInfo.templates.ExecuteTemplate(w, "user", &web)
-    if err != nil {
-	    log.Error("Error rendering the 'user' page.")
-	}
+	err = aa.WebInfo.templates.ExecuteTemplate(w, "artist", &web)
 
     return err
 }
 
 // HTTP POST handler for "/painter/<cmd>" URLs.
-func postPainterHandler(w http.ResponseWriter, r *http.Request,
-                            aa *ArtisticApp) error {
+func postArtistHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp) error {
 
     // get data to modify 
     cmd := mux.Vars(r)["cmd"]
@@ -185,8 +176,7 @@ func postPainterHandler(w http.ResponseWriter, r *http.Request,
 }
 
 // modify an existing user handler function.
-func modifyExistingPainter(
-            w http.ResponseWriter, r *http.Request, aa *ArtisticApp) error {
+func modifyExistingArtist(w http.ResponseWriter, r *http.Request, aa *ArtisticApp) error {
 
     // get data to modify 
 	id  := mux.Vars(r)["id"]
@@ -220,8 +210,7 @@ func modifyExistingPainter(
 }
 
 // create new user handler function.
-func insertNewPainter(
-            w http.ResponseWriter, r *http.Request, aa *ArtisticApp) error {
+func insertNewArtist(w http.ResponseWriter, r *http.Request, aa *ArtisticApp) error {
 
     // get data to modify 
 	id  := mux.Vars(r)["id"]

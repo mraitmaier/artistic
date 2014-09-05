@@ -1,84 +1,64 @@
-
 {{define "login"}}
 <!DOCTYPE html>
 <html lang="en">
-
-  <head>
+<head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Artistic - Login</title>
 
     <!-- Bootstrap -->
-  <!--  <link href="css/bootstrap.min.css" rel="stylesheet"> -->
+    <!--  <link href="css/bootstrap.min.css" rel="stylesheet"> -->
     <link href="/static/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
 
     <!-- custom CSS, additional to CSS -->
     <link href="/static/css/custom.css" rel="stylesheet">
-  </head>
+</head>
 
-  <body>
-
+<body>
     <div class="container">
+        <div class="row">
+            <div class="col-md-2"></div>
 
-    <div class="row">
-        <div class="col-md-2"></div>
-        <div class="col-md-8">
-    <!--
-        <div class="jumbotron">
-            <h1 class="text-center">Artistic</h1>
-            <p class="text-center">
-            Artistic is a web application to manage art history resources.
-            </p>
+            <div class="col-md-8">
+                <div class="well well-sm">
+                    <h1 class="text-center">Artistic</h1>
+                    <p class="text-center text-info"> Artistic is a web application to manage art history resources.</p>
+                </div> <!-- well -->
+            </div> <!-- col-md-8 -->
+            
+            <div class="col-md-2"></div>
+        </div> <!-- row -->
 
-        </div> 
-    -->
-            <div class="well well-sm">
-            <h1 class="text-center">Artistic</h1>
-            <p class="text-center text-info">
-            Artistic is a web application to manage art history resources.
-            </p>
-            </div> <!-- well -->
-        </div> <!-- col-md-8 -->
-        <div class="col-md-2"></div>
-    </div> <!-- row -->
+        <div class="row">
+            <div class="col-md-4"></div>
 
-    <div class="row">
-        <div class="col-md-4"></div>
-        <div class="col-md-4">
+            <div class="col-md-4">
+                <form class="form-signin" role="form" id="signin_form" method="post">
+                    <h2 class="form-signin-heading">Please sign in</h2>
+                    <input type="text" class="form-control" name="username" placeholder="Username" required autofocus>
+                    <input type="password" class="form-control" name="password" placeholder="Password" required>
+                    <button class="btn btn-lg btn-primary btn-block" id="signin_button" type="submit">Sign in</button>
+                </form>
+            </div>
 
-      <form class="form-signin" role="form" id="signin_form" method="post">
-        <h2 class="form-signin-heading">Please sign in</h2>
-        <input type="text" class="form-control" name="username" 
-                            placeholder="Username" required autofocus>
-        <input type="password" class="form-control" name="password"
-                            placeholder="Password" required>
-        <button class="btn btn-lg btn-primary btn-block" id="signin_button"
-                type="submit">Sign in</button>
-      </form>
-
-        </div>
-        <div class="col-md-4"></div>
-      </div> <!-- row -->
-
+            <div class="col-md-4"></div>
+        </div> <!-- row -->
     </div> <!-- /container -->
-<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
- <!--   <script 
-        src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js">
-    </script> -->
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <!--   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"> </script> -->
     <script  src="/static/js/jquery.min.js"></script>
 
-<!-- Include all compiled plugins (below), or include individual files as needed -->
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="/static/js/bootstrap.min.js"></script>
-
-    <script> </script>
-  </body>
+</body>
 </html>
 {{end}}

@@ -41,11 +41,9 @@ func parseArgs(ac *ArtisticApp, cfgfile *string) {
 		fmt.Println("FATAL: The main control structure is NOT defined...")
 		os.Exit(1)
 	}
-	flag.StringVar(&ac.LogFname, "l", "",
-		"define the custom log file path (absolute, please!)")
+	flag.StringVar(&ac.LogFname, "l", "", "define the custom log file path (absolute, please!)")
 	flag.StringVar(&ac.SyslogIP, "s", "", "IP address of the Syslog server")
-	flag.StringVar(cfgfile, "c", DefConfigFile,
-		"define custom path for config file")
+	flag.StringVar(cfgfile, "c", DefConfigFile, "define custom path for config file")
 	flag.BoolVar(&ac.Debug, "d", false, "enable debug mode (only for testing!)")
 	flag.Parse()
 }
@@ -83,8 +81,7 @@ func main() {
     var url string
 	// connect to database (FIXME: currently hardcoded, should be read from
 	// config file in the final version)
-    url, aa.DbSess, aa.DataProv, err = db.InitDb(db.MongoDB, "localhost", 27017,
-                              "artistic", "artistic", DbName)
+    url, aa.DbSess, aa.DataProv, err = db.InitDb(db.MongoDB, "localhost", 27017, "artistic", "artistic", DbName)
 	if err = aa.DbSess.Connect(url, DatabaseTimeout); err != nil {
 		aa.Log.Critical("Connection to database cannot be established.")
 		fmt.Println("Connection to database cannot be established. Exiting...")

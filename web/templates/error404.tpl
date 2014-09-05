@@ -33,13 +33,11 @@
 
         <div class="col-md-2" id="menu">
             <h1 id="menu-header"></h1>
-
             {{template "accordion"}}
         </div>
 
         <div class="col-md-4" id="data-list">
             <h1 id="data-list-header">Error 404</h1>
-
             <p>This page has not been found!</p>
         </div>
 

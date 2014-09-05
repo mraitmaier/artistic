@@ -255,8 +255,7 @@ func (f *FileHandler) Close() {
 }
 
 func (f *FileHandler) String() string {
-	return fmt.Sprintf("  FileHandler: fmt=%q, lvl=%-10s, fd=%d\n",
-		f.Format(), f.Severity(), f.file.Fd())
+	return fmt.Sprintf("  FileHandler: fmt=%q, lvl=%-10s, fd=%d\n", f.Format(), f.Severity(), f.file.Fd())
 }
 
 
