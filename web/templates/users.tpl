@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Artistic - Administrate users</title>
+    <title>Artistic - Administer Users</title>
 
     <!-- Bootstrap -->
     <!--  <link href="css/bootstrap.min.css" rel="stylesheet"> -->
@@ -34,8 +34,9 @@
 
             <div class="col-md-10" id="data-list">
                 <h1 id="data-list-header">Users</h1>
-                <p>{{template "user-list" .Users}}</p>
-                <button type="button" class="btn btn-primary" onclick="rerouteUsingGet('user', 'insert', '');">Add New User
+                {{template "user-list" .Users}}
+                <button type="button" class="btn btn-primary" onclick="rerouteUsingGet('user', 'insert', '');">
+                Add New User
                 </button>
             </div>
         </div> <!-- row -->
@@ -55,7 +56,7 @@
 {{end}}
 
 {{define "user-list"}}
-    <table class="table table-striped table-hover" id="user-list-table">
+<table class="table table-striped table-hover" id="user-list-table">
     <thead>
         <tr>
             <th>#</th>
@@ -77,7 +78,7 @@
             <td>{{printf "%s" $element.Role}}</td>
             <td>{{printf "%s" $element.Email}}</td>
             <td>
-                <a href=#" data-toggle="tooltip" data-placement="left" title="View user details" id="view-user-{{$id}}"
+                <a href="#" data-toggle="tooltip" data-placement="left" title="View user details" id="view-user-{{$id}}"
                            onclick="return rerouteUsingGet('user', 'view', {{$element.Id}});">
                     <span class="glyphicon glyphicon-eye-open"></span>
                 </a>
@@ -100,7 +101,7 @@
         </tr>
         {{end}}
     </tbody>
-    </table>
+</table>
 {{end}}
 
 {{define "user"}}

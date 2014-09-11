@@ -516,7 +516,7 @@ func (m *MongoDbConn) adminTechnique(cmd DbCommand, t *core.Technique) error {
          err = coll.RemoveId(t.Id)
 
     default:
-        err = fmt.Errorf("Handling techniques: Unknown command.")
+        err = fmt.Errorf("Handling techniques: Unknown DB command.")
     }
 
     return err
@@ -550,14 +550,29 @@ func (m *MongoDbConn) GetAllArtists(t core.ArtistType) ([]core.Artist, error) {
         switch t {
 
         case core.ArtistTypePainter:
-            err = db.C("artists").Find(
-                        bson.M{ "is_painter" : true }).All(&artists)
-            if err != nil { return }
+            if err = db.C("artists").Find( bson.M{ "is_painter" : true } ).All(&artists); err != nil {
+                return
+            }
 
         case core.ArtistTypeSculptor:
+            if err = db.C("artists").Find( bson.M{ "is_sculptor" : true } ).All(&artists); err != nil {
+                return
+            }
+
         case core.ArtistTypeArchitect:
+            if err = db.C("artists").Find( bson.M{ "is_architect" : true } ).All(&artists); err != nil {
+                return
+            }
+
         case core.ArtistTypePrintmaker:
+            if err = db.C("artists").Find( bson.M{ "is_printmaker" : true } ).All(&artists); err != nil {
+                return
+            }
+
         case core.ArtistTypeCeramicist:
+            if err = db.C("artists").Find( bson.M{ "is_ceramicist" : true } ).All(&artists); err != nil {
+                return
+            }
         }
 
         // write the users to the channel
@@ -571,6 +586,92 @@ func (m *MongoDbConn) GetAllArtists(t core.ArtistType) ([]core.Artist, error) {
     return artists, nil // OK
 }
 
+// Get a single artist from the DB: we need an ID . 
+func (m * MongoDbConn) GetArtist(id string) (*core.Artist, error) {
+
+    // acquire lock
+    dblock.Lock()
+    defer dblock.Unlock()
+
+    // get *mgo.Database instance
+    db := m.Sess.DB(m.name)
+    if db == nil { return nil, errors.New("MongoDB descriptor empty.") }
+
+    // prepare channel
+    ch := make(chan *core.Artist)
+
+    // start goroutine to get a user
+    go func(id string, ch chan *core.Artist) {
+
+        u := core.CreateArtist() // create empty user
+
+        // get a user from DB
+        err := db.C("artists").Find(bson.M{ "_id": MongoStringToId(id) }).One(&u)
+        if err != nil {
+            return
+        }
+
+        // write a user to channel
+        ch <- u
+    }(id, ch)
+
+    // read user from channel
+    user := <-ch
+
+    return user, nil // all OK
+}
+// Update a single artist in DB. 
+func (m * MongoDbConn) UpdateArtist(a *core.Artist) error {
+    return m.adminArtist(DBCmdUpdate, a)
+}
+
+// Create a new artist in DB. 
+func (m * MongoDbConn) InsertArtist(a *core.Artist) error {
+    // check the ID of the item to be inserted into DB
+    if a.Id == "" {
+        a.Id = NewId()
+    }
+    return m.adminArtist(DBCmdInsert, a)
+}
+
+// Delete a new artist in DB. 
+func (m * MongoDbConn) DeleteArtist(a *core.Artist) error {
+    return m.adminArtist(DBCmdDelete, a)
+}
+
+// Aux method that administers the artist records in DB
+func (m *MongoDbConn) adminArtist(cmd DbCommand, a *core.Artist) error {
+
+    dblock.Lock()
+    defer dblock.Unlock()
+
+    coll := m.Sess.DB(m.name).C("artists")
+    if coll == nil {
+        return  fmt.Errorf("Handling an artist: MongoDB descriptor empty.")
+    }
+
+    if a == nil {
+       return fmt.Errorf("Handling an artist: cannot create empty artist.")
+    }
+
+    var err error
+    switch cmd {
+
+    case DBCmdUpdate:
+        err = coll.UpdateId(a.Id, a)
+
+    case DBCmdInsert:
+        err = coll.Insert(a)
+
+    case DBCmdDelete:
+         err = coll.RemoveId(a.Id)
+
+    default:
+        err = fmt.Errorf("Handling artists: Unknown DB command.")
+    }
+
+    return err
+}
 
 ////////////////////// Experimental /////////////////
 // NOTE: how to abstract away the DB ID (for differents DBs)? By implementing 

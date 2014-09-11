@@ -106,7 +106,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Artistic - Artist</title>
+    <title>Artistic - Artist Administration</title>
 
     <!-- Bootstrap -->
     <link href="static/css/bootstrap.min.css" rel="stylesheet">
@@ -125,7 +125,6 @@
 <body>
     {{template "navbar" .User.Username}}
     <div class="container-fluid">
-
       <div class="row">
 
         <div class="col-md-2" id="menu">
@@ -161,7 +160,6 @@
     <script src="static/js/bootstrap.min.js"></script>
     <!-- custom JS code -->
     <script src="static/js/artistic.js"></script>
-
 </body>
 </html>
 {{end}}
@@ -173,9 +171,21 @@
 
     <div class="row">
     <div class="form-group">
-        <label for="name" class="col-md-2 control-label">Name</label>
-        <div class="col-md-6">
-            <input type="text" class="form-control" id="artist-name" name="artist-name" value="" placeholder="type name" required>
+        <label for="first" class="col-md-2 control-label">Name   First</label>
+        <div class="col-md-2">
+            <input type="text" class="form-control" id="first" name="first" value="" placeholder="first name" required>
+            </input>
+        </div>
+        &nbsp;
+        <label for="middle" class="col-md-1 control-label">Middle</label>
+        <div class="col-md-1">
+            <input type="text" class="form-control" id="middle" name="middle" value="" placeholder="middle">
+            </input>
+        </div>
+        &nbsp;
+        <label for="last" class="col-md-1 control-label">Last</label>
+        <div class="col-md-3">
+            <input type="text" class="form-control" id="last" name="last" value="" placeholder="last">
             </input>
         </div>
     </div> <!-- form-group -->
@@ -199,9 +209,63 @@
     </div> <!-- form-group -->
     </div> <!-- row -->
 
+    <div class="row">
+    <div class="form-group">
+        <label for="nationality" class="col-md-2 control-label">Nationality</label>
+        <div class="col-md-6">
+            <input type="text" class="form-control" id="nationality" name="nationality" value="" placeholder="nationality"></input>
+        </div>
+    </div> <!-- form-group -->
+    </div> <!-- row -->
 
 
+    <!-- TODO -->
 
+
+    <div class="row">&nbsp;</div><!-- empty row -->
+
+    <div class="row">
+    <div class="form-group">
+        <div class="checkbox">
+            <label><input type="checkbox" class="form-control" id="painter" name="painter" value="yes"></input>Painter</label>
+        </div> <!-- checkbox -->
+    </div> <!-- form-group -->
+    </div> <!-- row -->
+
+    <div class="row">
+    <div class="form-group">
+        <div class="checkbox">
+            <label><input type="checkbox" class="form-control" id="sculptor" name="sculptor" value="yes"></input>Sculptor</label>
+        </div> <!-- checkbox -->
+    </div> <!-- form-group -->
+    </div> <!-- row -->
+
+    <div class="row">
+    <div class="form-group">
+        <div class="checkbox">
+            <label><input type="checkbox" class="form-control" id="printmaker" name="printmaker" value="yes"></input>
+            Printmaker</label>
+        </div> <!-- checkbox -->
+    </div> <!-- form-group -->
+    </div> <!-- row -->
+
+    <div class="row">
+    <div class="form-group">
+        <div class="checkbox">
+            <label><input type="checkbox" class="form-control" id="ceramicist" name="ceramicist" value="yes"></input>
+            Ceramicist</label>
+        </div> <!-- checkbox -->
+    </div> <!-- form-group -->
+    </div> <!-- row -->
+
+    <div class="row">
+    <div class="form-group">
+        <div class="checkbox">
+            <label><input type="checkbox" class="form-control" id="Architect" name="architect" value="yes"></input>
+            Architect</label>
+        </div> <!-- checkbox -->
+    </div> <!-- form-group -->
+    </div> <!-- row -->
 
     <div class="row">&nbsp;</div><!-- empty row -->
 

@@ -104,13 +104,13 @@ func getArtistHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp, u
     case "view", "modify", "changepwd":
 
 	    // get a user from DB
-        /*
+    /*
 	    s, err = aa.DataProv.GetArtist(id)
 	    if err != nil {
 		    err = fmt.Errorf("%s user id=%q, DB returned %q.", cmd, id, err)
             return err
 	    }
-        */
+    */
 
     case "insert": // do nothing here...
 
@@ -153,18 +153,13 @@ func postArtistHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp) 
     switch cmd {
 
     case "insert":
-        if err = insertNewUser(w, r, aa) ; err != nil {
-            err = fmt.Errorf("Error creating user: %q.", err)
+        if err = insertNewArtist(w, r, aa) ; err != nil {
+            err = fmt.Errorf("Error creating artist: %q.", err)
         }
 
     case "modify":
-        if err = modifyExistingUser(w, r, aa); err != nil {
-            err = fmt.Errorf("Modifying user: %q.", err)
-        }
-
-    case "changepwd":
-        if err = changeUserPassword(w, r, aa); err != nil {
-            err = fmt.Errorf("Changing password for user failed: %q.", err)
+        if err = modifyExistingArtist(w, r, aa); err != nil {
+            err = fmt.Errorf("Modifying artist: %q.", err)
         }
 
     default:
