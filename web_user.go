@@ -7,6 +7,7 @@ import (
 	"fmt"
     "strings"
 	"net/http"
+	"bitbucket.org/miranr/artistic/core"
 	"bitbucket.org/miranr/artistic/utils"
 	"bitbucket.org/miranr/artistic/db"
 	"github.com/gorilla/mux"
@@ -24,7 +25,7 @@ func usersHandler(aa *ArtisticApp) http.Handler {
 		// get all users from DB
 		users, err := aa.DataProv.GetAllUsers()
 		if err != nil {
-			log.Error(fmt.Sprintf("Problem getting all users: %s", err.Error()))
+			log.Error(fmt.Sprintf("Problem getting all users: %q", err.Error()))
 			http.Redirect(w, r, "/error404", http.StatusFound)
 			return
 		}
@@ -38,7 +39,7 @@ func usersHandler(aa *ArtisticApp) http.Handler {
 		// render the page
 		err = aa.WebInfo.templates.ExecuteTemplate(w, "users", &web)
         if err != nil {
-			log.Error("Cannot render the 'users' page.")
+			log.Error(fmt.Sprintf("Cannot render the 'users' page: %q", err.Error()))
 		}
 
 	} else {
@@ -138,7 +139,7 @@ func getUserHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp, use
     // render the page
 	err = aa.WebInfo.templates.ExecuteTemplate(w, "user", &web)
     if err != nil {
-	    log.Error("Error rendering the 'user' page.")
+	    log.Error(fmt.Sprintf("Error rendering the 'user' page: %q", err.Error()))
 	}
 
     return err
@@ -183,69 +184,53 @@ func modifyExistingUser(w http.ResponseWriter, r *http.Request, aa *ArtisticApp)
 	id  := mux.Vars(r)["id"]
 
     // get POST form values and create a struct
-	name  := strings.TrimSpace(r.FormValue("username"))
-	pwd   := strings.TrimSpace(r.FormValue("password"))
-	role  := strings.TrimSpace(r.FormValue("role"))
-	full  := strings.TrimSpace(r.FormValue("fullname"))
-	email := strings.TrimSpace(r.FormValue("email"))
+	first := strings.TrimSpace(r.FormValue("first"))
+	middle := strings.TrimSpace(r.FormValue("middle"))
+	last := strings.TrimSpace(r.FormValue("last"))
 
     var err error = nil
 
-    // create a user and check passwords
-    t := utils.CreateUser(name, pwd)
+    // create an Artist instance 
+    a := core.CreateArtist()
 
-    if err = t.SetRole(role); err != nil {
-        return fmt.Errorf("invalid role.")
-    }
-    t.Id = db.MongoStringToId(id)
-    t.Name = full
-    t.Role = role
-    t.Email = email
+    a.Id = db.MongoStringToId(id)
+    a.Name = core.CreateName(first, middle, last)
 
     // do it...
-    if err = aa.DataProv.UpdateUser(t); err != nil {
+    if err = aa.DataProv.UpdateArtist(a); err != nil {
         return err
     }
-    aa.Log.Info(fmt.Sprintf("Successfully inserted new user %q.", name))
+    aa.Log.Info(fmt.Sprintf("Successfully updated user %q.", a.Name))
     return err
 }
 
 // create new user handler function.
-func insertNewUser(
-            w http.ResponseWriter, r *http.Request, aa *ArtisticApp) error {
+func insertNewUser(w http.ResponseWriter, r *http.Request, aa *ArtisticApp) error {
 
     // get data to modify 
 	id  := mux.Vars(r)["id"]
 
     // get POST form values and create a struct
-	name  := strings.TrimSpace(r.FormValue("username"))
-	pwd   := strings.TrimSpace(r.FormValue("password"))
-	pwd2  := strings.TrimSpace(r.FormValue("password2"))
-	role  := strings.TrimSpace(r.FormValue("role"))
-	full  := strings.TrimSpace(r.FormValue("fullname"))
-	email := strings.TrimSpace(r.FormValue("email"))
-
-    if pwd != pwd2 {
-        return fmt.Errorf("passwords do not match.")
-    }
+	first := strings.TrimSpace(r.FormValue("first"))
+	middle := strings.TrimSpace(r.FormValue("middle"))
+	last := strings.TrimSpace(r.FormValue("last"))
 
     var err error = nil
-    // create a user and check passwords
-    u, err := utils.NewUser(name, pwd, role);
+
+    // create an Artist instance
+    a := core.CreateArtist()
     if err != nil {
         return err
     }
-    u.Id = db.MongoStringToId(id)
-    u.Name = full
-    u.Role = role
-    u.Email = email
+    a.Id = db.MongoStringToId(id)
+    a.Name = core.CreateName(first, middle, last)
 
     // do it...
-    if err = aa.DataProv.InsertUser(u); err != nil {
+    if err = aa.DataProv.InsertArtist(a); err != nil {
        return err
     }
 
-    aa.Log.Info(fmt.Sprintf("Successfully modified existing user %q.", name))
+    aa.Log.Info(fmt.Sprintf("Successfully inserted new user %q.", a.Name))
     return err
 }
 
