@@ -61,23 +61,22 @@ func artistHandler(aa *ArtisticApp) http.Handler {
 
         case "GET":
             if err := getArtistHandler(w, r, aa, user); err != nil {
-                log.Error(fmt.Sprintf("[%s] Artist GET handler: %q.", user.Username, err.Error()))
-			    //http.Redirect(w, r, "/artists", http.StatusFound)
+                log.Error(fmt.Sprintf("[%s] Artist GET handler: %s.", user.Username, err.Error()))
                 break // force break
             }
             log.Info(fmt.Sprintf("[%s] Displaying the %q page", user.Username, r.RequestURI))
 
         case "POST":
             if err := postArtistHandler(w, r, aa, user); err != nil {
-                log.Error(fmt.Sprintf("[%s] Artist POST handler: %q.", user.Username, err.Error()))
+                log.Error(fmt.Sprintf("[%s] Artist POST handler: %s.", user.Username, err.Error()))
             }
 			http.Redirect(w, r, "/artists", http.StatusFound)
 
         case "DELETE":
-            log.Warning("received DELETE request. :)")
+            log.Warning(fmt.Sprintf("[%s] Received DELETE request. :)", user.Username))
 
         case "PUT":
-            log.Warning("received PUT request. :)")
+            log.Warning(fmt.Sprintf("[%s] Received PUT request. :)", user.Username))
         }
 
 	} else {
@@ -88,42 +87,34 @@ func artistHandler(aa *ArtisticApp) http.Handler {
 
 //  HTTP GET handler for "/artist/<cmd>" URLs.
 func getArtistHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp, user *utils.User) error {
-//                      at core.ArtistType, user *utils.User) error {
 
-//    id := mux.Vars(r)["id"]
+    id := mux.Vars(r)["id"]
     cmd := mux.Vars(r)["cmd"]
 
-//    log := aa.Log
-    //var err error
+    //log := aa.Log
+    var err error
 
     // create new artist instance
     a := core.CreateArtist()
 
     switch cmd {
 
-    case "view", "modify", "changepwd":
-
-	    // get a user from DB
-    /*
-	    s, err = aa.DataProv.GetArtist(id)
+    case "view", "modify", "changepwd":     // get a user from DB
+	    a, err = aa.DataProv.GetArtist(id)
 	    if err != nil {
-		    err = fmt.Errorf("%s user id=%q, DB returned %q.", cmd, id, err)
-            return err
+		    return fmt.Errorf("[%s] %s user id=%q: %q.", user.Username, strings.ToUpper(cmd), id, err.Error())
 	    }
-    */
 
     case "insert": // do nothing here...
 
-    case "delete":
-    /*
-        s.Id = db.MongoStringToId(id) // only valid ID needed to delete 
-        if err = aa.DataProv.DeleteUser(s); err != nil {
-            return fmt.Errorf("%s user id=%q, DB returned %q.", cmd, id, err)
+    case "delete": // delete from DB and redirect to main /artists page
+        a.Id = db.MongoStringToId(id) // only valid ID needed to delete 
+        if err = aa.DataProv.DeleteArtist(a); err != nil {
+            return fmt.Errorf("[%s] DELETE Artist name=%q: %q.", id, a.Name.String(), err.Error())
         }
-        log.Info(fmt.Sprintf("Successfully deleted artist %q.", s.Name))
+        aa.Log.Info(fmt.Sprintf("[%s] DELETE Artist name=%q, Success.", user.Username, a.Name.String()))
 	    http.Redirect(w, r, "/artists", http.StatusFound)
         return nil //  this is all about deleting items...
-    */
 
     default:
         return fmt.Errorf("Unknown command %q.", cmd)

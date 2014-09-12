@@ -158,7 +158,6 @@
 
     <!-- Include all compiled plugins, or include individual files as needed -->
     <script src="static/js/bootstrap.min.js"></script>
-    <!-- custom JS code -->
     <script src="static/js/artistic.js"></script>
 </body>
 </html>
@@ -173,8 +172,7 @@
     <div class="form-group">
         <label for="first" class="col-md-2 control-label">Name   First</label>
         <div class="col-md-2">
-            <input type="text" class="form-control" id="first" name="first" value="" placeholder="first name" required>
-            </input>
+            <input type="text" class="form-control" id="first" name="first" value="" placeholder="first name" required></input>
         </div>
         &nbsp;
         <label for="middle" class="col-md-1 control-label">Middle</label>

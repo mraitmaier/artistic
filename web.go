@@ -81,8 +81,8 @@ func registerHandlers(aa *ArtisticApp) {
     r.Handle("/printmakers", artistsHandler(aa, core.ArtistTypePrintmaker) )
     r.Handle("/ceramicists", artistsHandler(aa, core.ArtistTypeCeramicist) )
     r.Handle("/architects", artistsHandler(aa, core.ArtistTypeArchitect) )
-    r.Handle("/artist/{cmd}/", artistHandler(aa) )
     r.Handle("/artist/{cmd}/{id}", artistHandler(aa) )
+    r.Handle("/artist/{cmd}/", artistHandler(aa) )
 	r.HandleFunc("/favicon.ico", faviconHandler)
     // websocket handler
     //r.Handle("/ws", wsHandler(aa) )

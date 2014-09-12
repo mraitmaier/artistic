@@ -143,14 +143,11 @@
 
   <body>
     {{template "navbar" .User.Username}}
-
     <div class="container-fluid">
-
     <div class="row">
 
         <div class="col-md-2" id="menu">
             <h1 id="menu-header"></h1>
-
             {{template "accordion"}}
         </div>
 
@@ -172,31 +169,16 @@
         </div>
 
      </div> <!-- row -->
-
     </div> <!-- container fluid -->
 
-<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
- <!--   <script 
-        src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js">
-    </script> -->
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <!--   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"> </script> -->
     <script  src="/static/js/jquery.min.js"></script>
 
-<!-- Include all compiled plugins (below), or include individual files as needed -->
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="/static/js/bootstrap.min.js"></script>
     <script src="/static/js/artistic.js"></script>
-    <script>
-
-    // when page is ready...
-    $(document).ready( function() {
-
-        // parse the JSON data...
-        {{/*var data = JSON.parse({{.Json}}); */}}
-
-    });
-
-    </script>
-
-  </body>
+   </body>
 </html>
 {{end}}
 
@@ -285,53 +267,47 @@
 
 {{define "technique-create"}}
 <div id="create-technique-form-div" class="container-fluid">
-    <form class="form-vertical" role="form" method="post"
-                id="create-technique-form" action="/technique/insert/">
-        <fieldset>
+<form class="form-vertical" role="form" method="post" id="create-technique-form" action="/technique/insert/">
+    <fieldset>
 
-        <div class="row">
-        <div class="form-group">
-            <label for="technique-name" 
-                   class="col-md-2 control-label">Name</label>
-            <div class="col-md-6">
-            <input type="text" class="form-control" id="technique-name"
-                    name="technique-name" value="{{.Name}}" required></input>
-            </div>
+    <div class="row">
+    <div class="form-group">
+        <label for="technique-name" class="col-md-2 control-label">Name</label>
+        <div class="col-md-6">
+        <input type="text" class="form-control" id="technique-name" name="technique-name" value="{{.Name}}" required></input>
         </div>
-        </div>
+    </div>
+    </div>
         
-        <div class="row">
-        <div class="form-group">
-            <label for="technique-description" 
-                   class="col-md-2 control-label">Description</label>
-            <div class="col-md-6">
-            <textarea type="text" class="form-control" rows="10"
-                      name="technique-description"
-                      id="technique-description">{{.Description}}</textarea>
-                      </div>
+    <div class="row">
+    <div class="form-group">
+        <label for="technique-description" class="col-md-2 control-label">Description</label>
+        <div class="col-md-6">
+            <textarea type="text" class="form-control" rows="10" name="technique-description" id="technique-description">
+            {{.Description}}
+            </textarea>
         </div>
-        </div>
+    </div>
+    </div>
 
-        <div class="row">&nbsp;</div> <!-- empty row -->
+    <div class="row">&nbsp;</div> <!-- empty row -->
 
-        <div class="row">
-        <div class="form-group">
-            <div class="col-md-2">
-            <button class="btn btn-primary" type="submit"
-                    id="technique-submit">Create</button>
+    <div class="row">
+    <div class="form-group">
+        <div class="col-md-2">
+            <button class="btn btn-primary" type="submit" id="technique-submit">Create</button>
             <button class="btn btn-default" type="reset">Clear</button>
-            </div>
-            <div class="col-md-1 col-md-offset-5">
+        </div>
+        <div class="col-md-1 col-md-offset-5">
             <a type="button" class="btn btn-primary" href="/techniques">
-            <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;&nbsp;Back
+                <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;&nbsp;Back
             </a>
-            </div>
         </div>
-        </div>
+    </div>
+    </div>
 
-        </fieldset>
-    </form>
+    </fieldset>
+</form>
 </div>
 {{end}}
-
 
