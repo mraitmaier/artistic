@@ -26,8 +26,8 @@ func artistsHandler(aa *ArtisticApp, t core.ArtistType) http.Handler {
         // get all painters from DB
         artists, err := aa.DataProv.GetAllArtists(t)
         if err != nil {
-            log.Error(fmt.Sprintf("Problem getting painters from DB: %q", err.Error()))
-            http.Redirect(w, r, "/error404", http.StatusFound)
+            log.Error(fmt.Sprintf("[%s] Getting artists from DB: %q", user.Username, err.Error()))
+            http.Redirect(w, r, "/error", http.StatusFound)
             return
         }
 
@@ -38,20 +38,18 @@ func artistsHandler(aa *ArtisticApp, t core.ArtistType) http.Handler {
             Artists []core.Artist
         } { user, t, artists }
 
-		// render the page
-		err = aa.WebInfo.templates.ExecuteTemplate(w, "artists", &web)
-        if err != nil {
-			log.Error("Cannot render the 'painters' page.")
+        if err = renderPage("artists", &web, aa, w, r); err != nil {
+			log.Error(fmt.Sprintf("[%s] Rendering the 'artists' page (%s)", user.Username, err.Error()))
 		}
+        log.Info(fmt.Sprintf("[%s] Displaying the %s page.", user.Username, r.RequestURI))
 
 	} else {
-		http.Redirect(w, r, "/login", http.StatusFound)
+        redirectToLoginPage(w, r, aa)
 	}
     }) // return handler closure
 }
 
 //
-//func artistHandler(aa *ArtisticApp, at core.ArtistType) http.Handler {
 func artistHandler(aa *ArtisticApp) http.Handler {
     return http.HandlerFunc( func(w http.ResponseWriter, r *http.Request) {
 
@@ -63,13 +61,15 @@ func artistHandler(aa *ArtisticApp) http.Handler {
 
         case "GET":
             if err := getArtistHandler(w, r, aa, user); err != nil {
-                log.Error(fmt.Sprintf("Artist GET handler: %q", err.Error()))
-			    http.Redirect(w, r, "/artists", http.StatusFound)
+                log.Error(fmt.Sprintf("[%s] Artist GET handler: %q.", user.Username, err.Error()))
+			    //http.Redirect(w, r, "/artists", http.StatusFound)
+                break // force break
             }
+            log.Info(fmt.Sprintf("[%s] Displaying the %q page", user.Username, r.RequestURI))
 
         case "POST":
-            if err := postArtistHandler(w, r, aa); err != nil {
-                log.Error(fmt.Sprintf("Artist POST handler: %q", err.Error()))
+            if err := postArtistHandler(w, r, aa, user); err != nil {
+                log.Error(fmt.Sprintf("[%s] Artist POST handler: %q.", user.Username, err.Error()))
             }
 			http.Redirect(w, r, "/artists", http.StatusFound)
 
@@ -81,7 +81,7 @@ func artistHandler(aa *ArtisticApp) http.Handler {
         }
 
 	} else {
-		http.Redirect(w, r, "/login", http.StatusFound)
+        redirectToLoginPage(w, r, aa)
 	}
     }) // return handler closure
 }
@@ -94,10 +94,10 @@ func getArtistHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp, u
     cmd := mux.Vars(r)["cmd"]
 
 //    log := aa.Log
-    var err error
+    //var err error
 
     // create new artist instance
-    a := new(core.Artist)
+    a := core.CreateArtist()
 
     switch cmd {
 
@@ -126,7 +126,7 @@ func getArtistHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp, u
     */
 
     default:
-        return fmt.Errorf("GET artist handler: unknown command %q", cmd)
+        return fmt.Errorf("Unknown command %q.", cmd)
     }
 
 	// create ad-hoc struct to be sent to page template
@@ -136,109 +136,114 @@ func getArtistHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp, u
 		Artist *core.Artist
     }{ user, cmd, a }
 
-    // render the page
-	err = aa.WebInfo.templates.ExecuteTemplate(w, "artist", &web)
-
-    return err
+    return renderPage("artist", &web, aa, w, r)
 }
 
 // HTTP POST handler for "/painter/<cmd>" URLs.
-func postArtistHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp) error {
+func postArtistHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp, user *utils.User) error {
 
     // get data to modify 
     cmd := mux.Vars(r)["cmd"]
 
     var err error = nil
+    var name string
 
     switch cmd {
 
     case "insert":
-        if err = insertNewArtist(w, r, aa) ; err != nil {
-            err = fmt.Errorf("Error creating artist: %q.", err)
+        if name, err = insertNewArtist(w, r, aa) ; err != nil {
+            return fmt.Errorf("INSERT Failed (%s)", err.Error())
         }
+        aa.Log.Info(fmt.Sprintf("[%s] Artist %q INSERT Success.", user.Username, name))
 
     case "modify":
-        if err = modifyExistingArtist(w, r, aa); err != nil {
-            err = fmt.Errorf("Modifying artist: %q.", err)
+        if name, err = modifyExistingArtist(w, r, aa); err != nil {
+            err = fmt.Errorf("MODIFY Failed (%s)", err.Error())
         }
+        aa.Log.Info(fmt.Sprintf("[%s] Artist %q MODIFY Success.", user.Username, name))
 
     default:
-        err = fmt.Errorf(
-            "Invalid command %q for users. Redirecting to default page.", cmd)
+        err = fmt.Errorf("Unknown command %q", cmd)
     }
 
     return err
 }
 
-// modify an existing user handler function.
-func modifyExistingArtist(w http.ResponseWriter, r *http.Request, aa *ArtisticApp) error {
+// Modify an existing user handler function.
+// Return the name of the modified artist and error code. Return empty string for name when error occurs. 
+func modifyExistingArtist(w http.ResponseWriter, r *http.Request, aa *ArtisticApp) (string, error) {
 
     // get data to modify 
 	id  := mux.Vars(r)["id"]
 
     // get POST form values and create a struct
-	name  := strings.TrimSpace(r.FormValue("username"))
-	pwd   := strings.TrimSpace(r.FormValue("password"))
-	role  := strings.TrimSpace(r.FormValue("role"))
-	full  := strings.TrimSpace(r.FormValue("fullname"))
-	email := strings.TrimSpace(r.FormValue("email"))
-
-    var err error = nil
-
-    // create a user and check passwords
-    t := utils.CreateUser(name, pwd)
-
-    if err = t.SetRole(role); err != nil {
-        return fmt.Errorf("invalid role.")
-    }
-    t.Id = db.MongoStringToId(id)
-    t.Name = full
-    t.Role = role
-    t.Email = email
-
-    // do it...
-    if err = aa.DataProv.UpdateUser(t); err != nil {
-        return err
-    }
-    aa.Log.Info(fmt.Sprintf("Successfully inserted new user %q.", name))
-    return err
-}
-
-// create new user handler function.
-func insertNewArtist(w http.ResponseWriter, r *http.Request, aa *ArtisticApp) error {
-
-    // get data to modify 
-	id  := mux.Vars(r)["id"]
-
-    // get POST form values and create a struct
-	name  := strings.TrimSpace(r.FormValue("username"))
-	pwd   := strings.TrimSpace(r.FormValue("password"))
-	pwd2  := strings.TrimSpace(r.FormValue("password2"))
-	role  := strings.TrimSpace(r.FormValue("role"))
-	full  := strings.TrimSpace(r.FormValue("fullname"))
-	email := strings.TrimSpace(r.FormValue("email"))
-
-    if pwd != pwd2 {
-        return fmt.Errorf("passwords do not match.")
-    }
-
-    var err error = nil
-    // create a user and check passwords
-    u, err := utils.NewUser(name, pwd, role);
+    a, err := parseFormValues(r)
     if err != nil {
-        return err
+        return "", err
     }
-    u.Id = db.MongoStringToId(id)
-    u.Name = full
-    u.Role = role
-    u.Email = email
+    a.Id = db.MongoStringToId(id)
 
     // do it...
-    if err = aa.DataProv.InsertUser(u); err != nil {
-       return err
+    if err = aa.DataProv.UpdateArtist(a); err != nil {
+        return "", err
     }
 
-    aa.Log.Info(fmt.Sprintf("Successfully modified existing user %q.", name))
-    return err
+    return a.Name.String(), err
 }
 
+// Create new user handler function.
+// Return the name of the modified artist and error code. Return empty string for name when error occurs. 
+func insertNewArtist(w http.ResponseWriter, r *http.Request, aa *ArtisticApp) (string, error) {
+
+    // get data to modify 
+	id  := mux.Vars(r)["id"]
+
+    a, err := parseFormValues(r)
+    if err != nil {
+        return "", err
+    }
+    a.Id = db.MongoStringToId(id)
+
+    // do it...
+    if err = aa.DataProv.InsertArtist(a); err != nil {
+       return "", err
+    }
+
+    //aa.Log.Info(fmt.Sprintf("Successfully created new artist %q.", a.Name))
+    return a.Name.String(), err
+}
+
+// aux function that parses the HTTP POST form data and creates an Artist instance
+func parseFormValues(r *http.Request) (a *core.Artist, err error) {
+
+    // get POST form values and create a struct
+    first := strings.TrimSpace(r.FormValue("first"))
+    middle := strings.TrimSpace(r.FormValue("middle"))
+    last := strings.TrimSpace(r.FormValue("last"))
+    born := strings.TrimSpace(r.FormValue("born"))
+    died := strings.TrimSpace(r.FormValue("died"))
+    nation := strings.TrimSpace(r.FormValue("nationality"))
+
+    //if r.FormValue != nil {
+    painter := strings.TrimSpace(r.FormValue("painter"))
+    //}
+    sculptor := strings.TrimSpace(r.FormValue("sculprtor"))
+    printmaker := strings.TrimSpace(r.FormValue("printmaker"))
+    architect := strings.TrimSpace(r.FormValue("architect"))
+    ceramicist := strings.TrimSpace(r.FormValue("ceramicist"))
+
+    // create an Artist instance
+    a = core.CreateArtist()
+    a.Name = core.CreateName(first, middle, last)
+    a.Born = born
+    a.Died = died
+    a.Nationality = nation
+
+    if painter == "yes" { a.IsPainter = true }
+    if sculptor == "yes" { a.IsSculptor = true }
+    if ceramicist == "yes" { a.IsCeramicist = true }
+    if printmaker == "yes" { a.IsPrintmaker = true }
+    if architect == "yes" { a.IsArchitect = true }
+
+    return
+}

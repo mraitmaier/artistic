@@ -70,6 +70,7 @@ func registerHandlers(aa *ArtisticApp) {
 	r.Handle("/datings", datingsHandler(aa) )
 	r.Handle("/dating/{cmd}/{id}", datingHandler(aa) )
 	r.Handle("/error404", err404Handler(aa) )
+	r.Handle("/error", errorHandler(aa) )
 	r.Handle("/license", licenseHandler(aa) )
     r.Handle("/userprofile", profileHandler(aa) )
     r.Handle("/userprofile/{cmd}", profileHandler(aa) )
@@ -173,6 +174,39 @@ func cleanSessDir(aa *ArtisticApp) bool {
 	return status
 }
 
+// aux function redirecting to login page.
+func redirectToLoginPage(w http.ResponseWriter, r *http.Request, aa *ArtisticApp) {
+
+    aa.Log.Warning("User not authenticated. ")
+	http.Redirect(w, r, "/login", http.StatusFound)
+}
+
+/*
+// aux function redirecting to error page.
+func redirectToErrorPage(name string, user *utils.User, w http.ResponseWriter, r *http.Request, aa *ArtisticApp) {
+
+	aa.Log.Error(fmt.Sprintf("[%s] Cannot render the %q template.", name, user.Username))
+	http.Redirect(w, r, "/error", http.StatusFound)
+}
+*/
+
+// Aux function that renders the page (template!) with given (template) name.
+// Input parameters are:
+// - name - name of the template to render
+// - user - instance of User type
+// - web  - ptr to ad-hoc web struct that is used by template to fill in the data on page
+// - aa   - instance of ArtisticApp type
+// - w    - ptr to the ResponseWriter type instance
+// - r    - ptr to the (HTTP) Request type instance
+func renderPage(name string, web interface{}, aa *ArtisticApp, w http.ResponseWriter, r *http.Request) error {
+
+    var err error
+    if err = aa.WebInfo.templates.ExecuteTemplate(w, name, web); err != nil {
+        http.Redirect(w, r, "/error", http.StatusFound)
+    }
+    return err
+}
+
 // HTTP error 404 page handler
 func err404Handler(aa *ArtisticApp) http.Handler {
 
@@ -180,14 +214,34 @@ func err404Handler(aa *ArtisticApp) http.Handler {
 
 	if loggedin, user := userIsAuthenticated(aa, r); loggedin {
 
+        if err := renderPage("error404", user, aa, w, r); err != nil {
+	        aa.Log.Error(fmt.Sprintf("[%s] Cannot render the 'error404' template: %q.", user.Username, err.Error()))
+        }
+        aa.Log.Info(fmt.Sprintf("[%s] Displaying the %q page.", user.Username, r.RequestURI))
+
+	} else {
+		redirectToLoginPage(w, r, aa)
+	}
+
+    }) // return handler closure
+}
+
+// error page handler
+// this one should be displayed when template  cannot be rendered or in case when unknown error occurs.
+func errorHandler(aa *ArtisticApp) http.Handler {
+
+    return http.HandlerFunc(func (w http.ResponseWriter, r *http.Request) {
+
+	if loggedin, user := userIsAuthenticated(aa, r); loggedin {
+
 		// render the page
-		err := aa.WebInfo.templates.ExecuteTemplate(w, "error404", user)
-        if err != nil {
-			aa.Log.Error("Error rendering the '404' page.")
+		if err := aa.WebInfo.templates.ExecuteTemplate(w, "error", user); err != nil {
+			aa.Log.Error(fmt.Sprintf("[%s] Rendering the 'error' template.", user.Username))
+            http.Redirect(w, r, "/error404", http.StatusFound) // This is really worst-case scenario...
 		}
 
 	} else {
-		http.Redirect(w, r, "/login", http.StatusFound)
+        redirectToLoginPage(w, r, aa)
 	}
 
     }) // return handler closure
@@ -216,16 +270,14 @@ func logoutHandler(aa *ArtisticApp) http.Handler {
 func licenseHandler(aa *ArtisticApp) http.Handler {
     return http.HandlerFunc(func  (w http.ResponseWriter, r *http.Request) {
 
-	 if loggedin, user := userIsAuthenticated(aa, r); loggedin {
-
-		// render the page
-		err := aa.WebInfo.templates.ExecuteTemplate(w, "license", user)
-        if err != nil {
-			aa.Log.Error("Cannot render the 'license' page.")
-		}
-
+    if loggedin, user := userIsAuthenticated(aa, r); loggedin {
+        if err := renderPage("license", user, aa, w, r); err != nil {
+	        aa.Log.Error(fmt.Sprintf("[%s] Cannot render the %q template: %q.", user.Username, "license", err.Error()))
+            return
+        }
+        aa.Log.Info(fmt.Sprintf("[%s] Displaying the %q page.", user.Username, r.RequestURI))
 	} else {
-		http.Redirect(w, r, "/login", http.StatusFound)
+        redirectToLoginPage(w, r, aa)
 	}
 
     } ) // return handler closure
@@ -237,13 +289,13 @@ func indexHandler(aa *ArtisticApp) http.Handler {
 
 	if loggedin, user := userIsAuthenticated(aa, r); loggedin {
 
-		err := aa.WebInfo.templates.ExecuteTemplate(w, "index", user)
-        if err != nil {
-			aa.Log.Error("Cannot render the 'index' page.")
-		}
-
-	} else {
-		http.Redirect(w, r, "/login", http.StatusFound)
+        if err := renderPage("index", user, aa, w, r); err != nil {
+	        aa.Log.Error(fmt.Sprintf("[%s] Cannot render the 'index' template: %q.", user.Username, err.Error()))
+            return
+        }
+        aa.Log.Info(fmt.Sprintf("[%s] Displaying the %q page.", user.Username, r.RequestURI))
+    } else {
+        redirectToLoginPage(w, r, aa)
 	}
     }) // return handler closure
 }
@@ -267,13 +319,13 @@ func loginHandler(aa *ArtisticApp) http.Handler {
 		status, err := authenticateUser(user, pwd, aa, w, r)
 		if !status || err != nil {
 			err = aa.WebInfo.templates.ExecuteTemplate(w, "login", nil)
+            aa.Log.Info(fmt.Sprintf("[%s] Displaying the %q page.", user, r.RequestURI))
             if err != nil { log.Error(err.Error()) }
 			log.Alert(fmt.Sprintf("User %q NOT authenticated.", user))
 		}
 
 		// if authenticated, redirect to index page; otherwise display login
 		if status {
-
            // context.Set(r, LoggedUser, user)
 			http.Redirect(w, r, "/index", http.StatusFound)
 		}
@@ -283,8 +335,9 @@ func loginHandler(aa *ArtisticApp) http.Handler {
 	case "GET":
 		err := aa.WebInfo.templates.ExecuteTemplate(w, "login", nil)
         if err != nil {
-			log.Error("Cannot render the 'login' page.")
+			log.Error("Rendering the 'login' template.")
 		}
+        aa.Log.Info(fmt.Sprintf("Displaying the %q page.", r.RequestURI))
 	}
 
     }) // return handler closure
@@ -306,8 +359,8 @@ func datingsHandler(aa *ArtisticApp) http.Handler {
 		// get all datings from DB
 		datings, err := aa.DataProv.GetAllDatings()
 		if err != nil {
-			log.Error(fmt.Sprintf("Problem getting all datings: %s", err.Error()))
-			http.Redirect(w, r, "/error404", http.StatusFound)
+			log.Error(fmt.Sprintf("[%s] Problem getting all datings: %s", user.Username, err.Error()))
+			http.Redirect(w, r, "/error", http.StatusFound)
 			return
 		}
 
@@ -315,23 +368,22 @@ func datingsHandler(aa *ArtisticApp) http.Handler {
         var web = struct {
 			User    *utils.User
 			Datings []core.Dating
-        } { user, datings}
+        } { user, datings }
 
-		// render the page
-		err = aa.WebInfo.templates.ExecuteTemplate(w, "datings", &web)
-        if err != nil {
-			aa.Log.Error("Error rendering the 'datings' page.")
-		}
+        if err := renderPage("datings", &web, aa, w, r); err != nil {
+	        aa.Log.Error(fmt.Sprintf("[%s] Cannot render the 'datings' template: %q.", user.Username, err.Error()))
+            return
+        }
+        aa.Log.Info(fmt.Sprintf("[%s] Displaying the %q page.", user.Username, r.RequestURI))
 
-	} else {
-		http.Redirect(w, r, "/login", http.StatusFound)
+    } else {
+        redirectToLoginPage(w, r, aa)
 	}
     }) // return handler closure
 }
 
 // POST request handler for datings (private).
-func postDatingHandler(w http.ResponseWriter, r *http.Request,
-                        aa *ArtisticApp) error {
+func postDatingHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp) error {
 
     // get data to modify 
 	id := mux.Vars(r)["id"]
@@ -358,9 +410,8 @@ func getDatingHandler(w http.ResponseWriter, r *http.Request,
 	// get a dating with given ID from DB
 	dating, err := aa.DataProv.GetDating(id)
 	if err != nil {
-		//http.Redirect(w, r, "/error", http.StatusFound) 
-		http.Redirect(w, r, "/datings", http.StatusFound) // FIXME?
-		return err
+		http.Redirect(w, r, "/error", http.StatusFound)
+		return fmt.Errorf("Problem getting a dating from DB: %q", err.Error())
 	}
 
 	// create ad-hoc struct to be sent to page template
@@ -370,12 +421,7 @@ func getDatingHandler(w http.ResponseWriter, r *http.Request,
 		Dating  *core.Dating
     } { user, cmd, dating }
 
-	// render the page
-	err = aa.WebInfo.templates.ExecuteTemplate(w, "dating", &web)
-    if err != nil {
-        return fmt.Errorf("Error rendering the 'dating' page: %q.\n", err.Error())
-	}
-    return nil
+    return renderPage("dating", &web, aa, w, r)
 }
 
 // Handle request for single dating: view & modify operations.
@@ -390,19 +436,21 @@ func datingHandler(aa *ArtisticApp) http.Handler {
 
         case "GET":
             if err := getDatingHandler(w, r, aa, user); err != nil {
-			    log.Error(err.Error())
+			    log.Error(fmt.Sprintf("[%s] Dating GET handler: %s.", user.Username, err.Error()))
+                break // force break!
             }
+            aa.Log.Info(fmt.Sprintf("[%s] Displaying the %q page.", user.Username, r.RequestURI))
 
         case "POST":
             if err := postDatingHandler(w, r, aa); err != nil{
-			    log.Error(err.Error())
+			    log.Error(fmt.Sprintf("[%s] Dating POST handler: %s.", user.Username, err.Error()))
             }
 		    http.Redirect(w, r, "/datings", http.StatusFound)
 
         } // switch
 
 	} else {
-		http.Redirect(w, r, "/login", http.StatusFound)
+        redirectToLoginPage(w, r, aa)
 	}
     }) // return handler closure
 }
@@ -416,11 +464,10 @@ func stylesHandler(aa *ArtisticApp) http.Handler {
 		log := aa.Log // get logger instance
 
 		// get all styles from DB
-		//styles, err := dbase.MongoGetAllStyles(aa.DbSess.DB("artistic"))
 		styles, err := aa.DataProv.GetAllStyles()
 		if err != nil {
-			log.Error(fmt.Sprintf("Problem getting all styles: %s", err.Error()))
-			http.Redirect(w, r, "/error404", http.StatusFound)
+			log.Error(fmt.Sprintf("Problem getting all styles: %s.", err.Error()))
+			http.Redirect(w, r, "/error", http.StatusFound)
 			return
 		}
 
@@ -431,13 +478,14 @@ func stylesHandler(aa *ArtisticApp) http.Handler {
 		} { user, styles }
 
 		// render the page
-		err = aa.WebInfo.templates.ExecuteTemplate(w, "styles", &web)
-        if err != nil {
-			aa.Log.Error("Error rendering the 'styles' page.")
-		}
+        if err = renderPage("styles", &web, aa, w, r); err != nil {
+	        aa.Log.Error(fmt.Sprintf("[%s] Cannot render the 'styles' template: %q.", user.Username, err.Error()))
+            return
+        }
+        aa.Log.Info(fmt.Sprintf("[%s] Displaying the %q page.", user.Username, r.RequestURI))
 
 	} else {
-		http.Redirect(w, r, "/login", http.StatusFound)
+        redirectToLoginPage(w, r, aa)
 	}
     }) // return handler closure
 }
@@ -454,35 +502,35 @@ func styleHandler(aa *ArtisticApp) http.Handler {
 
         case "GET":
             if err := getStyleHandler(w, r, aa, user); err != nil {
-                log.Error(err.Error())
-			    http.Redirect(w, r, "/styles", http.StatusFound)
+                log.Error(fmt.Sprintf("[%s] Style GET handler: %s.", user.Username, err.Error()))
+                break // force break!
             }
+            log.Info(fmt.Sprintf("[%s] Displaying the %q page.", user.Username, r.RequestURI))
 
         case "POST":
-            if err := postStyleHandler(w, r, aa); err != nil {
-                log.Error(err.Error())
+            if err := postStyleHandler(w, r, aa, user); err != nil {
+                log.Error(fmt.Sprintf("[%s] Style POST handler: %s.", user.Username, err.Error()))
             }
 			http.Redirect(w, r, "/styles", http.StatusFound)
 
         case "DELETE":
             id := mux.Vars(r)["id"]
-            cmd := mux.Vars(r)["cmd"]
+            //cmd := mux.Vars(r)["cmd"]
             t := new(core.Style)
             t.Id = db.MongoStringToId(id) // only valid ID needed to delete 
             if err := aa.DataProv.DeleteStyle(t); err != nil {
-                msg := fmt.Sprintf("%s style id=%q, DB returned %q.", cmd, id, err)
-                log.Error(msg)
+                log.Error(fmt.Sprintf("[%s] DELETE Style id=%q (%s).", user.Username, id, err.Error()))
                 return
             }
-            log.Info(fmt.Sprintf("Successfully deleted style %q.", t.Id))
+            log.Info(fmt.Sprintf("[%s] Successfully deleted style %q.", user.Username, t.Name))
 	        http.Redirect(w, r, "/styles", http.StatusFound)
 
         case "PUT":
-            fmt.Printf("received PUT request. :)\n")
+            log.Warning(fmt.Sprintf("[%s] Received PUT request. :).", user.Username))
         }
 
 	} else {
-		http.Redirect(w, r, "/login", http.StatusFound)
+        redirectToLoginPage(w, r, aa)
 	}
     }) // return handler closure
 }
@@ -503,7 +551,7 @@ func getStyleHandler(w http.ResponseWriter, r *http.Request,
 	    // get a style from DB
 	    s, err = aa.DataProv.GetStyle(id)
 	    if err != nil {
-		    return fmt.Errorf("%s style id=%q, DB returned %q.", cmd, id, err)
+		    return fmt.Errorf("%s Style id=%q: %s.", strings.ToUpper(cmd), id, err.Error())
 	    }
 
     case "insert":
@@ -512,14 +560,14 @@ func getStyleHandler(w http.ResponseWriter, r *http.Request,
     case "delete":
         s.Id = db.MongoStringToId(id) // only valid ID needed to delete 
         if err = aa.DataProv.DeleteStyle(s); err != nil {
-            return fmt.Errorf("%s style id=%q, DB returned %q.", cmd, id, err)
+            return fmt.Errorf("DELETE Style id=%q: %s.", cmd, id, err.Error())
         }
-        log.Info(fmt.Sprintf("Successfully deleted style %q.", s.Id))
+        log.Info(fmt.Sprintf("Successfully deleted style %q.", s.Name))
 	    http.Redirect(w, r, "/styles", http.StatusFound)
         return nil //  this is all about deleting items...
 
     default:
-        return fmt.Errorf("GET Style handler: unknown command %q", cmd)
+        return fmt.Errorf("Unknown command %q", cmd)
     }
 
 	// create ad-hoc struct to be sent to page template
@@ -529,17 +577,10 @@ func getStyleHandler(w http.ResponseWriter, r *http.Request,
 		Style *core.Style
     }{ user, cmd, s }
 
-    // render the page
-	err = aa.WebInfo.templates.ExecuteTemplate(w, "style", &web)
-    if err != nil {
-	    log.Error("Error rendering the 'technique' page.")
-	}
-
-    return err
+    return renderPage("style", &web, aa, w, r)
 }
 
-func postStyleHandler(w http.ResponseWriter, r *http.Request,
-                            aa *ArtisticApp) error {
+func postStyleHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp, user *utils.User) error {
 
     // get data to modify 
 	id := mux.Vars(r)["id"]
@@ -550,7 +591,7 @@ func postStyleHandler(w http.ResponseWriter, r *http.Request,
 	descr := strings.TrimSpace(r.FormValue("style-description"))
     t := &core.Style{ db.MongoStringToId(id), name, descr }
 
-    var err error = nil
+    var err error
 
     switch cmd {
 
@@ -558,17 +599,17 @@ func postStyleHandler(w http.ResponseWriter, r *http.Request,
         if err = aa.DataProv.InsertStyle(t); err != nil {
             return err
         }
-        aa.Log.Info(fmt.Sprintf("Successfully created style %q.", name))
+        aa.Log.Info(fmt.Sprintf("[%s] Style INSERT %q Success.", user.Username, name))
 
     case "modify":
         if err = aa.DataProv.UpdateStyle(t); err != nil {
             return err
         }
-        aa.Log.Info(fmt.Sprintf("Successfully updated style %q.", name))
+        aa.Log.Info(fmt.Sprintf("[%s] Style MODIFY %q Success.", user.Username, name))
 
     default:
 	    http.Redirect(w, r, "/styles", http.StatusFound)
-        err = fmt.Errorf("Invalid command %q for style. Redirecting to default page.", cmd)
+        err = fmt.Errorf("Unknown command %q", strings.ToUpper(cmd))
     }
 
     return err
@@ -585,8 +626,8 @@ func techniquesHandler(aa *ArtisticApp) http.Handler {
 		// get all techniques from DB
 		tech, err := aa.DataProv.GetAllTechniques()
 		if err != nil {
-			log.Error(fmt.Sprintf("Problem getting all techniques: %s", err.Error()))
-			http.Redirect(w, r, "/error404", http.StatusFound)
+			log.Error(fmt.Sprintf("[%s] Problem getting all techniques: %s.", user.Username, err.Error()))
+			http.Redirect(w, r, "/error", http.StatusFound)
 			return
 		}
 
@@ -597,16 +638,19 @@ func techniquesHandler(aa *ArtisticApp) http.Handler {
         }{ user, tech }
 
 		// render the page
-		err = aa.WebInfo.templates.ExecuteTemplate(w, "techniques", &web)
-        if err != nil {
-			aa.Log.Error("Error rendering the 'techniques' page.")
+		//err = aa.WebInfo.templates.ExecuteTemplate(w, "techniques", &web)
+        if err = renderPage("techniques", &web, aa, w, r); err != nil {
+			log.Error(fmt.Sprintf("[%s] Rendering the 'techniques' template: %s.", user.Username, err.Error()))
+            return
 		}
+        log.Info(fmt.Sprintf("[%s] Displaying the %q page.", user.Username, r.RequestURI))
 
 	} else {
-		http.Redirect(w, r, "/login", http.StatusFound)
+        redirectToLoginPage(w, r, aa)
 	}
     }) // return handler closure
 }
+
 
 // a single technique handler
 func techniqueHandler(aa *ArtisticApp) http.Handler {
@@ -620,41 +664,41 @@ func techniqueHandler(aa *ArtisticApp) http.Handler {
 
         case "GET":
             if err := getTechniqueHandler(w, r, aa, user); err != nil {
-                log.Error(err.Error())
-			    http.Redirect(w, r, "/techniques", http.StatusFound)
+                log.Error(fmt.Sprintf("[%s] Technique GET handler: %s.", user.Username, err.Error()))
+                break // force break!
             }
+            log.Info(fmt.Sprintf("[%s] Displaying the %q page.", user.Username, r.RequestURI))
 
         case "POST":
-            if err := postTechniqueHandler(w, r, aa); err != nil {
-                log.Error(err.Error())
+            if err := postTechniqueHandler(w, r, aa, user); err != nil {
+                log.Error(fmt.Sprintf("[%s] Technique POST handler: %s.", user.Username, err.Error()))
             }
 			http.Redirect(w, r, "/techniques", http.StatusFound)
 
         case "DELETE":
             id := mux.Vars(r)["id"]
-            cmd := mux.Vars(r)["cmd"]
+            //cmd := mux.Vars(r)["cmd"]
             t := new(core.Technique)
             t.Id = db.MongoStringToId(id) // only valid ID needed to delete 
             if err := aa.DataProv.DeleteTechnique(t); err != nil {
-                msg := fmt.Sprintf("%s technique id=%q, DB returned %q.", cmd, id, err)
+                msg := fmt.Sprintf("[%s] DELETE Technique id=%q: %q.", user.Username, id, err.Error())
                 log.Error(msg)
                 return
             }
-            log.Info(fmt.Sprintf("Successfully deleted technique %q.", t.Id))
+            log.Info(fmt.Sprintf("[%s] DELETE Technique %q Success.", t.Name))
 	        http.Redirect(w, r, "/techniques", http.StatusFound)
 
         case "PUT":
-            fmt.Printf("received PUT request. :)\n")
+            log.Warning("Received HTTP PUT request. :).")
         }
 
 	} else {
-		http.Redirect(w, r, "/login", http.StatusFound)
+		redirectToLoginPage(w, r, aa)
 	}
     }) // return handler closure
 }
 
-func getTechniqueHandler(w http.ResponseWriter, r *http.Request,
-                        aa *ArtisticApp, user *utils.User) error {
+func getTechniqueHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp, user *utils.User) error {
 
     id := mux.Vars(r)["id"]
     cmd := mux.Vars(r)["cmd"]
@@ -669,7 +713,7 @@ func getTechniqueHandler(w http.ResponseWriter, r *http.Request,
 	    // get a technique from DB
 	    tech, err = aa.DataProv.GetTechnique(id)
 	    if err != nil {
-		    return fmt.Errorf("%s technique id=%q, DB returned %q.", cmd, id, err)
+		    return fmt.Errorf("%s Technique id=%q: %s", strings.ToUpper(cmd), id, err)
 	    }
 
     case "insert":
@@ -678,14 +722,14 @@ func getTechniqueHandler(w http.ResponseWriter, r *http.Request,
     case "delete":
         tech.Id = db.MongoStringToId(id) // only valid ID needed to delete 
         if err = aa.DataProv.DeleteTechnique(tech); err != nil {
-            return fmt.Errorf("%s technique id=%q, DB returned %q.", cmd, id, err)
+            return fmt.Errorf("DELETE Technique id=%q: %q.", id, err.Error())
         }
-        log.Info(fmt.Sprintf("Successfully deleted technique %q.", tech.Id))
+        log.Info(fmt.Sprintf("[%s] DELETE Technique %q Success.", tech.Name))
 	    http.Redirect(w, r, "/techniques", http.StatusFound)
         return nil //  this is all about deleting items...
 
     default:
-        return fmt.Errorf("GET Technique handler: unknown command %q", cmd)
+        return fmt.Errorf("Unknown command %q", cmd)
     }
 
 	// create ad-hoc struct to be sent to page template
@@ -695,17 +739,10 @@ func getTechniqueHandler(w http.ResponseWriter, r *http.Request,
 		Technique *core.Technique
     }{ user, cmd, tech }
 
-    // render the page
-	err = aa.WebInfo.templates.ExecuteTemplate(w, "technique", &web)
-    if err != nil {
-	    log.Error("Error rendering the 'technique' page.")
-	}
-
-    return err
+    return renderPage("technique", &web, aa, w, r)
 }
 
-func postTechniqueHandler(w http.ResponseWriter, r *http.Request,
-                            aa *ArtisticApp) error {
+func postTechniqueHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp, user *utils.User) error {
 
     // get data to modify 
 	id := mux.Vars(r)["id"]
@@ -724,19 +761,18 @@ func postTechniqueHandler(w http.ResponseWriter, r *http.Request,
         if err = aa.DataProv.InsertTechnique(t); err != nil {
             return err
         }
-        aa.Log.Info(fmt.Sprintf("Successfully created technique %q.", name))
+        aa.Log.Info(fmt.Sprintf("[%s] INSERT Technique %q Success.", user.Username, name))
 
     case "modify":
         if err = aa.DataProv.UpdateTechnique(t); err != nil {
             return err
         }
-        aa.Log.Info(fmt.Sprintf("Successfully updated technique %q.", name))
+        aa.Log.Info(fmt.Sprintf("[%s] MODIFY Technique %q Success.", user.Username, name))
 
     default:
 	    http.Redirect(w, r, "/techniques", http.StatusFound)
-        err = fmt.Errorf("Invalid command %q for technique. Redirecting to default page.", cmd)
+        err = fmt.Errorf("Unknown command %q", cmd)
     }
 
     return err
 }
-

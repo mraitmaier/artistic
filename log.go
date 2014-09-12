@@ -99,3 +99,4 @@ func defineDefLogFname(workdir string) string {
 	}
 	return filepath.Clean(defDir)
 }
+
