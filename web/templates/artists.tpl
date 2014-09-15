@@ -8,16 +8,15 @@
     <title>Artistic - View Artists</title>
 
     <!-- Bootstrap -->
-    <!--  <link href="css/bootstrap.min.css" rel="stylesheet"> -->
-    <link href="static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
         <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
-    <!-- custom CSS, additional to CSS -->
-    <link href="static/css/custom.css" rel="stylesheet">
+    <!-- custom CSS, additional to bootstrap -->
+    <link href="/static/css/custom.css" rel="stylesheet">
 </head>
 
 <body>
@@ -40,11 +39,11 @@
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <!--   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script> -->
-    <script  src="static/js/jquery.min.js"></script>
+    <script  src="/static/js/jquery.min.js"></script>
     <!-- Include all compiled plugins, or include individual files as needed -->
-    <script src="static/js/bootstrap.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
     <!-- custom JS code -->
-    <script src="static/js/artistic.js"></script>
+    <script src="/static/js/artistic.js"></script>
 </body>
 </html>
 {{end}}
@@ -109,56 +108,53 @@
     <title>Artistic - Artist Administration</title>
 
     <!-- Bootstrap -->
-    <link href="static/css/bootstrap.min.css" rel="stylesheet">
-
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
       <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
       <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
-
     <!-- custom CSS, additional to bootstrap CSS -->
-    <link href="static/css/custom.css" rel="stylesheet">
+    <link href="/static/css/custom.css" rel="stylesheet">
 </head>
 
 <body>
     {{template "navbar" .User.Username}}
     <div class="container-fluid">
-      <div class="row">
+        <div class="row">
 
-        <div class="col-md-2" id="menu">
-            <h1 id="menu-header"></h1>
-            {{template "accordion"}}
-        </div>
+            <div class="col-md-2" id="menu">
+                <h1 id="menu-header"></h1>
+                {{template "accordion"}}
+            </div>
 
-        <div class="col-md-10" id="data-view">
+            <div class="col-md-10" id="data-view">
     {{if eq .Cmd "view"}}
-        <h1 id="data-view-header">{{.Artist.Name}}</h1>
-        {{template "artist-view" .Artist}}
+            <h1 id="data-view-header">{{.Artist.Name}}</h1>
+            {{template "artist-view" .Artist}}
     {{else if eq .Cmd "modify"}}
-        <h1 id="data-view-header">Modify {{.Artist.Name}}</h1>
-        {{template "artist-modify" .Artist}}
+            <h1 id="data-view-header">Modify {{.Artist.Name}}</h1>
+            {{template "artist-modify" .Artist}}
     {{else if eq .Cmd "insert"}}
-        <h1 id="data-view-header">Create New Artist</h1>
-        <p>Please enter the data to create a new artist.</p>
-        {{template "artist-create"}}
+            <h1 id="data-view-header">Create New Artist</h1>
+            <p>Please enter the data to create a new artist.</p>
+            {{template "artist-create"}}
     {{else if eq .Cmd ""}}
-        <h1 id="data-view-header">{{.Artist.Name}}</h1>
-        {{template "artist-view" .Artist}}
+            <h1 id="data-view-header">{{.Artist.Name}}</h1>
+            {{template "artist-view" .Artist}}
     {{end}}
-        </div>
+            </div>
 
       </div> <!-- row -->
     </div> <!-- container-fluid -->
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <!--   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"> </script> -->
-    <script src="static/js/jquery.min.js"></script>
-
+    <script src="/static/js/jquery.min.js"></script>
     <!-- Include all compiled plugins, or include individual files as needed -->
-    <script src="static/js/bootstrap.min.js"></script>
-    <script src="static/js/artistic.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/artistic.js"></script>
 </body>
 </html>
 {{end}}
@@ -172,19 +168,17 @@
     <div class="form-group">
         <label for="first" class="col-md-2 control-label">Name   First</label>
         <div class="col-md-2">
-            <input type="text" class="form-control" id="first" name="first" value="" placeholder="first name" required></input>
+            <input type="text" class="form-control" id="first" name="first" value="" placeholder="first name" required />
         </div>
         &nbsp;
         <label for="middle" class="col-md-1 control-label">Middle</label>
         <div class="col-md-1">
-            <input type="text" class="form-control" id="middle" name="middle" value="" placeholder="middle">
-            </input>
+            <input type="text" class="form-control" id="middle" name="middle" value="" placeholder="middle" />
         </div>
         &nbsp;
         <label for="last" class="col-md-1 control-label">Last</label>
         <div class="col-md-3">
-            <input type="text" class="form-control" id="last" name="last" value="" placeholder="last">
-            </input>
+            <input type="text" class="form-control" id="last" name="last" value="" placeholder="last" />
         </div>
     </div> <!-- form-group -->
     </div> <!-- row -->
@@ -193,7 +187,7 @@
     <div class="form-group">
         <label for="born" class="col-md-2 control-label">Born</label>
         <div class="col-md-6">
-            <input type="date" class="form-control" id="born" name="born" value="" placeholder="date of birth"></input>
+            <input type="date" class="form-control" id="born" name="born" value="" />
         </div>
     </div> <!-- form-group -->
     </div> <!-- row -->
@@ -202,7 +196,7 @@
     <div class="form-group">
         <label for="died" class="col-md-2 control-label">Died</label>
         <div class="col-md-6">
-            <input type="date" class="form-control" id="died" name="died" value="" placeholder="date of death"></input>
+            <input type="date" class="form-control" id="died" name="died" value="" />
         </div>
     </div> <!-- form-group -->
     </div> <!-- row -->
@@ -211,7 +205,7 @@
     <div class="form-group">
         <label for="nationality" class="col-md-2 control-label">Nationality</label>
         <div class="col-md-6">
-            <input type="text" class="form-control" id="nationality" name="nationality" value="" placeholder="nationality"></input>
+            <input type="text" class="form-control" id="nationality" name="nationality" value="" placeholder="nationality" />
         </div>
     </div> <!-- form-group -->
     </div> <!-- row -->
@@ -225,7 +219,7 @@
     <div class="row">
     <div class="form-group">
         <div class="checkbox">
-            <label><input type="checkbox" class="form-control" id="painter" name="painter" value="yes"></input>Painter</label>
+            <label><input type="checkbox" class="form-control" id="painter" name="painter" value="yes" />Painter</label>
         </div> <!-- checkbox -->
     </div> <!-- form-group -->
     </div> <!-- row -->
@@ -233,7 +227,7 @@
     <div class="row">
     <div class="form-group">
         <div class="checkbox">
-            <label><input type="checkbox" class="form-control" id="sculptor" name="sculptor" value="yes"></input>Sculptor</label>
+            <label><input type="checkbox" class="form-control" id="sculptor" name="sculptor" value="yes" />Sculptor</label>
         </div> <!-- checkbox -->
     </div> <!-- form-group -->
     </div> <!-- row -->
@@ -241,8 +235,7 @@
     <div class="row">
     <div class="form-group">
         <div class="checkbox">
-            <label><input type="checkbox" class="form-control" id="printmaker" name="printmaker" value="yes"></input>
-            Printmaker</label>
+            <label><input type="checkbox" class="form-control" id="printmaker" name="printmaker" value="yes" />Printmaker</label>
         </div> <!-- checkbox -->
     </div> <!-- form-group -->
     </div> <!-- row -->
@@ -250,8 +243,7 @@
     <div class="row">
     <div class="form-group">
         <div class="checkbox">
-            <label><input type="checkbox" class="form-control" id="ceramicist" name="ceramicist" value="yes"></input>
-            Ceramicist</label>
+            <label><input type="checkbox" class="form-control" id="ceramicist" name="ceramicist" value="yes" />Ceramicist</label>
         </div> <!-- checkbox -->
     </div> <!-- form-group -->
     </div> <!-- row -->
@@ -259,8 +251,7 @@
     <div class="row">
     <div class="form-group">
         <div class="checkbox">
-            <label><input type="checkbox" class="form-control" id="Architect" name="architect" value="yes"></input>
-            Architect</label>
+            <label><input type="checkbox" class="form-control" id="Architect" name="architect" value="yes" />Architect</label>
         </div> <!-- checkbox -->
     </div> <!-- form-group -->
     </div> <!-- row -->
@@ -275,7 +266,7 @@
         </div>
 
         <div class="col-md-1 col-md-offset-5">
-            <a type="button" class="btn btn-primary" href="/artists">
+            <a class="btn btn-primary" href="/artists">
                 <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;&nbsp;Back
             </a>
         </div>

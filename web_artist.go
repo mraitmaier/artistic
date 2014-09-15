@@ -85,7 +85,7 @@ func artistHandler(aa *ArtisticApp) http.Handler {
     }) // return handler closure
 }
 
-//  HTTP GET handler for "/artist/<cmd>" URLs.
+//  HTTP GET handler for "/artist/<cmd>/..." URLs.
 func getArtistHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp, user *utils.User) error {
 
     id := mux.Vars(r)["id"]
@@ -130,13 +130,13 @@ func getArtistHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp, u
     return renderPage("artist", &web, aa, w, r)
 }
 
-// HTTP POST handler for "/painter/<cmd>" URLs.
+// HTTP POST handler for "/artist/<cmd>" URLs.
 func postArtistHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp, user *utils.User) error {
 
     // get data to modify 
     cmd := mux.Vars(r)["cmd"]
 
-    var err error = nil
+    var err error
     var name string
 
     switch cmd {
