@@ -297,8 +297,8 @@ func (f *FileHandler) Start() error {
 func NewFileHandler(filename string,
 	fmt string, sev Severity) (*FileHandler, error) {
 	// open log file
-	//f, err := os.OpenFile(filename, os.O_CREATE|os.O_WRONLY, 0755)
-	f, err := os.Create(filename)
+	f, err := os.OpenFile(filename, os.O_CREATE|os.O_RDWR|os.O_APPEND, 0755)
+	//f, err := os.Create(filename)
 	return &FileHandler{ newLogHandler(fmt, sev), f }, err
 }
 
