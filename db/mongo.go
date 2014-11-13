@@ -9,7 +9,6 @@ import (
     "errors"
     "gopkg.in/mgo.v2"
     "gopkg.in/mgo.v2/bson"
-  //  "bitbucket.org/miranr/artistic/core"
 )
 
 // Type representing the MongoDB Session. Implements the DbConnector interface.

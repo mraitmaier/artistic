@@ -8,7 +8,6 @@ import (
     "strings"
 	"net/http"
 	"bitbucket.org/miranr/artistic/core"
-//	"bitbucket.org/miranr/artistic/utils"
 	"bitbucket.org/miranr/artistic/db"
 	"github.com/gorilla/mux"
 )

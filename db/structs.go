@@ -33,6 +33,7 @@ func (t Timestamp) Update(stamp string) {
 ///
 type Dating  struct {
 
+    // database ID
     Id bson.ObjectId `bson:"_id"`
     //  embed the instance of the DB Identifier interface, this is generalized DB ID
     //Id DbIdentifier `bson:"_id"` // XXX: need more knowledge about that...
@@ -41,11 +42,9 @@ type Dating  struct {
     core.Dating `bson:",inline"`
 
     // created timestamp; SHOULD be read-only, 
-    //Created string
     Created Timestamp
 
     //  modified 
-    //Modified string
     Modified Timestamp
 }
 
@@ -57,6 +56,7 @@ func NewDating() *Dating {
 ///
 type Technique struct {
 
+    // database ID
     Id bson.ObjectId `bson:"_id"`
     //  embed the instance of the DB Identifier interface, this is generalized DB ID
     //Id DbIdentifier
@@ -64,11 +64,10 @@ type Technique struct {
     // original core Technique struct is embedded
     core.Technique `bson:",inline"`
 
-
-    //
+    // created timestamp
     Created Timestamp
 
-    //  modified 
+    // modified timestamp
     Modified Timestamp
 }
 
@@ -83,6 +82,7 @@ func CreateTechnique(name, descr string) *Technique {
 ////
 type Style struct {
 
+    // database ID
     Id bson.ObjectId `bson:"_id"`
     //  embed the instance of the DB Identifier interface, this is generalized DB ID
     //Id DbIdentifier `bson:"_id,inline"`
@@ -90,10 +90,10 @@ type Style struct {
     // original core Sytle struct is embedded
     core.Style `bson:",inline"`
 
-    //
+    // created timestamp
     Created Timestamp
 
-    //  modified 
+    // modified timestamp
     Modified Timestamp
 }
 
@@ -104,6 +104,7 @@ func NewStyle() *Style {
 ////
 type User struct {
 
+    // database ID
     Id bson.ObjectId `bson:"_id"`
     //  embed the instance of the DB Identifier interface, this is generalized DB ID
     //Id DbIdentifier `bson:"_id,inline"`
@@ -111,10 +112,10 @@ type User struct {
     // original User struct is embedded
     utils.User `bson:",inline"`
 
-    //
+    // created timestamp
     Created Timestamp
 
-    //  modified 
+    // modified timestamp
     Modified Timestamp
 }
 
@@ -160,6 +161,7 @@ func (t ArtistType) String() string {
 
 type Artist struct {
 
+    // database ID
     Id bson.ObjectId `bson:"_id"`
     //  embed the instance of the DB Identifier interface, this is generalized DB ID
     //Id DbIdentifier
@@ -167,10 +169,10 @@ type Artist struct {
     // original core Artist struct is embedded
     core.Artist `bson:",inline"`
 
-    //
+    // created timestamp
     Created Timestamp
 
-    //  modified 
+    // modified timestamp
     Modified Timestamp
 }
 
@@ -181,6 +183,7 @@ func NewArtist() *Artist {
 ///
 type Artwork struct {
 
+    // database ID
     Id bson.ObjectId `bson:"_id"`
     //  embed the instance of the DB Identifier interface, this is generalized DB ID
     //Id DbIdentifier
@@ -188,10 +191,10 @@ type Artwork struct {
     // original core Artwork interface is embedded
     core.Artwork `bson:",inline"`
 
-    //
+    // created timestamp
     Created Timestamp
 
-    //  modified 
+    // modified timestamp
     Modified Timestamp
 
 }
