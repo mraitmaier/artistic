@@ -365,12 +365,12 @@
 
         <div class="row">
         <div class="form-group">
-            <div class="col-md-2">
+            <div class="col-md-4">
                 <button class="btn btn-primary" type="submit" id="user-submit">Create</button>
                 <button class="btn btn-default" type="reset">Clear</button>
             </div>
 
-            <div class="col-md-1 col-md-offset-5">
+            <div class="col-md-1 col-md-offset-3">
                 <a type="button" class="btn btn-primary" href="/users">
                     <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;&nbsp;Back
                 </a>

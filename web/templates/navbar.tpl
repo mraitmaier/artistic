@@ -1,5 +1,6 @@
 {{define "navbar"}}
-    <nav class="navbar navbar-inverse" role="navigation"> 
+    <!--<nav class="navbar navbar-inverse" role="navigation"> -->
+    <nav class="navbar navbar-default" role="navigation"> 
         <div class="container-fluid">
             <!-- Brand and toggle get grouped for better mobile display -->
             <div class="navbar-header">
@@ -26,6 +27,7 @@
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Admin<b class="caret"></b> </a>
                         <ul class="dropdown-menu">
                             <li><a href="/users">Users</a></li>
+                            <li><a href="/log">Log</a></li>
                         </ul>
                     </li>
  

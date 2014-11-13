@@ -7,11 +7,9 @@ import (
     "fmt"
     "time"
     "errors"
-//    "labix.org/v2/mgo"
- //   "labix.org/v2/mgo/bson"
     "gopkg.in/mgo.v2"
     "gopkg.in/mgo.v2/bson"
-    "bitbucket.org/miranr/artistic/utils"
+//    "bitbucket.org/miranr/artistic/utils"
     "bitbucket.org/miranr/artistic/core"
 )
 
@@ -32,7 +30,6 @@ type MongoDbConn struct {
 func (m *MongoDbConn) Connect(url string, timeout time.Duration) (e error) {
 
     m.Sess, e = mgo.DialWithTimeout(url, timeout)
-
     return e
 }
 
@@ -53,22 +50,23 @@ func MongoIdToString(id bson.ObjectId) string {
 
 // Convert ID from hex string representation to BSON Object ID.
 func MongoStringToId(id string) bson.ObjectId {
+
     if id != "" {
-        return bson.ObjectIdHex(id)
+        return (bson.ObjectIdHex(id))
     } else {
         return bson.ObjectId(id)
     }
 }
 
 // Create new ObjectId
-func NewId() bson.ObjectId {
+func NewMongoId() bson.ObjectId {
     return bson.NewObjectId()
 }
 
 ///////////////////////////// Users
 
 // Retrieves all users from database.
-func (m *MongoDbConn) GetAllUsers() ([]utils.User, error) {
+func (m *MongoDbConn) GetAllUsers() ([]User, error) {
 
     // acquire lock
     dblock.Lock()
@@ -79,16 +77,16 @@ func (m *MongoDbConn) GetAllUsers() ([]utils.User, error) {
     if db == nil { return nil, errors.New("Mongo descriptor empty.") }
 
     // create channel
-    ch := make(chan []utils.User)
+    ch := make(chan []User)
 
     // start a new goroutine to get users from DB
-    go func(ch chan []utils.User) {
+    go func(ch chan []User) {
 
         // check channel
         if ch == nil { return }
 
         // prepare the empty slice for users
-        users := make([]utils.User, 0)
+        users := make([]User, 0)
 
         // get all users from DB
         if err := db.C("users").Find(bson.D{}).All(&users); err != nil {
@@ -107,7 +105,7 @@ func (m *MongoDbConn) GetAllUsers() ([]utils.User, error) {
 }
 
 // Get a single user from the DB: we need a username. 
-func (m * MongoDbConn) GetUserByUsername(username string) (*utils.User, error) {
+func (m * MongoDbConn) GetUserByUsername(username string) (*User, error) {
 
     // acquire lock
     dblock.Lock()
@@ -118,12 +116,13 @@ func (m * MongoDbConn) GetUserByUsername(username string) (*utils.User, error) {
     if db == nil { return nil, errors.New("MongoDB descriptor empty.") }
 
     // prepare channel
-    ch := make(chan *utils.User)
+    ch := make(chan *User)
 
     // start goroutine to get a user
-    go func(username string, ch chan *utils.User) {
+    go func(username string, ch chan *User) {
 
-        u := utils.CreateUser("", "") // create empty user
+        //u := utils.CreateUser("", "") // create empty user
+        u := NewUser()
 
         // get a user from DB
         err := db.C("users").Find(bson.M{ "username": username }).One(&u)
@@ -177,7 +176,7 @@ func (m * MongoDbConn) GetUser(id string) (*utils.User, error) {
 }
 */
 
-func (m * MongoDbConn) GetUser(id string) (*utils.User, error) {
+func (m * MongoDbConn) GetUser(id string) (*User, error) {
 
     // acquire lock
     dblock.Lock()
@@ -189,11 +188,11 @@ func (m * MongoDbConn) GetUser(id string) (*utils.User, error) {
         return nil, errors.New("MongoDB descriptor empty.")
     }
 
-    u := utils.CreateUser("", "") // create empty user
+    // create empty user
+    u := NewUser()
 
     // get a user from DB
-    err := db.C("users").Find(bson.M{ "_id": MongoStringToId(id) }).One(&u)
-    if err != nil {
+    if err := db.C("users").Find(bson.M{ "_id": MongoStringToId(id) }).One(&u); err != nil {
         return nil, err
     }
 
@@ -201,26 +200,26 @@ func (m * MongoDbConn) GetUser(id string) (*utils.User, error) {
 }
 
 // Update a single user in DB. 
-func (m *MongoDbConn) UpdateUser(u *utils.User) error {
+func (m *MongoDbConn) UpdateUser(u *User) error {
     return m.adminUser(DBCmdUpdate, u)
 }
 
 // Create a new user in DB. 
-func (m *MongoDbConn) InsertUser(u *utils.User) error {
+func (m *MongoDbConn) InsertUser(u *User) error {
     // check the ID of the item to be inserted into DB
     if u.Id == "" {
-        u.Id = NewId()
+        u.Id = NewMongoId()
     }
     return m.adminUser(DBCmdInsert, u)
 }
 
 // Delete a single user in DB. 
-func (m *MongoDbConn) DeleteUser(u *utils.User) error {
+func (m *MongoDbConn) DeleteUser(u *User) error {
     return m.adminUser(DBCmdDelete, u)
 }
 
 // Aux method that administers the user records in DB
-func (m *MongoDbConn) adminUser(cmd DbCommand, u *utils.User) error {
+func (m *MongoDbConn) adminUser(cmd DbCommand, u *User) error {
 
     // acquire lock
     dblock.Lock()
@@ -256,7 +255,7 @@ func (m *MongoDbConn) adminUser(cmd DbCommand, u *utils.User) error {
 ///////////////////////////// Datings
 
 // Retrieves all datings from database.
-func (m *MongoDbConn) GetAllDatings() ([]core.Dating, error) {
+func (m *MongoDbConn) GetAllDatings() ([]Dating, error) {
 
     // acquire lock
     dblock.Lock()
@@ -269,7 +268,7 @@ func (m *MongoDbConn) GetAllDatings() ([]core.Dating, error) {
     }
 
     // prepare the empty slice for users
-    d := make([]core.Dating, 0)
+    d := make([]Dating, 0)
 
     // get all users from DB
     if err := db.C("datings").Find(bson.D{}).All(&d); err != nil {
@@ -280,7 +279,7 @@ func (m *MongoDbConn) GetAllDatings() ([]core.Dating, error) {
 }
 
 // Retrieve a single Dating record by ID.
-func (m *MongoDbConn) GetDating(id string) (*core.Dating, error) {
+func (m *MongoDbConn) GetDating(id string) (*Dating, error) {
 
     // acquire lock
     dblock.Lock()
@@ -292,8 +291,7 @@ func (m *MongoDbConn) GetDating(id string) (*core.Dating, error) {
         return nil, errors.New("Get a dating: MongoDb descriptor empty.")
     }
 
-    t := new(core.Dating)
-
+    t := new(Dating)
     err := db.C("datings").Find(bson.M{ "_id": MongoStringToId(id) }).One(&t)
     if err != nil { return nil, err }
 
@@ -301,7 +299,7 @@ func (m *MongoDbConn) GetDating(id string) (*core.Dating, error) {
 }
 
 // Update a single dating in DB. 
-func (m * MongoDbConn) UpdateDating(d *core.Dating) error {
+func (m * MongoDbConn) UpdateDating(d *Dating) error {
 
     // acquire lock
     dblock.Lock()
@@ -327,7 +325,7 @@ func (m * MongoDbConn) UpdateDating(d *core.Dating) error {
 ///////////////////////////// Styles
 
 // Retrieves all styles from DB with given DB descriptor.
-func (m *MongoDbConn) GetAllStyles() ([]core.Style, error) {
+func (m *MongoDbConn) GetAllStyles() ([]Style, error) {
 
     // acquire lock
     dblock.Lock()
@@ -338,7 +336,8 @@ func (m *MongoDbConn) GetAllStyles() ([]core.Style, error) {
     if db == nil { return nil,  errors.New("MongoDB descriptor empty.") }
 
     // prepare the empty slice for users
-    s := make([]core.Style, 0)
+    //s := make([]core.Style, 0)
+    s := make([]Style, 0)
 
     // get all users from DB
     if err := db.C("styles").Find(bson.D{}).All(&s); err != nil {
@@ -348,7 +347,8 @@ func (m *MongoDbConn) GetAllStyles() ([]core.Style, error) {
 }
 
 // Retrieve a single Style record.
-func (m *MongoDbConn) GetStyle(id string) (*core.Style, error) {
+//func (m *MongoDbConn) GetStyle(id string) (*core.Style, error) {
+func (m *MongoDbConn) GetStyle(id string) (*Style, error) {
 
     // acquire lock
     dblock.Lock()
@@ -360,8 +360,12 @@ func (m *MongoDbConn) GetStyle(id string) (*core.Style, error) {
         return nil, errors.New("Update a style: MongoDb descriptor empty.")
     }
 
-    s := core.NewStyle("", "")
+    s := NewStyle()
+    //s := core.NewStyle("", "")
+    //var dbid DbIdentifier
+    //dbid.StringToId(id)
     err := db.C("styles").Find(bson.M{ "_id" : MongoStringToId(id) }).One(&s)
+    //err := db.C("styles").Find(bson.M{ "_id" : dbid }).One(&s)
     if err != nil {
         return nil, err
     }
@@ -370,26 +374,26 @@ func (m *MongoDbConn) GetStyle(id string) (*core.Style, error) {
 }
 
 // Update a single style in DB. 
-func (m * MongoDbConn) UpdateStyle(s *core.Style) error {
+func (m * MongoDbConn) UpdateStyle(s *Style) error {
     return m.adminStyle(DBCmdUpdate, s)
 }
 
 // Create a new style in DB. 
-func (m * MongoDbConn) InsertStyle(s *core.Style) error {
+func (m * MongoDbConn) InsertStyle(s *Style) error {
     // check the ID of the item to be inserted into DB
     if s.Id == "" {
-        s.Id = NewId()
+        s.Id = NewMongoId()
     }
     return m.adminStyle(DBCmdInsert, s)
 }
 
 // Delete a single style in DB
-func (m *MongoDbConn) DeleteStyle(s *core.Style) error {
+func (m *MongoDbConn) DeleteStyle(s *Style) error {
     return m.adminStyle(DBCmdDelete, s)
 }
 
 // Aux method that administers the style records in DB
-func (m *MongoDbConn) adminStyle(cmd DbCommand, s *core.Style) error {
+func (m *MongoDbConn) adminStyle(cmd DbCommand, s *Style) error {
 
     // acquire lock
     dblock.Lock()
@@ -426,7 +430,7 @@ func (m *MongoDbConn) adminStyle(cmd DbCommand, s *core.Style) error {
 ///////////////////////////// Techniques
 
 // Retrieves all techniques from DB with given DB descriptor.
-func (m *MongoDbConn) GetAllTechniques() ([]core.Technique, error) {
+func (m *MongoDbConn) GetAllTechniques() ([]Technique, error) {
 
     // acquire lock
     dblock.Lock()
@@ -439,7 +443,7 @@ func (m *MongoDbConn) GetAllTechniques() ([]core.Technique, error) {
     }
 
     // prepare the empty slice for users
-    t := make([]core.Technique, 0)
+    t := make([]Technique, 0)
 
     // get all users from DB
     if err := db.C("techniques").Find(bson.D{}).All(&t); err != nil {
@@ -450,7 +454,7 @@ func (m *MongoDbConn) GetAllTechniques() ([]core.Technique, error) {
 }
 
 // Retrieve a single Technique record.
-func (m *MongoDbConn) GetTechnique(id string) (*core.Technique, error) {
+func (m *MongoDbConn) GetTechnique(id string) (*Technique, error) {
 
     dblock.Lock()
     defer dblock.Unlock()
@@ -460,8 +464,11 @@ func (m *MongoDbConn) GetTechnique(id string) (*core.Technique, error) {
         return nil, errors.New("Getting a technique: MongoDb descriptor empty.")
     }
 
-    t := new(core.Technique)
+    t := new(Technique)
+    //var dbid DbIdentifier
+    //dbid.StringToId(id)
     err := db.C("techniques").Find(bson.M{ "_id": MongoStringToId(id) }).One(&t)
+    //err := db.C("techniques").Find(bson.M{ "_id": id }).One(&t)
     if err != nil {
         return nil, err
     }
@@ -470,26 +477,26 @@ func (m *MongoDbConn) GetTechnique(id string) (*core.Technique, error) {
 }
 
 // Update a single technique in DB. 
-func (m * MongoDbConn) UpdateTechnique(t *core.Technique) error {
+func (m * MongoDbConn) UpdateTechnique(t *Technique) error {
     return m.adminTechnique(DBCmdUpdate, t)
 }
 
 // Create a new technique in DB. 
-func (m * MongoDbConn) InsertTechnique(t *core.Technique) error {
+func (m * MongoDbConn) InsertTechnique(t *Technique) error {
     // check the ID of the item to be inserted into DB
     if t.Id == "" {
-        t.Id = NewId()
+        t.Id = NewMongoId()
     }
     return m.adminTechnique(DBCmdInsert, t)
 }
 
 // Delete a new technique in DB. 
-func (m * MongoDbConn) DeleteTechnique(t *core.Technique) error {
+func (m * MongoDbConn) DeleteTechnique(t *Technique) error {
     return m.adminTechnique(DBCmdDelete, t)
 }
 
 // Aux method that administers the technique records in DB
-func (m *MongoDbConn) adminTechnique(cmd DbCommand, t *core.Technique) error {
+func (m *MongoDbConn) adminTechnique(cmd DbCommand, t *Technique) error {
 
     dblock.Lock()
     defer dblock.Unlock()
@@ -606,7 +613,10 @@ func (m * MongoDbConn) GetArtist(id string) (*core.Artist, error) {
         u := core.CreateArtist() // create empty user
 
         // get a user from DB
-        err := db.C("artists").Find(bson.M{ "_id": MongoStringToId(id) }).One(&u)
+        var dbid DbIdentifier
+        dbid.StringToId(id)
+        //err := db.C("artists").Find(bson.M{ "_id": MongoStringToId(id) }).One(&u)
+        err := db.C("artists").Find(bson.M{ "_id": id }).One(&u)
         if err != nil {
             return
         }
@@ -629,7 +639,7 @@ func (m * MongoDbConn) UpdateArtist(a *core.Artist) error {
 func (m * MongoDbConn) InsertArtist(a *core.Artist) error {
     // check the ID of the item to be inserted into DB
     if a.Id == "" {
-        a.Id = NewId()
+        a.Id = NewMongoId()
     }
     return m.adminArtist(DBCmdInsert, a)
 }
@@ -671,25 +681,5 @@ func (m *MongoDbConn) adminArtist(cmd DbCommand, a *core.Artist) error {
     }
 
     return err
-}
-
-////////////////////// Experimental /////////////////
-// NOTE: how to abstract away the DB ID (for differents DBs)? By implementing 
-// a type that satisfies the interface...
-//
-// implementing the DbIdentifier interface for MongoDb
-type MongoDbId bson.ObjectId
-
-func (m MongoDbId) IdToString(id interface{}) string {
-    s := id.(bson.ObjectId)
-    return s.String()
-}
-
-func (m MongoDbId) StringToId(s string) interface{} {
-    return interface{}(bson.ObjectIdHex(s))
-}
-
-func (m MongoDbId) New() MongoDbId {
-    return MongoDbId(bson.NewObjectId())
 }
 

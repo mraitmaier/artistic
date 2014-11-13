@@ -68,7 +68,7 @@ func newLogHandler(fmt string, sev Severity) *logHandler {
 
 // Clear the log - empty implementation to satisfy the interface, only file logger needs this one...
 func (l *logHandler) Clear() error {
-    return nil
+    return l.Clear()
 }
 
 /************************** Log ***********************************/
@@ -206,10 +206,11 @@ func (l *Log) Close() {
 }
 
 // Clear the contents of the log: empty implementation to satisfy the interface, only FileHandler actually needs one...
-func (l *Log) Clear() error {
-    return nil
+func (l *Log) Clear() {
+    for _, h := range l.Handlers {
+        h.Clear()
+    }
 }
-
 
 // Create new logger, specify the number of log handlers and create needed  
 // channels: the one onto which the log messages are sent and the other where
@@ -284,12 +285,16 @@ func (f *FileHandler) Send(sev Severity, msg string) {
 func (f *FileHandler) Clear() error {
 
     var err error
+
+    f.Close() // we must close the file
+
     if err = os.Remove(f.filename); err != nil {
         return err
     }
 	if f.file, err = os.OpenFile(f.filename, os.O_CREATE|os.O_RDWR|os.O_APPEND, 0755); err != nil {
         return err
     }
+    f.Start() // we must close the file
     return err
 }
 
@@ -305,7 +310,6 @@ func (f *FileHandler) Start() error {
             select {
             // when message is received over channel, write it
             case m, ok :=<-f.logHandler.msgch:
-                //fmt.Printf("DEBUG, file logger: msg=%v\n", m) // DEBUG
                 if ok { f.write(m.sev, m.msg) }
 
             // when data is received over stop channel, just exit the goroutine

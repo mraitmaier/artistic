@@ -3,17 +3,12 @@ package core
 import (
 	"fmt"
     "encoding/json"
-    //"labix.org/v2/mgo/bson"
-    "gopkg.in/mgo.v2/bson"
 )
 
 /*
  * Style - a type representing an art style
  */
 type Style struct {
-
-    //
-    Id bson.ObjectId `bson:"_id"`
 
 	// name of the style
 	Name string
@@ -24,7 +19,7 @@ type Style struct {
 
 // Create new instance of Style type
 func NewStyle(name, description string) *Style {
-    return &Style{ bson.NewObjectId(), name, description }
+    return &Style{ name, description }
 }
 
 func (s *Style) String() string { return s.Name }

@@ -61,6 +61,7 @@ func registerHandlers(aa *ArtisticApp) {
 	r.Handle("/users", usersHandler(aa))
 	r.Handle("/user/{cmd}/{id}", userHandler(aa) )
 	r.Handle("/user/{cmd}/", userHandler(aa) )
+	r.Handle("/log", logHandler(aa))
 	r.Handle("/techniques", techniquesHandler(aa) )
 	r.Handle("/technique/{cmd}/{id}", techniqueHandler(aa) )
 	r.Handle("/technique/{cmd}/", techniqueHandler(aa) )
@@ -116,6 +117,7 @@ func webStart(aa *ArtisticApp, wwwpath string) error {
 	//web page templates, with defined additional functions
 	funcs := template.FuncMap{
 		"add": func(x, y int) int { return x + y },
+        "length": func(list []string) int { return len(list) },
         "allowedroles": func() []string { return utils.AllowedRoles },
         "get_artist_type": func(t core.ArtistType) string { return t.String() },
         "totitle": func(s string) string { return strings.Title(s) },
@@ -343,6 +345,49 @@ func loginHandler(aa *ArtisticApp) http.Handler {
     }) // return handler closure
 }
 
+// log admin page handler 
+func logHandler(aa *ArtisticApp) http.Handler {
+    return http.HandlerFunc(func (w http.ResponseWriter, r *http.Request) {
+
+	if loggedin, user := userIsAuthenticated(aa, r); loggedin {
+	    switch r.Method {
+
+	    case "POST":
+            aa.Log.Clear() // clear the log contents
+
+	    case "GET":
+            // do nothing... 
+        }
+
+        // read a log file as a slice of lines
+        var err error
+        var contents []string
+        if contents, err = readLog(aa.LogFname); err != nil {
+            aa.Log.Error(fmt.Sprintf("[%s] Problem reading log file: %q", user.Username, err.Error()))
+			http.Redirect(w, r, "/error", http.StatusFound)
+            return
+        }
+
+	    // create ad-hoc struct to be sent to page template
+        var web = struct {
+		    User    *db.User
+		    Contents  []string // a list of log messages
+            PerPage  int // how many log messages per page is displayed...
+        } { user, contents, 25 }
+
+        if err = renderPage("log", &web, aa, w, r); err != nil {
+	        aa.Log.Error(fmt.Sprintf("[%s] Cannot render the 'log' template: %q.", user.Username, err.Error()))
+            return
+        }
+        aa.Log.Info(fmt.Sprintf("[%s] Displaying the %q page.", user.Username, r.RequestURI))
+
+    } else {
+        redirectToLoginPage(w, r, aa)
+	}
+    }) // return handler closure
+}
+
+
 // favincon handler
 func faviconHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, favicon)
@@ -366,8 +411,8 @@ func datingsHandler(aa *ArtisticApp) http.Handler {
 
 		// create ad-hoc struct to be sent to page template
         var web = struct {
-			User    *utils.User
-			Datings []core.Dating
+			User    *db.User
+			Datings []db.Dating
         } { user, datings }
 
         if err := renderPage("datings", &web, aa, w, r); err != nil {
@@ -390,7 +435,7 @@ func postDatingHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp) 
 	name := r.FormValue("dating-name")
 	descr := r.FormValue("dating-description")
 
-    d := &core.Dating {db.MongoStringToId(id), name, descr}
+    d := &db.Dating { db.MongoStringToId(id), core.Dating{ name, descr}, db.NewTimestamp(), db.NewTimestamp() } // 
 
     if err := aa.DataProv.UpdateDating(d); err != nil {
         return err
@@ -401,8 +446,7 @@ func postDatingHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp) 
 }
 
 // GET request handler for datings (private).
-func getDatingHandler(w http.ResponseWriter, r *http.Request,
-                    aa *ArtisticApp, user *utils.User) error {
+func getDatingHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp, user *db.User) error {
 
     id := mux.Vars(r)["id"]
     cmd := mux.Vars(r)["cmd"]
@@ -416,9 +460,9 @@ func getDatingHandler(w http.ResponseWriter, r *http.Request,
 
 	// create ad-hoc struct to be sent to page template
     var web = struct {
-		User    *utils.User
+		User    *db.User
         Cmd     string // "view" or "modify"; we don't allow "delete"...
-		Dating  *core.Dating
+		Dating  *db.Dating
     } { user, cmd, dating }
 
     return renderPage("dating", &web, aa, w, r)
@@ -473,8 +517,8 @@ func stylesHandler(aa *ArtisticApp) http.Handler {
 
 		// create ad-hoc struct to be sent to page template
 		var web = struct {
-			User   *utils.User
-			Styles []core.Style
+			User   *db.User
+			Styles []db.Style
 		} { user, styles }
 
 		// render the page
@@ -516,7 +560,7 @@ func styleHandler(aa *ArtisticApp) http.Handler {
         case "DELETE":
             id := mux.Vars(r)["id"]
             //cmd := mux.Vars(r)["cmd"]
-            t := new(core.Style)
+            t := new(db.Style)
             t.Id = db.MongoStringToId(id) // only valid ID needed to delete 
             if err := aa.DataProv.DeleteStyle(t); err != nil {
                 log.Error(fmt.Sprintf("[%s] DELETE Style id=%q (%s).", user.Username, id, err.Error()))
@@ -536,14 +580,14 @@ func styleHandler(aa *ArtisticApp) http.Handler {
 }
 
 func getStyleHandler(w http.ResponseWriter, r *http.Request,
-                        aa *ArtisticApp, user *utils.User) error {
+                        aa *ArtisticApp, user *db.User) error {
 
     id := mux.Vars(r)["id"]
     cmd := mux.Vars(r)["cmd"]
 
     log := aa.Log
     var err error
-    s := new(core.Style)
+    s := db.NewStyle()
 
     switch cmd {
 
@@ -572,15 +616,15 @@ func getStyleHandler(w http.ResponseWriter, r *http.Request,
 
 	// create ad-hoc struct to be sent to page template
     var web = struct {
-		User  *utils.User
+		User  *db.User
         Cmd   string        // "view", "modify", "create" or "delete"...
-		Style *core.Style
+		Style *db.Style
     }{ user, cmd, s }
 
     return renderPage("style", &web, aa, w, r)
 }
 
-func postStyleHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp, user *utils.User) error {
+func postStyleHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp, user *db.User) error {
 
     // get data to modify 
 	id := mux.Vars(r)["id"]
@@ -589,7 +633,7 @@ func postStyleHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp, u
     // get POST form values and create a struct
 	name := strings.TrimSpace(r.FormValue("style-name"))
 	descr := strings.TrimSpace(r.FormValue("style-description"))
-    t := &core.Style{ db.MongoStringToId(id), name, descr }
+    t := &db.Style{ db.MongoStringToId(id), core.Style{ name, descr }, db.NewTimestamp(), db.NewTimestamp() }
 
     var err error
 
@@ -633,8 +677,8 @@ func techniquesHandler(aa *ArtisticApp) http.Handler {
 
 		// create ad-hoc struct to be sent to page template
         var web = struct {
-			User       *utils.User
-			Techniques []core.Technique
+			User       *db.User
+			Techniques []db.Technique
         }{ user, tech }
 
 		// render the page
@@ -678,7 +722,7 @@ func techniqueHandler(aa *ArtisticApp) http.Handler {
         case "DELETE":
             id := mux.Vars(r)["id"]
             //cmd := mux.Vars(r)["cmd"]
-            t := new(core.Technique)
+            t := new(db.Technique)
             t.Id = db.MongoStringToId(id) // only valid ID needed to delete 
             if err := aa.DataProv.DeleteTechnique(t); err != nil {
                 msg := fmt.Sprintf("[%s] DELETE Technique id=%q: %q.", user.Username, id, err.Error())
@@ -698,14 +742,14 @@ func techniqueHandler(aa *ArtisticApp) http.Handler {
     }) // return handler closure
 }
 
-func getTechniqueHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp, user *utils.User) error {
+func getTechniqueHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp, user *db.User) error {
 
     id := mux.Vars(r)["id"]
     cmd := mux.Vars(r)["cmd"]
 
     log := aa.Log
     var err error
-    tech := new(core.Technique)
+    tech := new(db.Technique)
 
     switch cmd {
 
@@ -734,15 +778,15 @@ func getTechniqueHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp
 
 	// create ad-hoc struct to be sent to page template
     var web = struct {
-		User      *utils.User
+		User      *db.User
         Cmd       string        // "view", "modify", "insert" or "delete"...
-		Technique *core.Technique
+		Technique *db.Technique
     }{ user, cmd, tech }
 
     return renderPage("technique", &web, aa, w, r)
 }
 
-func postTechniqueHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp, user *utils.User) error {
+func postTechniqueHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp, user *db.User) error {
 
     // get data to modify 
 	id := mux.Vars(r)["id"]
@@ -751,7 +795,8 @@ func postTechniqueHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticAp
     // get POST form values and create a struct
 	name := strings.TrimSpace(r.FormValue("technique-name"))
 	descr := strings.TrimSpace(r.FormValue("technique-description"))
-    t := &core.Technique {db.MongoStringToId(id), name, descr}
+    t := db.CreateTechnique(name, descr)
+    t.Id = db.MongoStringToId(id)
 
     var err error = nil
 

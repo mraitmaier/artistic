@@ -51,7 +51,7 @@
     -->
 
         <div class="col-md-10" id="data-list">
-<h3>BSD Simplified License</h3>
+<h1>BSD Simplified License</h1>
         
 <p><b>Copyright 2014 by Miran Raitmaier. All Rights Reserved.</b></p>
 <p>Redistribution and use in source and binary forms, with or without 

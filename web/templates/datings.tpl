@@ -81,15 +81,15 @@
         {{$id := add $index 1}}
         <tr id="dating-row-{{$id}}">
             <td>{{$id}}</td>
-            <td>{{$element.Dating}}</td>
-            <td>{{$element.Description}}</td>
+            <td>{{$element.Dating.Dating}}</td>
+            <td>{{$element.Dating.Description}}</td>
             <td>
-                <a data-toggle="tooltip" data-placement="left" title="View dating details" id="view-dating"
+                <a href="#" data-toggle="tooltip" data-placement="left" title="View dating details" id="view-dating"
                                          onclick="rerouteUsingGet('dating', 'view', {{$element.Id}});">
                     <span class="glyphicon glyphicon-eye-open"></span>
                 </a>
                 &nbsp;
-                <a data-toggle="tooltip" data-placement="left" title="Edit dating" id="edit-dating"
+                <a href="#" data-toggle="tooltip" data-placement="left" title="Edit dating" id="edit-dating"
                                          onclick="rerouteUsingGet('dating', 'modify', {{$element.Id}});">
                     <span class="glyphicon glyphicon-cog" ></span>
                 </a>
@@ -186,8 +186,8 @@
     <div class="row">
         <table id="view-dating-table" class="table table-hover">
         <tbody>
-            <tr> <td class="col-md-2">Name</td> <td class="col-md-10">{{.Dating}}</td> </tr>
-            <tr> <td class="col-md-2">Description</td> <td class="col-md-10">{{.Description}}</td> </tr>
+            <tr> <td class="col-md-2">Name</td> <td class="col-md-10">{{.Dating.Dating}}</td> </tr>
+            <tr> <td class="col-md-2">Description</td> <td class="col-md-10">{{.Dating.Description}}</td> </tr>
         </tbody>
         </table>
     </div><!-- row -->
@@ -214,7 +214,7 @@
     <div class="form-group"> 
         <label for="dating-name" class="col-md-2 control-label">Name</label>
         <div class="col-md-6">
-            <input type="text" class="form-control" id="dating-name" name="dating-name" value="{{.Dating}}" readonly></input>
+            <input type="text" class="form-control" id="dating-name" name="dating-name" value="{{.Dating.Dating}}" readonly></input>
         </div>
     </div>
     </div>
@@ -223,7 +223,8 @@
     <div class="form-group"> 
         <label for="dating-description" class="col-md-2 control-label"> Description</label>
         <div class="col-md-6">
-            <textarea type="text" class="form-control"  rows="5" id="dating-description" name="dating-description">{{.Description}}
+            <textarea type="text" class="form-control"  rows="5" id="dating-description" name="dating-description">
+            {{.Dating.Description}}
             </textarea>
         </div>
     </div>
@@ -233,10 +234,10 @@
 
     <div class="row">
     <div class="form-group">
-        <div class="col-md-2">
+        <div class="col-md-4">
             <button class="btn btn-primary" type="submit" id="dating-submit">Modify</button>
         </div>
-        <div class="col-md-1 col-md-offset-5">
+        <div class="col-md-1 col-md-offset-3">
             <a type="button" class="btn btn-primary" href="/datings">
                 <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;&nbsp;Back
             </a>

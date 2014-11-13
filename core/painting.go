@@ -38,9 +38,9 @@ func (p *Painting) DisplayExhibitions() string {
 	return p.Work.DisplayExhibitions()
 }
 
-func (p *Painting) Created() string {
-    return p.Work.Created()
-}
+//func (p *Painting) Created() string {
+//    return p.Work.Created()
+//}
 
 
 // serialize a list of paintings into JSON

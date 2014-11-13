@@ -28,7 +28,7 @@ func (p *Print) DisplayExhibitions() string {
 	return p.Work.DisplayExhibitions()
 }
 
-func (p *Print) Created() string { return p.Work.Created() }
+//func (p *Print) Created() string { return p.Work.Created() }
 
 
 // serialize a list of prints into JSON

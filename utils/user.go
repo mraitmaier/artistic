@@ -12,12 +12,11 @@ import (
 	"fmt"
 	"strings"
     "errors"
-    "gopkg.in/mgo.v2/bson"
+//    "gopkg.in/mgo.v2/bson"
 )
 
 // User
 type User struct {
-    Id        bson.ObjectId `bson:"_id"`
 	Username  string // username 
 	Password  string // password (should always be hashed, use CreateUser()! ) 
 	Name      string // full name
@@ -84,7 +83,7 @@ func (u *User) SetPassword(newpwd string) {
 func NewUser(username, password, role string) (*User, error) {
 	p := new(Password)
 	p.Set(password)
-    u := &User{bson.NewObjectId(), username, p.Get(), "", "user", ""}
+    u := &User{ username, p.Get(), "", "user", "" }
     if err := u.SetRole(role); err != nil {
         return nil, err
     }
@@ -95,7 +94,7 @@ func NewUser(username, password, role string) (*User, error) {
 // This one is used to authenticate the existing user (role is stored in 
 // some DB...)
 func CreateUser(username, password string) *User {
-    return &User{bson.NewObjectId(), username, password, "", "user", ""}
+    return &User{ username, password, "", "user", "" }
 }
 
 // serialize the list of users into JSON

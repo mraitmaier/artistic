@@ -14,6 +14,7 @@ import (
 	"path/filepath"
 	"time"
 	"bitbucket.org/miranr/artistic/utils"
+	"bitbucket.org/miranr/artistic/db"
 )
 
 // authenticate the user with given username and password
@@ -83,7 +84,7 @@ func logout(aa *ArtisticApp, w http.ResponseWriter, r *http.Request) error {
 }
 
 // check if user is already authenticated
-func userIsAuthenticated(aa *ArtisticApp, r *http.Request) (bool, *utils.User) {
+func userIsAuthenticated(aa *ArtisticApp, r *http.Request) (bool, *db.User) {
 
 	s, err := aa.WebInfo.store.Get(r, "artistic")
 	if err != nil {

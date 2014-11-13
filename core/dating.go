@@ -4,7 +4,7 @@ import (
 	"fmt"
     "encoding/json"
 //    "labix.org/v2/mgo/bson"
-    "gopkg.in/mgo.v2/bson"
+//    "gopkg.in/mgo.v2/bson"
 )
 
 var AllowedDatings = []string{ "L", "S", "A", "a.q.", "a.q.n.", "p.q.", "p.q.n.", "unknown" }
@@ -15,7 +15,7 @@ var AllowedDatings = []string{ "L", "S", "A", "a.q.", "a.q.n.", "p.q.", "p.q.n."
 type Dating struct {
     // ID is created by DB automatically and is only a RO property
     //Id db.DbIdentifier `bson:"_id"`
-    Id bson.ObjectId `bson:"_id"`
+//    Id bson.ObjectId `bson:"_id"`
 
     // a dating value is defined (as enum) above 
 	Dating string

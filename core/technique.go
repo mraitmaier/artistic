@@ -3,14 +3,10 @@ package core
 import (
 	"fmt"
     "encoding/json"
-    "gopkg.in/mgo.v2/bson"
 )
 
 // Technique - a type representing an art technique
 type Technique struct {
-
-    //
-    Id bson.ObjectId `bson:"_id"`
 
 	// name of the technique
 	Name string
@@ -20,7 +16,7 @@ type Technique struct {
 }
 
 func NewTechnique(name, description string) *Technique {
-    return &Technique{ bson.NewObjectId(), name, description }
+    return &Technique{ name, description }
 }
 
 func (t *Technique) String() string { return t.Name }

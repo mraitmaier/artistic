@@ -41,10 +41,9 @@ func (p *Ceramic) DisplayExhibitions() string {
 	return p.Work.DisplayExhibitions()
 }
 
-func (p *Ceramic) Created() string {
-    return p.Work.Created()
-}
-
+//func (p *Ceramic) Created() string {
+//    return p.Work.Created()
+//}
 
 // serialize a list of ceramics into JSON
 func ceramicsToJson(items []Ceramic) (data string, err error) {

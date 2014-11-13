@@ -8,7 +8,7 @@ import (
     "strings"
 	"net/http"
 	"bitbucket.org/miranr/artistic/core"
-	"bitbucket.org/miranr/artistic/utils"
+//	"bitbucket.org/miranr/artistic/utils"
 	"bitbucket.org/miranr/artistic/db"
 	"github.com/gorilla/mux"
 )
@@ -33,7 +33,7 @@ func artistsHandler(aa *ArtisticApp, t core.ArtistType) http.Handler {
 
 	    // create ad-hoc struct to be sent to page template
         var web = struct {
-		    User  *utils.User
+		    User  *db.User
             Type core.ArtistType
             Artists []core.Artist
         } { user, t, artists }
@@ -86,7 +86,7 @@ func artistHandler(aa *ArtisticApp) http.Handler {
 }
 
 //  HTTP GET handler for "/artist/<cmd>/..." URLs.
-func getArtistHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp, user *utils.User) error {
+func getArtistHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp, user *db.User) error {
 
     id := mux.Vars(r)["id"]
     cmd := mux.Vars(r)["cmd"]
@@ -122,7 +122,7 @@ func getArtistHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp, u
 
 	// create ad-hoc struct to be sent to page template
     var web = struct {
-		User  *utils.User
+		User  *db.User
         Cmd   string   // "view", "modify", "insert" or "delete"...
 		Artist *core.Artist
     }{ user, cmd, a }
@@ -131,7 +131,7 @@ func getArtistHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp, u
 }
 
 // HTTP POST handler for "/artist/<cmd>" URLs.
-func postArtistHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp, user *utils.User) error {
+func postArtistHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp, user *db.User) error {
 
     // get data to modify 
     cmd := mux.Vars(r)["cmd"]

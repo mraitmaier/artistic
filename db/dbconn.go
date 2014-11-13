@@ -7,7 +7,7 @@ import (
     "fmt"
     "time"
     "sync"
-    "bitbucket.org/miranr/artistic/utils"
+//    "bitbucket.org/miranr/artistic/utils"
     "bitbucket.org/miranr/artistic/core"
 )
 
@@ -22,6 +22,25 @@ const (
     MongoDB
 )
 
+/*
+// A factory function for the right DB IDs: returns the proper DB ID for the DB type given.
+func NewDbId(dbtype DbType) DbIdentifier {
+
+    var id DbIdentifier = nil
+
+    switch dbtype {
+
+    case MongoDB: // if DB is MongoDB
+        var id MongoDbId
+        id.NewId()
+
+    default:     // other cases...
+    }
+
+    return id
+}
+*/
+
 // Interface that defines the database connection.
 type DbConnector interface {
 
@@ -32,12 +51,12 @@ type DbConnector interface {
 // Interface that defines the data provider
 type DataProvider interface {
 
-    GetAllUsers() ([]utils.User, error)
-    GetUser(string) (*utils.User, error)
-    GetUserByUsername(string) (*utils.User, error)
-    InsertUser(*utils.User) error
-    UpdateUser(*utils.User) error
-    DeleteUser(*utils.User) error
+    GetAllUsers() ([]User, error)
+    GetUser(string) (*User, error)
+    GetUserByUsername(string) (*User, error)
+    InsertUser(*User) error
+    UpdateUser(*User) error
+    DeleteUser(*User) error
 
     GetAllArtists(core.ArtistType) ([]core.Artist, error)
     GetArtist(string) (*core.Artist, error)
@@ -45,21 +64,21 @@ type DataProvider interface {
     UpdateArtist(*core.Artist) error
     DeleteArtist(*core.Artist) error
 
-    GetAllTechniques() ([]core.Technique, error)
-    GetTechnique(string) (*core.Technique, error)
-    InsertTechnique(*core.Technique) error
-    UpdateTechnique(*core.Technique) error
-    DeleteTechnique(*core.Technique) error
+    GetAllTechniques() ([]Technique, error)
+    GetTechnique(string) (*Technique, error)
+    InsertTechnique(*Technique) error
+    UpdateTechnique(*Technique) error
+    DeleteTechnique(*Technique) error
 
-    GetAllStyles() ([]core.Style, error)
-    GetStyle(string) (*core.Style, error)
-    InsertStyle(*core.Style) error
-    UpdateStyle(*core.Style) error
-    DeleteStyle(*core.Style) error
+    GetAllStyles() ([]Style, error)
+    GetStyle(string) (*Style, error)
+    InsertStyle(*Style) error
+    UpdateStyle(*Style) error
+    DeleteStyle(*Style) error
 
-    GetAllDatings() ([]core.Dating, error)
-    GetDating(string) (*core.Dating, error)
-    UpdateDating(*core.Dating) error
+    GetAllDatings() ([]Dating, error)
+    GetDating(string) (*Dating, error)
+    UpdateDating(*Dating) error
 }
 
 // Init database factory: returns appropriate DB connection URL, initialized
@@ -67,8 +86,7 @@ type DataProvider interface {
 // Note that DB connector and data provider are, in general, implemented 
 // by the same type. 
 func InitDb(dbtype DbType, host string, port int,
-            username, password, dbname string) (url string, db DbConnector,
-            data DataProvider, e error) {
+                           username, password, dbname string) (url string, db DbConnector, data DataProvider, e error) {
 
     // initialize
     url = ""
@@ -86,12 +104,10 @@ func InitDb(dbtype DbType, host string, port int,
 }
 
 // Initialization function for MongoDB.
-func initMongo(host string, port int, username, passwd,
-                dbname string) (string, *MongoDbConn, *MongoDbConn) {
+func initMongo(host string, port int, username, passwd, dbname string) (string, *MongoDbConn, *MongoDbConn) {
 
     // create DB connection URL for MongoDB
-    s := fmt.Sprintf("mongodb://%s:%s@%s:%d/%s", username, passwd,
-                                                host, port, dbname)
+    s := fmt.Sprintf("mongodb://%s:%s@%s:%d/%s", username, passwd, host, port, dbname)
 
     // create new instance of MongoDB Session
     db := new(MongoDbConn)
@@ -99,6 +115,7 @@ func initMongo(host string, port int, username, passwd,
 
     return s, db, db
 }
+
 ///////////////
 type DbCommand int
 const (
@@ -113,6 +130,10 @@ const (
 // a type that satisfies the interface...
 //
 type DbIdentifier interface {
-    IdToString(interface{}) string
-    StringToId(string) interface{}
+
+    IdToString() string
+
+    StringToId(string)
+
+    NewId()
 }

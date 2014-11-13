@@ -3,13 +3,13 @@ package core
 import (
 	"encoding/json"
 	"fmt"
-    "time"
+ //   "time"
 )
 
 type Artwork interface {
     Json() (string, error)
     Display() string
-    Created() string
+ //   Created() string
     // Create() error
     // Update() error
     // Delete() error
@@ -74,10 +74,10 @@ type Work struct {
 	Picture string
 
     /* timestamp when this instance was created */
-    created string
+//    created string
 
     /* a timestamp when this instance was last updated */
-    updated string
+ //   updated string
 }
 
 /* work's string representation */
@@ -91,20 +91,20 @@ func (w *Work) Json() (string, error) {
 	return string(s[:]), err
 }
 
-func (w *Work) Created() string {
-    return w.created
-}
+//func (w *Work) Created() string {
+//    return w.created
+//}
 
 /* create a new, default instance of the Work */
 const DefaultWorkCapacity = 10
 
 func CreateNewWork() *Work {
     /* generate a 'created' timestamp and apply it to the 'updated', too */
-    creat := time.Now().Format("2012-12-15 15:04:05")
+//    creat := time.Now().Format("2012-12-15 15:04:05")
 	s := make([]string, 0, DefaultWorkCapacity) // sources
 	e := make([]string, 0, DefaultWorkCapacity) // exhibitions
 	n := make([]Note, 0, DefaultWorkCapacity)   // remarks
-	w := &Dating{"", "unknown", "Default Description"}
+	w := &Dating{"unknown", "Default Description"}
 	return &Work{"", // title
                 CreateArtist(), // artist
                 NewTechnique("", ""), // technique
@@ -123,9 +123,9 @@ func CreateNewWork() *Work {
                 e,      // exhibitions
                 s,      // sources
                 n,      // notes
-                "",     // picture
-                creat,  // created
-                creat}  // updated
+                ""  }   // picture
+  //              creat,  // created
+  //              creat}  // updated
 }
 
 func (w *Work) Display() string {

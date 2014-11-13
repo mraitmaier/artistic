@@ -7,7 +7,6 @@ import (
 	"fmt"
     "strings"
 	"net/http"
-	"bitbucket.org/miranr/artistic/utils"
 	"bitbucket.org/miranr/artistic/db"
 	"github.com/gorilla/mux"
 )
@@ -31,8 +30,8 @@ func usersHandler(aa *ArtisticApp) http.Handler {
 
 		// create ad-hoc struct to be sent to page template
 		var web = struct {
-			User  *utils.User
-			Users []utils.User
+			User  *db.User
+			Users []db.User
 		} { user, users }
 
 		// render the page
@@ -73,7 +72,7 @@ func userHandler(aa *ArtisticApp) http.Handler {
         case "DELETE":
             id := mux.Vars(r)["id"]
             cmd := mux.Vars(r)["cmd"]
-            t := new(utils.User)
+            t := new(db.User)
             t.Id = db.MongoStringToId(id) // only valid ID needed to delete 
             if err := aa.DataProv.DeleteUser(t); err != nil {
                 log.Error(fmt.Sprintf("[%s] %s user id=%q, DB returned %q.", user, cmd, id, err))
@@ -93,14 +92,14 @@ func userHandler(aa *ArtisticApp) http.Handler {
 }
 
 //  HTTP GET handler for "/user/<cmd>" URLs.
-func getUserHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp, user *utils.User) error {
+func getUserHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp, user *db.User) error {
 
     id := mux.Vars(r)["id"]
     cmd := mux.Vars(r)["cmd"]
 
     log := aa.Log
     var err error
-    s := new(utils.User)
+    s := new(db.User)
 
     switch cmd {
 
@@ -131,15 +130,15 @@ func getUserHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp, use
 
 	// create ad-hoc struct to be sent to page template
     var web = struct {
-		User  *utils.User
+		User  *db.User
         Cmd   string   // "view", "modify", "insert" or "delete"...
-		UserProfile *utils.User
+		UserProfile *db.User
     }{ user, cmd, s }
 
     return renderPage("user", &web, aa, w, r)
 }
 
-func postUserHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp, user *utils.User) error {
+func postUserHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp, user *db.User) error {
 
     // get data to modify 
     cmd := mux.Vars(r)["cmd"]
@@ -190,7 +189,7 @@ func modifyExistingUser(w http.ResponseWriter, r *http.Request, aa *ArtisticApp)
     var err error = nil
 
     // create a user and check passwords
-    t := utils.CreateUser(name, pwd)
+    t := db.CreateUser(name, pwd)
     if err = t.SetRole(role); err != nil {
         return "", fmt.Errorf("invalid role")
     }
@@ -223,7 +222,7 @@ func insertNewUser(w http.ResponseWriter, r *http.Request, aa *ArtisticApp) (str
     var err error = nil
 
     // create a user and check passwords
-    t := utils.CreateUser(name, pwd)
+    t := db.CreateUser(name, pwd)
 
     if err = t.SetRole(role); err != nil {
         return "", fmt.Errorf("invalid role")
@@ -307,23 +306,20 @@ func profileHandler(aa *ArtisticApp) http.Handler {
 }
 
 //  HTTP GET handler for "/userprofile/<cmd>" URLs.
-func getProfileHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp, user *utils.User) error {
+func getProfileHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp, user *db.User) error {
 
     cmd := mux.Vars(r)["cmd"]
 
-    //log := aa.Log
-    //var err error
-
 	// create ad-hoc struct to be sent to page template
     var web = struct {
-		User  *utils.User
+		User  *db.User
         Cmd   string   // "view", "modify", "changepwd"...
     }{ user, cmd }
 
 	return renderPage("userprofile", &web, aa, w, r)
 }
 
-func postProfileHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp, user *utils.User) error {
+func postProfileHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp, user *db.User) error {
 
     // get data to modify 
     cmd := mux.Vars(r)["cmd"]

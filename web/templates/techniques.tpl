@@ -85,20 +85,20 @@
             <td>{{$element.Name}}</td>
             <td>{{$element.Description}}</td>
             <td>
-                <a data-toggle="tooltip" data-placement="left"
+                <a href="#" data-toggle="tooltip" data-placement="left"
                    title="View technique details" id="view-technique"
           onclick="rerouteUsingGet('technique', 'view', {{$element.Id}});">
                     <span class="glyphicon glyphicon-eye-open"></span>
                 </a>
                 &nbsp;
-                <a data-toggle="tooltip" data-placement="left"
+                <a href="#" data-toggle="tooltip" data-placement="left"
                    title="Modify technique" id="modify-technique"
           onclick="rerouteUsingGet('technique', 'modify', {{$element.Id}});">
 <!--         onclick="rerouteTechnique('PUT', 'modify', {{$element.Id}});"-->
                     <span class="glyphicon glyphicon-cog" ></span>
                 </a>
                 &nbsp;
-                <a data-toggle="tooltip" data-placement="left"
+                <a href="#" data-toggle="tooltip" data-placement="left"
                    title="Delete technique" id="delete-technique"
           onclick="rerouteUsingGet('technique', 'delete', {{$element.Id}});">
        <!--  onclick="rerouteTechnique('DELETE', 'delete', {{$element.Id}});"-->
@@ -245,12 +245,12 @@
 
     <div class="row">
     <div class="form-group">
-        <div class="col-md-2">
+        <div class="col-md-4">
             <button class="btn btn-primary" type="submit" 
                     id="technique-submit">Modify</button>
 
         </div>
-        <div class="col-md-1 col-md-offset-5">
+        <div class="col-md-1 col-md-offset-3">
             <a type="button" class="btn btn-primary" href="/techniques">
             <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;&nbsp;Back
             </a>
@@ -294,11 +294,11 @@
 
     <div class="row">
     <div class="form-group">
-        <div class="col-md-2">
+        <div class="col-md-4">
             <button class="btn btn-primary" type="submit" id="technique-submit">Create</button>
             <button class="btn btn-default" type="reset">Clear</button>
         </div>
-        <div class="col-md-1 col-md-offset-5">
+        <div class="col-md-1 col-md-offset-3">
             <a type="button" class="btn btn-primary" href="/techniques">
                 <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;&nbsp;Back
             </a>
