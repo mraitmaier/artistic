@@ -185,14 +185,13 @@ func modifyExistingArtist(w http.ResponseWriter, r *http.Request, aa *ArtisticAp
 // Return the name of the modified artist and error code. Return empty string for name when error occurs. 
 func insertNewArtist(w http.ResponseWriter, r *http.Request, aa *ArtisticApp) (string, error) {
 
-    // get data to modify 
-	id  := mux.Vars(r)["id"]
-
     a, err := parseFormValues(r)
+    fmt.Printf("DEBUG: %v\n", a) // DEBUG
     if err != nil {
         return "", err
     }
-    a.Id = db.MongoStringToId(id)
+    //a.Id = db.MongoStringToId(id)
+    a.Id = db.NewMongoId()
 
     // do it...
     if err = aa.DataProv.InsertArtist(a); err != nil {

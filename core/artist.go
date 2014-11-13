@@ -4,15 +4,11 @@ import (
 	//"fmt"
 //	"time"
 	"encoding/json"
-    "gopkg.in/mgo.v2/bson"
 )
 
 // type representing the person
 // This type is a basis for all artists: painters, sculptors, writers etc.
 type Artist struct {
-
-    // ID from DB
-    Id bson.ObjectId `bson:"_id"`
 
 	/* name of the artist */
 	*Name
@@ -53,22 +49,14 @@ type Artist struct {
     IsWriter bool       `bson:"is_writer"`
     IsPoet bool         `bson:"is_poet"`
     IsPlayWriter bool   `bson:"is_playwriter"`
-
-    // timestamp when an instance was created
-//    created string
-
-    // timestamp when an instance was last updated
-//    updated string
 }
 
 const DefaultArtistCapacity = 10
 
 func CreateArtist() *Artist {
- //   creat := time.Now().Format("2012-12-15 15:0405")
 	n := make([]Note, 0, DefaultArtistCapacity)
 	s := make([]string, 0, DefaultArtistCapacity)
-	return &Artist{bson.NewObjectId(),
-                   &Name{"", "", ""}, // Name
+	return &Artist{&Name{"", "", ""}, // Name
                    &Name{"", "", ""}, // Real name
 		           "",      // Born
                    "",      // Died
@@ -85,8 +73,6 @@ func CreateArtist() *Artist {
                    false,   // IsWriter
                    false,   // IsPoet
                    false }  // IsPlayWriter
-  //                 creat,   // created
-  //                 creat }  // updated
 }
 
 /*
