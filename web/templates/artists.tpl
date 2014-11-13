@@ -184,7 +184,7 @@
     <div class="form-group">
         <label for="realfirst" class="col-md-2 control-label">Real Name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;First</label>
         <div class="col-md-3">
-            <input type="text" class="form-control" id="realfirst" name="realfirst" value="" placeholder="first name" required />
+            <input type="text" class="form-control" id="realfirst" name="realfirst" value="" placeholder="first name" />
         </div>
         
         <label for="realmiddle" class="col-md-1 control-label">Middle</label>
@@ -218,26 +218,31 @@
 
     <div class="form-group">
         <label for="biography" class="control-label">Biography</label>
-        <textarea class="form-control" id="biography" name="biography" rows="10">Biography goes here... </textarea>
+        <textarea class="form-control" id="biography" name="biography" rows="5">Biography goes here... </textarea>
     </div> <!-- form-group -->
 
     <!-- TODO -->
 
-    <div class="form-group has-success">
+    <div class="form-group form-inline">
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         <div class="checkbox">
-            <label><input type="checkbox" id="painter" name="painter" value="yes" />Painter</label>
+            <label><input type="checkbox" id="painter" name="painter" value="yes">&nbsp;&nbsp;Painter</label>
         </div> <!-- checkbox -->
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         <div class="checkbox">
-            <label><input type="checkbox" id="sculptor" name="sculptor" value="yes" />Sculptor</label>
+            <label><input type="checkbox" id="sculptor" name="sculptor" value="yes">&nbsp;&nbsp;Sculptor</label>
         </div> <!-- checkbox -->
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         <div class="checkbox">
-            <label><input type="checkbox" id="printmaker" name="printmaker" value="yes" />Printmaker</label>
+            <label><input type="checkbox" id="printmaker" name="printmaker" value="yes">&nbsp;&nbsp;Printmaker</label>
         </div> <!-- checkbox -->
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         <div class="checkbox">
-            <label><input type="checkbox" id="ceramicist" name="ceramicist" value="yes" />Ceramicist</label>
+            <label><input type="checkbox" id="ceramicist" name="ceramicist" value="yes">&nbsp;&nbsp;Ceramicist</label>
         </div> <!-- checkbox -->
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         <div class="checkbox">
-            <label><input type="checkbox" id="architect" name="architect" value="yes" />Architect</label>
+            <label><input type="checkbox" id="architect" name="architect" value="yes">&nbsp;&nbsp;Architect</label>
         </div> <!-- checkbox -->
    </div> <!-- form-group -->
 
