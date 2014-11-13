@@ -7,8 +7,7 @@ import (
     "fmt"
     "time"
     "sync"
-//    "bitbucket.org/miranr/artistic/utils"
-    "bitbucket.org/miranr/artistic/core"
+//    "bitbucket.org/miranr/artistic/core"
 )
 
 
@@ -58,11 +57,11 @@ type DataProvider interface {
     UpdateUser(*User) error
     DeleteUser(*User) error
 
-    GetAllArtists(core.ArtistType) ([]core.Artist, error)
-    GetArtist(string) (*core.Artist, error)
-    InsertArtist(*core.Artist) error
-    UpdateArtist(*core.Artist) error
-    DeleteArtist(*core.Artist) error
+    GetAllArtists(ArtistType) ([]Artist, error)
+    GetArtist(string) (*Artist, error)
+    InsertArtist(*Artist) error
+    UpdateArtist(*Artist) error
+    DeleteArtist(*Artist) error
 
     GetAllTechniques() ([]Technique, error)
     GetTechnique(string) (*Technique, error)

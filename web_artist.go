@@ -14,7 +14,7 @@ import (
 )
 
 // The artists page handler: one handler factory function to rule them all
-func artistsHandler(aa *ArtisticApp, t core.ArtistType) http.Handler {
+func artistsHandler(aa *ArtisticApp, t db.ArtistType) http.Handler {
 
     return http.HandlerFunc( func (w http.ResponseWriter, r *http.Request) {
 
@@ -34,8 +34,8 @@ func artistsHandler(aa *ArtisticApp, t core.ArtistType) http.Handler {
 	    // create ad-hoc struct to be sent to page template
         var web = struct {
 		    User  *db.User
-            Type core.ArtistType
-            Artists []core.Artist
+            Type db.ArtistType
+            Artists []db.Artist
         } { user, t, artists }
 
         if err = renderPage("artists", &web, aa, w, r); err != nil {
@@ -95,7 +95,7 @@ func getArtistHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp, u
     var err error
 
     // create new artist instance
-    a := core.CreateArtist()
+    a := db.NewArtist()
 
     switch cmd {
 
@@ -124,7 +124,7 @@ func getArtistHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp, u
     var web = struct {
 		User  *db.User
         Cmd   string   // "view", "modify", "insert" or "delete"...
-		Artist *core.Artist
+		Artist *db.Artist
     }{ user, cmd, a }
 
     return renderPage("artist", &web, aa, w, r)
@@ -205,7 +205,7 @@ func insertNewArtist(w http.ResponseWriter, r *http.Request, aa *ArtisticApp) (s
 }
 
 // aux function that parses the HTTP POST form data and creates an Artist instance
-func parseFormValues(r *http.Request) (a *core.Artist, err error) {
+func parseFormValues(r *http.Request) (a *db.Artist, err error) {
 
     // get POST form values and create a struct
     first := strings.TrimSpace(r.FormValue("first"))
@@ -224,7 +224,7 @@ func parseFormValues(r *http.Request) (a *core.Artist, err error) {
     ceramicist := strings.TrimSpace(r.FormValue("ceramicist"))
 
     // create an Artist instance
-    a = core.CreateArtist()
+    a = db.NewArtist()
     a.Name = core.CreateName(first, middle, last)
     a.Born = born
     a.Died = died

@@ -127,6 +127,37 @@ func CreateUser(user, pwd string) *User {
 }
 
 ////
+type ArtistType int
+const (
+    ArtistTypeUnknown ArtistType = iota
+    ArtistTypeArtist    // this is used as "whatever" or "all-types" value
+    ArtistTypePainter
+    ArtistTypeSculptor
+    ArtistTypeArchitect
+    ArtistTypePrintmaker
+    ArtistTypeCeramicist
+    ArtistTypeWriter
+    ArtistTypePoet
+    ArtistTypePlaywriter
+)
+
+func (t ArtistType) String() string {
+    var s string
+    switch t {
+    case ArtistTypeArtist: s = "Artist"
+    case ArtistTypePainter: s = "Painter"
+    case ArtistTypeSculptor: s = "Sculptor"
+    case ArtistTypeArchitect: s = "Architect"
+    case ArtistTypePrintmaker: s = "Printmaker"
+    case ArtistTypeCeramicist: s = "Ceramicist"
+    case ArtistTypeWriter: s = "Writer"
+    case ArtistTypePoet: s = "Poet"
+    case ArtistTypePlaywriter: s = "Playwriter"
+    default: s = "Unknown Artist Type"
+    }
+    return s
+}
+
 type Artist struct {
 
     Id bson.ObjectId `bson:"_id"`

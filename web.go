@@ -76,12 +76,12 @@ func registerHandlers(aa *ArtisticApp) {
     r.Handle("/userprofile", profileHandler(aa) )
     r.Handle("/userprofile/{cmd}", profileHandler(aa) )
     r.Handle("/userprofile/{cmd}/{id}", profileHandler(aa) )
-    r.Handle("/artists", artistsHandler(aa, core.ArtistTypeArtist) )
-    r.Handle("/painters", artistsHandler(aa, core.ArtistTypePainter) )
-    r.Handle("/sculptors", artistsHandler(aa, core.ArtistTypeSculptor) )
-    r.Handle("/printmakers", artistsHandler(aa, core.ArtistTypePrintmaker) )
-    r.Handle("/ceramicists", artistsHandler(aa, core.ArtistTypeCeramicist) )
-    r.Handle("/architects", artistsHandler(aa, core.ArtistTypeArchitect) )
+    r.Handle("/artists", artistsHandler(aa, db.ArtistTypeArtist) )
+    r.Handle("/painters", artistsHandler(aa, db.ArtistTypePainter) )
+    r.Handle("/sculptors", artistsHandler(aa, db.ArtistTypeSculptor) )
+    r.Handle("/printmakers", artistsHandler(aa, db.ArtistTypePrintmaker) )
+    r.Handle("/ceramicists", artistsHandler(aa, db.ArtistTypeCeramicist) )
+    r.Handle("/architects", artistsHandler(aa, db.ArtistTypeArchitect) )
     r.Handle("/artist/{cmd}/{id}", artistHandler(aa) )
     r.Handle("/artist/{cmd}/", artistHandler(aa) )
 	r.HandleFunc("/favicon.ico", faviconHandler)
@@ -119,7 +119,7 @@ func webStart(aa *ArtisticApp, wwwpath string) error {
 		"add": func(x, y int) int { return x + y },
         "length": func(list []string) int { return len(list) },
         "allowedroles": func() []string { return utils.AllowedRoles },
-        "get_artist_type": func(t core.ArtistType) string { return t.String() },
+        "get_artist_type": func(t db.ArtistType) string { return t.String() },
         "totitle": func(s string) string { return strings.Title(s) },
         "toupper": func(s string) string { return strings.ToUpper(s) },
         "tolower": func(s string) string { return strings.ToLower(s) }}
