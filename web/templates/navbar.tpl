@@ -55,10 +55,10 @@
                         </a>
                     </li>
 
-                    <li><p class="navbar-text">Logged in as {{.}}</p></li>
+                    <li><p class="navbar-text">Signed in as {{.}}</p></li>
 
                     <li>
-                        <a href="/logout" data-toggle="tooltip" data-placement="left" title="Logout">
+                        <a href="/logout" data-toggle="tooltip" data-placement="left" title="Sign out">
                             <span class="glyphicon glyphicon-log-out"></span>
                         </a>
                     </li>
