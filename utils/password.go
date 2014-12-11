@@ -4,12 +4,13 @@
  * History:
  *  1   Jun11 MR Initial version, limited testing
  *  2   Aug13 MR New and much shorter version using bcrypt package
+ *  3   Dec14 MR URL for bcrypt module has changed
  */
 
 package utils
 
 import (
-    "code.google.com/p/go.crypto/bcrypt"
+    "golang.org/x/crypto/bcrypt"
 )
 
 /*
