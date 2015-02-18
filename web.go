@@ -33,8 +33,8 @@ type WebInfo struct {
     // websocket connection
     //wsConn *websocket.Conn
 
-    // (error) message to be displayed on page
-    LastMsg string
+    // (error, info etc.) message to be displayed on page
+    Msg WebMessage
 }
 
 const (
@@ -133,8 +133,9 @@ func webStart(aa *ArtisticApp, wwwpath string) error {
 	return nil
 }
 
-func SetMessage(wi *WebInfo, msg string) {
-    wi.LastMsg = msg
+func SetMessage(wi *WebInfo, msgtype, msg string) {
+    wi.Msg.MsgType = msgtype
+    wi.Msg.MsgText = msg
 }
 
 func checkSessDir(path string, aa *ArtisticApp) bool {
@@ -354,6 +355,8 @@ func logHandler(aa *ArtisticApp) http.Handler {
 
 	    case "POST":
             aa.Log.Clear() // clear the log contents
+//			http.Redirect(w, r, "/log", http.StatusFound)
+//          return
 
 	    case "GET":
             // do nothing... 
@@ -361,7 +364,7 @@ func logHandler(aa *ArtisticApp) http.Handler {
 
         // read a log file as a slice of lines
         var err error
-        var contents []string
+        var contents []string = make([]string, 0)
         if contents, err = readLog(aa.LogFname); err != nil {
             aa.Log.Error(fmt.Sprintf("[%s] Problem reading log file: %q", user.Username, err.Error()))
 			http.Redirect(w, r, "/error", http.StatusFound)
@@ -820,4 +823,18 @@ func postTechniqueHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticAp
     }
 
     return err
+}
+
+// The structure for displaying messages on web page
+type WebMessage struct {
+
+    // message type: warning, danger, success, info
+    MsgType string
+
+    // actual text message
+    MsgText string
+}
+
+func (m *WebMessage) String() string {
+    return fmt.Sprintf("%s: %s", m.MsgType, m.MsgText)
 }

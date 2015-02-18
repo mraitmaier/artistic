@@ -163,8 +163,6 @@ type Artist struct {
 
     // database ID
     Id bson.ObjectId `bson:"_id"`
-    //  embed the instance of the DB Identifier interface, this is generalized DB ID
-    //Id DbIdentifier
 
     // original core Artist struct is embedded
     core.Artist `bson:",inline"`

@@ -79,7 +79,7 @@
               <span class="glyphicon glyphicon-eye-open"></span>
           </a>
           &nbsp;
-          <a href="#" data-toggle="tooltip" data-placement="left" title="Edit artist" id="edit-artist-{{$id}}"
+          <a href="#" data-toggle="tooltip" data-placement="left" title="Modify artist data" id="edit-artist-{{$id}}"
                       onclick="rerouteUsingGet('artist', 'modify', {{$element.Id}});">
               <span class="glyphicon glyphicon-cog"></span>
           </a>
@@ -131,10 +131,8 @@
 
             <div class="col-md-10" id="data-view">
     {{if eq .Cmd "view"}}
-            <h1 id="data-view-header">{{.Artist.Name}}</h1>
             {{template "artist-view" .Artist}}
     {{else if eq .Cmd "modify"}}
-            <h1 id="data-view-header">Modify {{.Artist.Name}}</h1>
             {{template "artist-modify" .Artist}}
     {{else if eq .Cmd "insert"}}
             <h1 id="data-view-header">Create New Artist</h1>
@@ -165,8 +163,9 @@
     <fieldset>
 
     <div class="form-group has-success">
-        <label for="first" class="col-md-2 control-label">Name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;First</label>
-        <div class="col-md-3">
+        <div class="col-md-2 control-label"><b>Name</b></div>
+        <label for="first" class="col-md-1 control-label">First</label>
+        <div class="col-md-2">
             <input type="text" class="form-control" id="first" name="first" value="" placeholder="first name" required />
         </div>
         
@@ -182,8 +181,9 @@
     </div> <!-- form-group -->
 
     <div class="form-group">
-        <label for="realfirst" class="col-md-2 control-label">Real Name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;First</label>
-        <div class="col-md-3">
+        <div class="col-md-2 control-label"><b>Real Name</b></div>
+        <label for="realfirst" class="col-md-1 control-label">First</label>
+        <div class="col-md-2">
             <input type="text" class="form-control" id="realfirst" name="realfirst" value="" placeholder="first name" />
         </div>
         
@@ -264,9 +264,203 @@
 {{end}}
 
 {{define "artist-view"}}
-<p>View artist mockup page.</p>
+<div class="container-fluid" id="view-artist-table-div">
+
+    <div class="row">
+        <h1 id="data-view-header">{{.Name}}</h1>
+     <!--   <div class="col-md-2 control-label"><b>Name</b></div>
+        <label for="name" class="col-md-1 control-label">Name</label>
+        <div class="col-md-2">
+            <input type="text" class="form-control" id="name" name="name" value="{{.Name}}" readonly />
+        </div> -->
+    </div>    
+
+    <div class="row">
+        <h3><span class="col-md-2">{{.Born}}</span><span class="col-md1">-</span><span class="col-md-2">{{.Died}}</span></h3>
+    </div>    
+
+    <div class="row">&nbsp;<!--empty row --></div>    
+
+    <div class="row"> <b>{{.RealName}}</b> </div>    
+
+    <div class="row">
+         {{if eq .IsPainter true}}<div class="col-md-1"><b>Painter&nbsp;&nbsp;</b></div>{{end}}
+         {{if eq .IsSculptor true}}<div class="col-md-1"><b>Sculptor&nbsp;&nbsp;</b></div>{{end}}
+         {{if eq .IsPrintmaker true}}<div class="col-md-1"><b>Printmaker&nbsp;&nbsp;</b></div>{{end}}
+         {{if eq .IsCeramicist true}}<div class="col-md-1"><b>Ceramicist&nbsp;&nbsp;</b></div>{{end}}
+         {{if eq .IsArchitect true}}<div class="col-md-1"><b>Architect&nbsp;&nbsp;</b></div>{{end}}
+    </div>    
+
+    <div class="row">
+        <p><div class="col-md-2"><b>Nationality</b></div><div class="col-md-10">{{.Nationality}}</div></p> 
+    </div>    
+
+    <div class="row">
+        <div class="control-label"><b>Biography</b></div><br />
+        <textarea class="form-control" id="biography" rows="10" readonly>{{.Biography}}</textarea>
+      <!--  <div class="col-md-2"><b>Biography</b></div><br />
+        <div class="col-md-6"><textarea rows="5" readonly>{{.Biography}}</textarea></div> -->
+    </div>    
+
+    <div class="row"> <div class="col-md-1 col-md-offset-9">
+        <a type="button" class="btn btn-primary" href="/artists">
+            <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;&nbsp;Back
+        </a>
+    </div>
+</div> <!-- container-fluid -->
 {{end}}
 
 {{define "artist-modify"}}
-<p>Modify artist mockup page.</p>
+<div class="container-fluid" id="modify-artist-form-div">
+    <div class="row">
+        <h1 id="data-view-header">Modify Artist</h1>
+    </div>
+
+<form class="form-horizontal" role="form" method="post" id="modify-artist-form">
+    <fieldset>
+
+    <div class="row form-group has-success">
+        <div class="col-md-2 control-label"><b>Name</b></div>
+        <label for="first" class="col-md-1 control-label">First</label>
+        <div class="col-md-2">
+            <input type="text" class="form-control" id="first" name="first" value="{{.Name.First}}" 
+                                                                placeholder="first name" required />
+        </div>
+        
+        <label for="middle" class="col-md-1 control-label">Middle</label>
+        <div class="col-md-2">
+            <input type="text" class="form-control" id="middle" name="middle" value="{{.Name.Middle}}" placeholder="middle" />
+        </div>
+        
+        <label for="last" class="col-md-1 control-label">Last</label>
+        <div class="col-md-3">
+            <input type="text" class="form-control" id="last" name="last" value="{{.Name.Last}}" placeholder="last" />
+        </div>
+    </div> <!-- form-group -->
+
+    <div class="row form-group">
+        <div class="col-md-2 control-label"><b>Real Name</b></div>
+        <label for="realfirst" class="col-md-1 control-label">First</label>
+        <div class="col-md-2">
+            <input type="text" class="form-control" id="realfirst" name="realfirst" value="{{.RealName.First}}" />
+        </div> 
+        <label for="realmiddle" class="col-md-1 control-label">Middle</label>
+        <div class="col-md-2">
+            <input type="text" class="form-control" id="realmiddle" name="realmiddle" value="{{.RealName.Middle}}" />
+        </div>
+        
+        <label for="reallast" class="col-md-1 control-label">Last</label>
+        <div class="col-md-3">
+            <input type="text" class="form-control" id="reallast" name="reallast" value="{{.RealName.Last}}" />
+        </div>
+    </div> <!-- form-group -->
+
+    <div class="row form-group">
+        <label for="born" class="col-md-2 control-label">Born</label>
+        <div class="col-md-3">
+            <input type="date" class="form-control" id="born" name="born" value="{{.Born}}" />
+        </div>
+        <label for="died" class="col-md-1 control-label">Died</label>
+        <div class="col-md-3">
+            <input type="date" class="form-control" id="died" name="died" value="{{.Died}}" />
+        </div>
+    </div> <!-- form-group -->
+
+    <div class="row form-group">
+        <label for="nationality" class="col-md-2 control-label">Nationality</label>
+        <div class="col-md-3">
+            <input type="text" class="form-control" id="nationality" name="nationality" value="{{.Nationality}}" />
+        </div>
+    </div> <!-- form-group -->
+
+    <div class="row form-group">
+        <label for="biography" class="control-label">Biography</label>
+        <textarea class="form-control" id="biography" name="biography" rows="5">{{.Biography}}</textarea>
+    </div> <!-- form-group -->
+
+    <!-- TODO -->
+
+    <div class="row form-group form-inline">
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <div class="col-md-2">
+        <div class="checkbox">
+            <label>
+            {{if eq .IsPainter true}}
+            <input type="checkbox" id="painter" name="painter" value="yes" checked>
+            {{else}}
+            <input type="checkbox" id="painter" name="painter" value="yes">
+            {{end}}
+            &nbsp;&nbsp;Painter</label>
+        </div> <!-- checkbox -->
+        </div>
+        <div class="col-md-2">
+        
+        <div class="checkbox">
+            <label class="text-right">
+            {{if eq .IsSculptor true}}
+            <input type="checkbox" id="sculptor" name="sculptor" value="yes" checked>
+            {{else}}
+            <input type="checkbox" id="sculptor" name="sculptor" value="yes">
+            {{end}}
+            &nbsp;&nbsp;Sculptor
+            </label>
+        </div> <!-- checkbox -->
+        </div>
+        <div class="col-md-2">
+        
+        <div class="checkbox">
+            <label class="text-right">
+            {{if eq .IsPrintmaker true}}
+            <input type="checkbox" id="printmaker" name="printmaker" value="yes" checked>
+            {{else}}
+            <input type="checkbox" id="printmaker" name="printmaker" value="yes">
+            {{end}}
+            &nbsp;&nbsp;Printmaker
+            </label>
+        </div> <!-- checkbox -->
+        </div>
+        <div class="col-md-2">
+        
+        <div class="checkbox">
+            <label>
+            {{if eq .IsCeramicist true}}
+            <input type="checkbox" id="ceramicist" name="ceramicist" value="yes" checked>
+            {{else}}
+            <input type="checkbox" id="ceramicist" name="ceramicist" value="yes">
+            &nbsp;&nbsp;Ceramicist
+            {{end}}
+            </label>
+        </div> <!-- checkbox -->
+        </div>
+        <div class="col-md-2">
+        
+        <div class="checkbox">
+            <label>
+            {{if eq .IsArchitect true}}
+            <input type="checkbox" id="architect" name="architect" value="yes" checked>
+            {{else}}
+            <input type="checkbox" id="architect" name="architect" value="yes">
+            {{end}}
+            &nbsp;&nbsp;Architect
+            </label>
+        </div> <!-- checkbox -->
+        </div>
+   </div> <!-- form-group -->
+
+    <div class="row form-group">
+        <div class="col-md-4">
+            <button class="btn btn-primary" type="submit" id="artist-submit">Modify</button>
+            <button class="btn btn-default" type="reset">Clear</button>
+        </div>
+        <div class="col-md-1 col-md-offset-3">
+            <a class="btn btn-primary" href="/artists">
+                <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;&nbsp;Back
+            </a>
+        </div>
+    </div> <!-- form-group -->
+
+    </fieldset>
+</form>
+</div> <!-- container-fluid -->
+
 {{end}}

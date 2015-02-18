@@ -45,11 +45,12 @@
            <div class="col-md-10" id="data-list">
            <h1>Log</h1>
            <p>Log administation</p>
-           <p>Displaying {{$num}} log message(s).</p>
 
            <p>
            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#clearLogModal">Clear Log</button>
            </p>
+           <p>Displaying {{$num}} log message(s).</p>
+
 
            <!-- modal pop-up definition -->
            <div class="modal fade" id="clearLogModal" 

@@ -108,8 +108,7 @@ func getUserHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp, use
 	    // get a user from DB
 	    s, err = aa.DataProv.GetUser(id)
 	    if err != nil {
-		    err = fmt.Errorf("%s user id=%q, DB returned %q.", cmd, id, err)
-            return err
+		    return fmt.Errorf("%s user id=%q, DB returned %q.", cmd, id, err)
 	    }
         log.Info(fmt.Sprintf("[%s] %s user=%q Success.", user, strings.ToUpper(cmd), s.Username)) // OK log message
 
@@ -186,7 +185,7 @@ func modifyExistingUser(w http.ResponseWriter, r *http.Request, aa *ArtisticApp)
     full  := strings.TrimSpace(r.FormValue("fullname"))
     email := strings.TrimSpace(r.FormValue("email"))
 
-    var err error = nil
+    var err error
 
     // create a user and check passwords
     t := db.CreateUser(name, pwd)
@@ -202,7 +201,6 @@ func modifyExistingUser(w http.ResponseWriter, r *http.Request, aa *ArtisticApp)
     if err = aa.DataProv.UpdateUser(t); err != nil {
         return "", err
     }
-    //aa.Log.Info(fmt.Sprintf("[%s] Successfully updated user %q.", user, t.Username))
     return t.Username, err
 }
 
@@ -242,8 +240,6 @@ func insertNewUser(w http.ResponseWriter, r *http.Request, aa *ArtisticApp) (str
 // Change password for existing user handler function.
 func changeUserPassword(w http.ResponseWriter, r *http.Request, aa *ArtisticApp) (string, error) {
 
-    var err error = nil
-
     // get data to modify 
 	id  := mux.Vars(r)["id"]
 
@@ -251,6 +247,8 @@ func changeUserPassword(w http.ResponseWriter, r *http.Request, aa *ArtisticApp)
     old  := strings.TrimSpace(r.FormValue("oldpassword"))
 	pwd  := strings.TrimSpace(r.FormValue("newpassword"))
 	pwd2 := strings.TrimSpace(r.FormValue("newpassword2"))
+
+    var err error = nil
 
 	u, err := aa.DataProv.GetUser(id)
 	if err != nil {

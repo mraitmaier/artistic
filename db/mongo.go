@@ -538,6 +538,11 @@ func (m *MongoDbConn) GetAllArtists(t ArtistType) ([]Artist, error) {
         // get all artists from DB
         switch t {
 
+        case ArtistTypeArtist: // get all case
+            if err = db.C("artists").Find( bson.M{} ).All(&artists); err != nil {
+                return
+            }
+
         case ArtistTypePainter:
             if err = db.C("artists").Find( bson.M{ "is_painter" : true } ).All(&artists); err != nil {
                 return
@@ -595,10 +600,7 @@ func (m * MongoDbConn) GetArtist(id string) (*Artist, error) {
         u := NewArtist() // create empty user
 
         // get a user from DB
-        //var dbid DbIdentifier
-        //dbid.StringToId(id)
         err := db.C("artists").Find(bson.M{ "_id": MongoStringToId(id) }).One(&u)
-        //err := db.C("artists").Find(bson.M{ "_id": id }).One(&u)
         if err != nil {
             return
         }
@@ -619,6 +621,7 @@ func (m * MongoDbConn) UpdateArtist(a *Artist) error {
 
 // Create a new artist in DB. 
 func (m * MongoDbConn) InsertArtist(a *Artist) error {
+
     // check the ID of the item to be inserted into DB
     if a.Id == "" {
         a.Id = NewMongoId()
