@@ -4,6 +4,8 @@
 package main
 
 import (
+	"bitbucket.org/miranr/artistic/db"
+	"bitbucket.org/miranr/artistic/utils"
 	"bytes"
 	"crypto/sha512"
 	"encoding/binary"
@@ -13,8 +15,6 @@ import (
 	"os"
 	"path/filepath"
 	"time"
-	"bitbucket.org/miranr/artistic/utils"
-	"bitbucket.org/miranr/artistic/db"
 )
 
 // authenticate the user with given username and password
@@ -30,7 +30,7 @@ func authenticateUser(u, p string, aa *ArtisticApp, w http.ResponseWriter, r *ht
 		return false, err
 	}
 
-   // fmt.Printf("DEBUG authenticateUser(): %v\n", userdb) // DEBUG
+	// fmt.Printf("DEBUG authenticateUser(): %v\n", userdb) // DEBUG
 	// if passwords match....
 	if userdb != nil && utils.ComparePasswords(userdb.Password, p) {
 
@@ -100,7 +100,7 @@ func userIsAuthenticated(aa *ArtisticApp, r *http.Request) (bool, *db.User) {
 		if utils.FileExists(f) {
 
 			// get user information
-			user,err := aa.DataProv.GetUserByUsername(s.Values["user"].(string))
+			user, err := aa.DataProv.GetUserByUsername(s.Values["user"].(string))
 			if err != nil { // something is not OK...
 				return false, nil
 			}

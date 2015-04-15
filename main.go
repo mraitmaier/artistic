@@ -27,8 +27,8 @@ const (
 	// default web server root
 	DefWebRoot = "./web/"
 
-    // Database name
-    DbName = "artistic"
+	// Database name
+	DbName = "artistic"
 )
 
 // create a new Artistic application instance
@@ -51,8 +51,8 @@ func parseArgs(ac *ArtisticApp, cfgfile *string) {
 // MAIN: this is where all begins...
 func main() {
 
-    // create a new Artistic application instance
-    var aa = new(ArtisticApp)
+	// create a new Artistic application instance
+	var aa = new(ArtisticApp)
 
 	// parse the CLI arguments
 	configfile := ""
@@ -78,10 +78,10 @@ func main() {
 	defer aa.Cleanup()
 
 	var err error
-    var url string
+	var url string
 	// connect to database (FIXME: currently hardcoded, should be read from
 	// config file in the final version)
-    url, aa.DbSess, aa.DataProv, err = db.InitDb(db.MongoDB, "localhost", 27017, "artistic", "artistic", DbName)
+	url, aa.DbSess, aa.DataProv, err = db.InitDb(db.MongoDB, "localhost", 27017, "artistic", "artistic", DbName)
 	if err = aa.DbSess.Connect(url, DatabaseTimeout); err != nil {
 		aa.Log.Critical("Connection to database cannot be established.")
 		fmt.Println("Connection to database cannot be established. Exiting...")

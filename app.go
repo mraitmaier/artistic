@@ -32,10 +32,10 @@ type ArtisticApp struct {
 	Log *utils.Log
 
 	// DB session
-    DbSess db.DbConnector
+	DbSess db.DbConnector
 
-    // DB data provider
-    DataProv db.DataProvider
+	// DB data provider
+	DataProv db.DataProvider
 
 	// folder for session files
 	SessDir string
@@ -52,7 +52,7 @@ func (a *ArtisticApp) createLogs() { createLog(a) }
 func (a *ArtisticApp) HandleConfigFile(cfgfile string) error {
 
 	fmt.Printf("DEBUG config file: %q\n", cfgfile) // DEBUG
-    // TODO
+	// TODO
 
 	return nil
 }
@@ -92,17 +92,15 @@ func (a *ArtisticApp) Cleanup() {
 	}
 
 	// clean the sessions directory
-    if a.WebInfo != nil {
-	    cleanSessDir(a)
-	    a.Log.Info("Sessions folder deleted.")
-    }
+	if a.WebInfo != nil {
+		cleanSessDir(a)
+		a.Log.Info("Sessions folder deleted.")
+	}
 
-    // close the websockets connection
-    //if a.WebInfo.wsConn != nil { a.WebInfo.wsConn.Close() }
+	// close the websockets connection
+	//if a.WebInfo.wsConn != nil { a.WebInfo.wsConn.Close() }
 
 	// close the log
 	a.Log.Info("Closing log.")
 	a.Log.Close()
 }
-
-

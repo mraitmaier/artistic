@@ -1,16 +1,16 @@
+package main
+
 /*
    log.go -
 */
-package main
-
 import (
+	"bitbucket.org/miranr/artistic/utils"
 	"fmt"
+	"io/ioutil"
 	"path"
 	"path/filepath"
 	"runtime"
-    "io/ioutil"
-    "strings"
-	"bitbucket.org/miranr/artistic/utils"
+	"strings"
 )
 
 // Let's define the default log levels for different log handlers
@@ -104,17 +104,16 @@ func defineDefLogFname(workdir string) string {
 // Reads a log file and returns it as a list of lines
 func readLog(filename string) ([]string, error) {
 
-    // we read a log file
-    var err error
-    var data []byte
-    if data, err = ioutil.ReadFile(filename); err != nil {
-        return []string{""}, err
-    }
+	// we read a log file
+	var err error
+	var data []byte
+	if data, err = ioutil.ReadFile(filename); err != nil {
+		return []string{""}, err
+	}
 
-    // now we convert the text into an array of lines
-    lines := strings.Split(string(data), "\n")
+	// now we convert the text into an array of lines
+	lines := strings.Split(string(data), "\n")
 
-    // the last line is always an empty one, slice it out... 
-    return lines[:len(lines)-1], nil
+	// the last line is always an empty one, slice it out...
+	return lines[:len(lines)-1], nil
 }
-
