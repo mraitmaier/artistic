@@ -1,8 +1,7 @@
 package main
 
-/*
-   log.go -
-*/
+//   log.go -
+
 import (
 	"bitbucket.org/miranr/artistic/utils"
 	"fmt"
@@ -19,9 +18,7 @@ const (
 	defFileLevel   utils.Severity = utils.Informational
 )
 
-/*
- * createLog -
- */
+// createLog
 func createLog(ac *ArtisticApp) (err error) {
 
 	if ac == nil {
@@ -50,12 +47,13 @@ func createLog(ac *ArtisticApp) (err error) {
 	return nil
 }
 
+//
 func createLoggers(ac *ArtisticApp, format string, debug bool) error {
 
 	if ac == nil {
 		panic("FATAL: The main control structure is NOT defined...")
 	}
-	var err error = nil
+	var err error
 
 	// define default log levels
 	fLevel := defFileLevel
@@ -66,7 +64,6 @@ func createLoggers(ac *ArtisticApp, format string, debug bool) error {
 	}
 
 	// add file log handler
-
 	f, err := utils.NewFileHandler(ac.LogFname, fmt.Sprintf("%s\n", format), fLevel)
 	if f != nil {
 		ac.Log.Handlers = ac.Log.AddHandler(f)
@@ -82,15 +79,10 @@ func createLoggers(ac *ArtisticApp, format string, debug bool) error {
 	return err
 }
 
-/*
- * defineDefLogName - define a default log file location
- *
- * This is private function that defines the default path for log file.
- * If app is run on Unix/Linux environment, the default path is standard
- * '/var/log/artistc.log'. In the case of WinXY environment, the default is
- * taken from '%USERPROFILE%' env variable (this is usually
- * 'c:\Users\<Username>').
- */
+// Define a default log file location.
+// This is private function that defines the default path for log file. If app is run on Unix/Linux environment, the
+// default path is standard '/var/log/artistc.log'. In the case of WinXY environment, the default is taken from '%USERPROFILE%'
+// env variable (this is usually 'c:\Users\<Username>').
 func defineDefLogFname(workdir string) string {
 
 	defDir := "/var/log/artistic.log"

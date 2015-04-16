@@ -1,7 +1,6 @@
-/*
-   auth.go
-*/
 package main
+
+// auth.go
 
 import (
 	"bitbucket.org/miranr/artistic/db"
@@ -21,7 +20,7 @@ import (
 func authenticateUser(u, p string, aa *ArtisticApp, w http.ResponseWriter, r *http.Request) (bool, error) {
 
 	// create new session ID
-	id := newSessId()
+	id := newSessID()
 	//    fmt.Printf("DEBUG: session ID=%q\n", id) // DEBUG
 
 	// get information from DB
@@ -58,6 +57,7 @@ func authenticateUser(u, p string, aa *ArtisticApp, w http.ResponseWriter, r *ht
 	return false, fmt.Errorf("Passwords do not match.")
 }
 
+// Perform a user logout.
 func logout(aa *ArtisticApp, w http.ResponseWriter, r *http.Request) error {
 
 	// get current session data; retrieve session ID
@@ -68,10 +68,8 @@ func logout(aa *ArtisticApp, w http.ResponseWriter, r *http.Request) error {
 	id := s.Values["sessid"].(string) // get session ID
 	//   name := s.Values["user"].(string) // get username
 
-	// user has a unique session ID and there should be the file with this ID
-	// in the sessions folder.
-	// Delete it, if it exists.
-	// If it doesn't exist, there's probably something wrong: do nothing.
+	// user has a unique session ID and there should be the file with this ID in the sessions folder.
+	// Delete it, if it exists. If it doesn't exist, there's probably something wrong: do nothing.
 	f := filepath.Join(aa.WebInfo.sessDir, id)
 	if utils.FileExists(f) {
 		os.Remove(f)
@@ -112,7 +110,7 @@ func userIsAuthenticated(aa *ArtisticApp, r *http.Request) (bool, *db.User) {
 }
 
 // generate unique session ID; return it as string
-func newSessId() string {
+func newSessID() string {
 
 	// generate pseudo-random int64, seed is current time in nanoseconds
 	rand.Seed(time.Now().UnixNano())

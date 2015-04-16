@@ -1,7 +1,6 @@
-/*
-   app.go -
-*/
 package main
+
+// app.go -
 
 import (
 	"fmt"
@@ -17,6 +16,7 @@ import (
 
 //var cleanupTime = time.Second * 1
 
+// ArtisticApp is a ... XXX
 type ArtisticApp struct {
 
 	// working folder
@@ -49,6 +49,7 @@ type ArtisticApp struct {
 
 func (a *ArtisticApp) createLogs() { createLog(a) }
 
+// HandleConfigFile reads a config file and configures the application aproprietally.
 func (a *ArtisticApp) HandleConfigFile(cfgfile string) error {
 
 	fmt.Printf("DEBUG config file: %q\n", cfgfile) // DEBUG
@@ -57,7 +58,7 @@ func (a *ArtisticApp) HandleConfigFile(cfgfile string) error {
 	return nil
 }
 
-// Define working folder and create it, if it doesn't exist
+// SetWorkDir dfines working folder and create it, if it doesn't exist
 func (a *ArtisticApp) SetWorkDir() error {
 
 	// if working folder is already set in global struct, use it

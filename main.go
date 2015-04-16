@@ -1,5 +1,4 @@
-//
-//   main.go -
+// main.go -
 //
 package main
 
@@ -18,17 +17,17 @@ import (
 
 const (
 
-	// default path to config file
+	// DefConfigFile designates a default path to config file
 	DefConfigFile string = "./artistic.cfg"
 
-	// default timeout for DB connect
+	// DatabaseTimeout defines a default timeout for DB connect
 	DatabaseTimeout time.Duration = 5 * time.Second
 
-	// default web server root
+	// DefWebRoot defines a default web server root
 	DefWebRoot = "./web/"
 
-	// Database name
-	DbName = "artistic"
+	// DBName defines a Database name
+	DBName = "artistic"
 )
 
 // create a new Artistic application instance
@@ -81,7 +80,7 @@ func main() {
 	var url string
 	// connect to database (FIXME: currently hardcoded, should be read from
 	// config file in the final version)
-	url, aa.DbSess, aa.DataProv, err = db.InitDb(db.MongoDB, "localhost", 27017, "artistic", "artistic", DbName)
+	url, aa.DbSess, aa.DataProv, err = db.InitDb(db.MongoDB, "localhost", 27017, "artistic", "artistic", DBName)
 	if err = aa.DbSess.Connect(url, DatabaseTimeout); err != nil {
 		aa.Log.Critical("Connection to database cannot be established.")
 		fmt.Println("Connection to database cannot be established. Exiting...")
