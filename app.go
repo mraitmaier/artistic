@@ -9,9 +9,8 @@ import (
 	//    "time"
 	//    "errors"
 	"path/filepath"
-	//    "bitbucket.org/miranr/artistic/core"
-	"bitbucket.org/miranr/artistic/db"
-	"bitbucket.org/miranr/artistic/utils"
+	"github.com/mraitmaier/artistic/db"
+	"github.com/mraitmaier/artistic/utils"
 )
 
 //var cleanupTime = time.Second * 1

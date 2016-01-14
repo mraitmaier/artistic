@@ -3,8 +3,8 @@ package main
 // auth.go
 
 import (
-	"bitbucket.org/miranr/artistic/db"
-	"bitbucket.org/miranr/artistic/utils"
+	"github.com/mraitmaier/artistic/db"
+	"github.com/mraitmaier/artistic/utils"
 	"bytes"
 	"crypto/sha512"
 	"encoding/binary"

@@ -5,7 +5,7 @@ package main
 //
 
 import (
-	"bitbucket.org/miranr/artistic/db"
+	"github.com/mraitmaier/artistic/db"
 	"fmt"
 	"github.com/gorilla/mux"
 	"net/http"

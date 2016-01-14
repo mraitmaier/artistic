@@ -6,8 +6,8 @@ import (
    // "fmt"
    // "time"
    "gopkg.in/mgo.v2/bson"
-   "bitbucket.org/miranr/artistic/core"
-   "bitbucket.org/miranr/artistic/utils"
+   "github.com/mraitmaier/artistic/core"
+   "github.com/mraitmaier/artistic/utils"
 )
 
 //

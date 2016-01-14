@@ -3,7 +3,7 @@ package main
 //   log.go -
 
 import (
-	"bitbucket.org/miranr/artistic/utils"
+	"github.com/mraitmaier/artistic/utils"
 	"fmt"
 	"io/ioutil"
 	"path"

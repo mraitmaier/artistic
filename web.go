@@ -5,9 +5,12 @@ package main
 //
 
 import (
-	"bitbucket.org/miranr/artistic/core"
-	"bitbucket.org/miranr/artistic/db"
-	"bitbucket.org/miranr/artistic/utils"
+//	"bitbucket.org/miranr/artistic/core"
+//	"bitbucket.org/miranr/artistic/db"
+//	"bitbucket.org/miranr/artistic/utils"
+    "github.com/mraitmaier/artistic/core"
+    "github.com/mraitmaier/artistic/db"
+    "github.com/mraitmaier/artistic/utils"
 	"errors"
 	"fmt"
 	"github.com/gorilla/mux"
