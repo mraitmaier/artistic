@@ -73,7 +73,8 @@
 
     <tbody>
         {{range $index, $element := .}}
-        {{ $id := add $index 1 }}
+            {{ $id := add $index 1 }}
+            {{if eq $element.Visible true}}
         <tr id="user-row-{{$id}}">
             <td>{{$id}}</td>
             <td>{{$element.Username}}</td>
@@ -105,6 +106,7 @@
                 </a>
             </td>
         </tr>
+            {{end}}
         {{end}}
     </tbody>
 </table>
