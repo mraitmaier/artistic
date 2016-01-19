@@ -31,7 +31,7 @@ func authenticateUser(u, p string, aa *ArtisticApp, w http.ResponseWriter, r *ht
 
 	// fmt.Printf("DEBUG authenticateUser(): %v\n", userdb) // DEBUG
 	// if passwords match....
-	if userdb != nil && utils.ComparePasswords(userdb.Password, p) {
+	if userdb != nil && userdb.ComparePassword(p) {
 
 		// get current session data; create new session with given random ID
 		s, err := aa.WebInfo.store.Get(r, "artistic")
