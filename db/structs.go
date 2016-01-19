@@ -10,27 +10,6 @@ import (
    "github.com/mraitmaier/artistic/utils"
 )
 
-/*
-type Timestamp struct {
-
-    // we keep the actual data read-only
-    timestamp string
-}
-
-func NewTimestamp() Timestamp {
-    //creat := time.Now().Format("2012-12-15 15:0405")
-    return Timestamp {""}
-}
-
-func (t Timestamp) String() string {
-    return t.timestamp
-}
-
-func (t Timestamp) Update(stamp string) {
-    t.timestamp = stamp
-}
-    */
-
 //
 type Timestamp string
 
