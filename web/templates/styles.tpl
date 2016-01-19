@@ -23,7 +23,7 @@
   </head>
 
   <body>
-    {{template "navbar" .User.Username}}
+    {{template "navbar" .User.Fullname}}
 
     <div class="container-fluid">
 
@@ -86,7 +86,7 @@
                 &nbsp;
                 <a href="#" data-toggle="tooltip" data-placement="left" title="Edit style" id="edit-style"
                    onclick="rerouteUsingGet('style', 'modify', {{$element.Id}});">
-                    <span class="glyphicon glyphicon-cog" ></span>
+                    <span class="glyphicon glyphicon-pencil" ></span>
                 </a>
                 &nbsp;
                 <a href="#" data-toggle="tooltip" data-placement="left" title="Delete style" id="delete-style"
@@ -130,7 +130,7 @@
   </head>
 
   <body>
-    {{template "navbar" .User.Username}}
+    {{template "navbar" .User.Fullname}}
 
     <div class="container-fluid">
 

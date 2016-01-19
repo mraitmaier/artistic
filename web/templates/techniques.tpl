@@ -24,7 +24,7 @@
   </head>
 
   <body>
-    {{template "navbar" .User.Username}}
+    {{template "navbar" .User.Fullname}}
 
     <div class="container-fluid">
 
@@ -95,7 +95,7 @@
                    title="Modify technique" id="modify-technique"
           onclick="rerouteUsingGet('technique', 'modify', {{$element.Id}});">
 <!--         onclick="rerouteTechnique('PUT', 'modify', {{$element.Id}});"-->
-                    <span class="glyphicon glyphicon-cog" ></span>
+                    <span class="glyphicon glyphicon-pencil" ></span>
                 </a>
                 &nbsp;
                 <a href="#" data-toggle="tooltip" data-placement="left"
@@ -142,7 +142,7 @@
   </head>
 
   <body>
-    {{template "navbar" .User.Username}}
+    {{template "navbar" .User.Fullname}}
     <div class="container-fluid">
     <div class="row">
 

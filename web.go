@@ -5,12 +5,9 @@ package main
 //
 
 import (
-//	"bitbucket.org/miranr/artistic/core"
-//	"bitbucket.org/miranr/artistic/db"
-//	"bitbucket.org/miranr/artistic/utils"
     "github.com/mraitmaier/artistic/core"
     "github.com/mraitmaier/artistic/db"
-    "github.com/mraitmaier/artistic/utils"
+    //"github.com/mraitmaier/artistic/utils"
 	"errors"
 	"fmt"
 	"github.com/gorilla/mux"
@@ -123,7 +120,7 @@ func webStart(aa *ArtisticApp, wwwpath string) error {
 	funcs := template.FuncMap{
 		"add":             func(x, y int) int { return x + y },
 		"length":          func(list []string) int { return len(list) },
-		"allowedroles":    func() []string { return utils.AllowedRoles },
+		"allowedroles":    func() []string { return db.AllRoles },
 		"get_artist_type": func(t db.ArtistType) string { return t.String() },
 		"totitle":         func(s string) string { return strings.Title(s) },
 		"toupper":         func(s string) string { return strings.ToUpper(s) },

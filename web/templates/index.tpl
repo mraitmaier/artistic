@@ -23,7 +23,7 @@
 </head>
 
 <body>
-    {{template "navbar" .Username}}
+    {{template "navbar" .Fullname}}
 
     <div class="container-fluid">
         <div class="row">

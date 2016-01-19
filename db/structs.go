@@ -4,13 +4,13 @@ package db
 
 import (
    // "fmt"
-   // "time"
+   "time"
    "gopkg.in/mgo.v2/bson"
    "github.com/mraitmaier/artistic/core"
    "github.com/mraitmaier/artistic/utils"
 )
 
-//
+/*
 type Timestamp struct {
 
     // we keep the actual data read-only
@@ -29,6 +29,19 @@ func (t Timestamp) String() string {
 func (t Timestamp) Update(stamp string) {
     t.timestamp = stamp
 }
+    */
+
+//
+type Timestamp string
+
+//
+func NewTimestamp() Timestamp { return Timestamp(time.Now().Format(time.RFC822)) }
+
+//
+func (t Timestamp) String() string { return string(t) }
+
+// Update is a method that updates the timestamp to now.
+//func (t Timestamp) Update() { t = NewTimestamp() }
 
 ///
 type Dating  struct {
@@ -49,8 +62,8 @@ type Dating  struct {
 }
 
 // create new Dating instance to be used for web page
-func NewDating() *Dating {
-    return &Dating{ bson.NewObjectId(), core.Dating{}, NewTimestamp(), NewTimestamp() }
+func NewDating(d *core.Dating) *Dating {
+    return &Dating{ bson.NewObjectId(), *d, NewTimestamp(), NewTimestamp() }
 }
 
 ///
@@ -119,12 +132,37 @@ type User struct {
     Modified Timestamp
 }
 
+// NewUser creates new empty DB user instance. 
 func NewUser() *User {
-    return &User{ bson.NewObjectId(), *utils.CreateUser("",""), NewTimestamp(), NewTimestamp() }
+    return &User{
+        bson.NewObjectId(),
+        *utils.CreateUser("","", "guest", "", "", "", true, checkRole),
+        NewTimestamp(),
+        NewTimestamp() }
 }
 
-func CreateUser(user, pwd string) *User {
-    return &User{ bson.NewObjectId(), *utils.CreateUser(user, pwd), NewTimestamp(), NewTimestamp() }
+// CreateUser creates new DB user instance. We need basic stuff: username, password, user role; 'create' is a flag denoting
+// if this user's password must be hashed (insert new user into DB) or no (existing user). 
+func CreateUser(user, pwd, role string, create bool) *User {
+    return &User{
+        bson.NewObjectId(),
+        *utils.CreateUser(user, pwd, role, "Change Myname", "email@blah.org", "", create, checkRole),
+        NewTimestamp(),
+        NewTimestamp() }
+}
+
+// This is the the list of valid user roles. 
+var AllRoles = []string { "admin", "user", "guest" }
+
+// The checkRole() is a helper function that checks if user roles is valid.
+func checkRole(val string) bool {
+
+     for _, v := range AllRoles {
+         if v == val {
+             return true
+         }
+     }
+     return false
 }
 
 ////

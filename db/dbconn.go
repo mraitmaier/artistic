@@ -20,6 +20,14 @@ const (
     MongoDB
 )
 
+
+const (
+    //
+    DefAppUsername = "admin"
+    //
+    DefAppPasswd = "admin123!"
+)
+
 /*
 // A factory function for the right DB IDs: returns the proper DB ID for the DB type given.
 func NewDbId(dbtype DbType) DbIdentifier {
@@ -55,6 +63,7 @@ type DataProvider interface {
     InsertUser(*User) error
     UpdateUser(*User) error
     DeleteUser(*User) error
+    CountUsers() (int, error)
 
     GetAllArtists(ArtistType) ([]Artist, error)
     GetArtist(string) (*Artist, error)
@@ -77,6 +86,8 @@ type DataProvider interface {
     GetAllDatings() ([]Dating, error)
     GetDating(string) (*Dating, error)
     UpdateDating(*Dating) error
+    CountDatings() (int, error)
+    InsertDatings([]*Dating) error
 }
 
 // Init database factory: returns appropriate DB connection URL, initialized

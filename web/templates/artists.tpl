@@ -20,7 +20,7 @@
 </head>
 
 <body>
-    {{template "navbar" .User.Username}}
+    {{template "navbar" .User.Fullname}}
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-2" id="menu">
@@ -81,7 +81,7 @@
           &nbsp;
           <a href="#" data-toggle="tooltip" data-placement="left" title="Modify artist data" id="edit-artist-{{$id}}"
                       onclick="rerouteUsingGet('artist', 'modify', {{$element.Id}});">
-              <span class="glyphicon glyphicon-cog"></span>
+              <span class="glyphicon glyphicon-pencil"></span>
           </a>
           &nbsp;
           <a href="#" data-toggle="tooltip" data-placement="left" title="Delete artist" id="delete-artist-{{$id}}"
@@ -120,7 +120,7 @@
 </head>
 
 <body>
-    {{template "navbar" .User.Username}}
+    {{template "navbar" .User.Fullname}}
     <div class="container-fluid">
         <div class="row">
 

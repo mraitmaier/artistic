@@ -31,7 +31,7 @@
   </head>
 
   <body>
-    {{template "navbar" .User.Username}}
+    {{template "navbar" .User.Fullname}}
 
     <div class="container-fluid">
 

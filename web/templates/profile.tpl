@@ -23,7 +23,7 @@
 </head>
 
 <body>
-    {{template "navbar" .User.Username}}
+    {{template "navbar" .User.Fullname}}
 
     <div class="container-fluid">
         <div class="row">
@@ -81,9 +81,14 @@
         <tbody>
             <tr> <td class="col-md-2"><b>Username<b/></td><td class="col-md-10">{{.Username}}</td> </tr>
             <tr> <td class="col-md-2"><b>Password</b></td> <td class="col-md-10">{{.Password}}</td> </tr>
-            <tr> <td class="col-md-2"><b>Role</b></td> <td class="col-md-10">{{.Role}}</td> </tr>
-            <tr> <td class="col-md-2"><b>Full Name</b></td> <td class="col-md-10">{{.Name}}</td> </tr>
+            <tr> <td class="col-md-2"><b>Role</b></td> <td class="col-md-10">{{totitle .Role}}</td> </tr>
+            <tr> <td class="col-md-2"><b>Full Name</b></td> <td class="col-md-10">{{.Fullname}}</td> </tr>
             <tr> <td class="col-md-2"><b>Email Address</b></td> <td class="col-md-10">{{.Email}}</td> </tr>
+            <tr> <td class="col-md-2"><b>Phone #</b></td> <td class="col-md-10">{{.Phone}}</td> </tr>
+            <tr> <td class="col-md-2"><b>Disabled</b></td> 
+                 <td class="col-md-10">{{if eq .Disabled true}}Yes{{else}}No{{end}}</td> </tr>
+            <tr> <td class="col-md-2"><b>Must Change Password</b></td> 
+                 <td class="col-md-10">{{if eq .MustChangePassword true}}Yes{{else}}No{{end}}</td> </tr>
         </tbody>
         </table>
     </div>
@@ -124,9 +129,9 @@
 
         <div class="row">
         <div class="form-group"> 
-            <label for="role" class="col-md-2 control-label">User Role</label>
+            <label for="urole" class="col-md-2 control-label">User Role</label>
             <div class="col-md-6">
-                <input type="text" class="form-control" id="role"   name="role" value="{{.Role}}" readonly> </input>
+                <input type="text" class="form-control" id="urole"   name="urole" value="{{totitle .Role}}" readonly> </input>
             </div>
         </div>
         </div>
@@ -135,7 +140,7 @@
         <div class="form-group"> 
             <label for="fullname" class="col-md-2 control-label">Full Name</label>
             <div class="col-md-6">
-                <input type="text" class="form-control" id="fullname" name="fullname" value="{{.Name}}"></input>
+                <input type="text" class="form-control" id="fullname" name="fullname" value="{{.Fullname}}"></input>
             </div>
         </div>
         </div>
@@ -145,6 +150,35 @@
             <label for="email" class="col-md-2 control-label">E-mail Address</label>
             <div class="col-md-6">
                 <input type="email" class="form-control" id="email" name="email" value="{{.Email}}"></input>
+            </div>
+        </div>
+        </div>
+
+        <div class="row">
+        <div class="form-group"> 
+            <label for="phone" class="col-md-2 control-label">Phone Number</label>
+            <div class="col-md-6">
+                <input type="text" class="form-control" id="phone" name="phone" value="{{.Phone}}"></input>
+            </div>
+        </div>
+        </div>
+
+        <div class="row">
+        <div class="form-group"> 
+            <label for="disabled" class="col-md-2 control-label">Disabled</label>
+            <div class="col-md-6">
+                <input type="input" class="form-control" id="disabled" name="disabled" 
+                                    value="{{if eq .Disabled true}}Yes{{else}}No{{end}}" readonly></input>
+            </div>
+        </div>
+        </div>
+
+        <div class="row">
+        <div class="form-group"> 
+            <label for="mustchange" class="col-md-2 control-label">Must Change Password</label>
+            <div class="col-md-6">
+                <input type="input" class="form-control" id="mustchange" name="mustchange" 
+                                    value="{{if eq .MustChangePassword true}}Yes{{else}}No{{end}}" readonly></input>
             </div>
         </div>
         </div>

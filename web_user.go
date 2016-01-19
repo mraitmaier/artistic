@@ -182,21 +182,31 @@ func modifyExistingUser(w http.ResponseWriter, r *http.Request, aa *ArtisticApp)
 	// get POST form values and create a struct
 	name := strings.TrimSpace(r.FormValue("username"))
 	pwd := strings.TrimSpace(r.FormValue("password"))
-	role := strings.TrimSpace(r.FormValue("role"))
+	role := strings.TrimSpace(r.FormValue("urole"))
 	full := strings.TrimSpace(r.FormValue("fullname"))
 	email := strings.TrimSpace(r.FormValue("email"))
+	phone := strings.TrimSpace(r.FormValue("phone"))
+	disabled := strings.ToLower(strings.TrimSpace(r.FormValue("disabled")))
+	change := strings.ToLower(strings.TrimSpace(r.FormValue("change")))
 
 	var err error
 
 	// create a user and check passwords
-	t := db.CreateUser(name, pwd)
-	if err = t.SetRole(role); err != nil {
-		return "", fmt.Errorf("invalid role")
-	}
+	t := db.CreateUser(name, pwd, role, false)
 	t.Id = db.MongoStringToId(id)
-	t.Name = full
-	t.Role = role
+	t.Fullname = full
 	t.Email = email
+	t.Phone = phone
+    if disabled == "no" {
+        t.Disabled = false
+    } else {
+        t.Disabled = true
+    }
+    if change == "no" {
+        t.MustChangePassword = false
+    } else {
+        t.MustChangePassword = true
+    }
 
 	// do it...
 	if err = aa.DataProv.UpdateUser(t); err != nil {
@@ -214,22 +224,31 @@ func insertNewUser(w http.ResponseWriter, r *http.Request, aa *ArtisticApp) (str
 	// get POST form values and create a struct
 	name := strings.TrimSpace(r.FormValue("username"))
 	pwd := strings.TrimSpace(r.FormValue("password"))
-	role := strings.TrimSpace(r.FormValue("role"))
+	role := strings.TrimSpace(r.FormValue("urole"))
 	full := strings.TrimSpace(r.FormValue("fullname"))
 	email := strings.TrimSpace(r.FormValue("email"))
+	phone := strings.TrimSpace(r.FormValue("phone"))
+	disabled := strings.ToLower(strings.TrimSpace(r.FormValue("disabled")))
+	change := strings.ToLower(strings.TrimSpace(r.FormValue("change")))
 
 	var err error
 
 	// create a user and check passwords
-	t := db.CreateUser(name, pwd)
-
-	if err = t.SetRole(role); err != nil {
-		return "", fmt.Errorf("invalid role")
-	}
+	t := db.CreateUser(name, pwd, role, true)
 	t.Id = db.MongoStringToId(id)
-	t.Name = full
-	t.Role = role
+	t.Fullname = full
 	t.Email = email
+	t.Phone = phone
+    if disabled == "no" {
+        t.Disabled = false
+    } else {
+        t.Disabled = true
+    }
+    if change == "no" {
+        t.MustChangePassword = false
+    } else {
+        t.MustChangePassword = true
+    }
 
 	// do it...
 	if err = aa.DataProv.InsertUser(t); err != nil {
@@ -257,15 +276,20 @@ func changeUserPassword(w http.ResponseWriter, r *http.Request, aa *ArtisticApp)
 	}
 
 	// check password first and return error if they're not valid
+	if err = u.ChangePassword(old, pwd, pwd2); err != nil {
+        return "", err
+    }
+
+    /*
 	if pwd != pwd2 {
 		return "", fmt.Errorf("new passwords do not match")
 	}
 	if !u.ComparePassword(old) {
 		return "", fmt.Errorf("invalid old password")
 	}
+    */
 
 	// now do it...
-	u.SetPassword(pwd)
 	if err = aa.DataProv.UpdateUser(u); err != nil {
 		return "", err
 	}

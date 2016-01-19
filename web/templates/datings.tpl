@@ -23,7 +23,7 @@
 </head>
 
 <body>
-    {{template "navbar" .User.Username}}
+    {{template "navbar" .User.Fullname}}
 
     <div class="container-fluid">
         <div class="row">
@@ -91,7 +91,7 @@
                 &nbsp;
                 <a href="#" data-toggle="tooltip" data-placement="left" title="Edit dating" id="edit-dating"
                                          onclick="rerouteUsingGet('dating', 'modify', {{$element.Id}});">
-                    <span class="glyphicon glyphicon-cog" ></span>
+                    <span class="glyphicon glyphicon-pencil" ></span>
                 </a>
             </td>
         </tr>
@@ -129,7 +129,7 @@
 </head>
 
 <body>
-    {{template "navbar" .User.Username}}
+    {{template "navbar" .User.Fullname}}
 
     <div class="container-fluid">
         <div class="row">
