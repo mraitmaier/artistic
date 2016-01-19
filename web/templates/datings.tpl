@@ -188,6 +188,10 @@
         <tbody>
             <tr> <td class="col-md-2">Name</td> <td class="col-md-10">{{.Dating.Dating}}</td> </tr>
             <tr> <td class="col-md-2">Description</td> <td class="col-md-10">{{.Dating.Description}}</td> </tr>
+            <!--
+            <tr> <td class="col-md-2">Created</td><td class="col-md-10">{printf "%q" .Dating.Created.String}</td></tr> 
+            <tr> <td class="col-md-2">Last Modified</td> <td class="col-md-10">{printf "%q" .Dating.Modified.String}</td> </tr>
+            -->
         </tbody>
         </table>
     </div><!-- row -->
@@ -229,6 +233,23 @@
         </div>
     </div>
     </div>
+
+<!--
+    <div class="row">
+    <div class="form-group"> 
+        <label class="col-md-2 control-label" for="created">Created</label>
+        <div class="col-md-4">
+            <input type="text" class="form-control" id="created" name="created" value="{.Dating.Created.String}" readonly>
+            </input>
+        </div>
+        <label class="col-md-2 control-label" for="modified">Last Modified</label>
+        <div class="col-md-4">
+            <input type="text" class="form-control" id="modified" name="modified" value="{.Dating.Modified.String}" readonly>
+            </input>
+        </div>
+    </div>
+    </div>
+-->
 
     <div class="row">&nbsp;</row> <!-- empty row -->
 

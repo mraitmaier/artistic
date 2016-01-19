@@ -10,19 +10,16 @@ import (
    "github.com/mraitmaier/artistic/utils"
 )
 
-//
+// Timestamp is the helper type representing timestamp according to RFC 822.
 type Timestamp string
 
-//
+// NewTimestamp creates a new Timestamp using time.Now().
 func NewTimestamp() Timestamp { return Timestamp(time.Now().Format(time.RFC822)) }
 
-//
+// String returns the standard string represenatation of the Timestamp.
 func (t Timestamp) String() string { return string(t) }
 
-// Update is a method that updates the timestamp to now.
-//func (t Timestamp) Update() { t = NewTimestamp() }
-
-///
+// Dating represents the Database version of the core Dating type.
 type Dating  struct {
 
     // database ID
@@ -40,9 +37,10 @@ type Dating  struct {
     Modified Timestamp
 }
 
-// create new Dating instance to be used for web page
+// NewDating creates new Dating instance to be used for web page.
 func NewDating(d *core.Dating) *Dating {
-    return &Dating{ bson.NewObjectId(), *d, NewTimestamp(), NewTimestamp() }
+    t := NewTimestamp()
+    return &Dating{ bson.NewObjectId(), *d, t, t }
 }
 
 ///

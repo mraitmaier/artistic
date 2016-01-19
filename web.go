@@ -441,12 +441,13 @@ func postDatingHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp) 
 	id := mux.Vars(r)["id"]
 	name := r.FormValue("dating-name")
 	descr := r.FormValue("dating-description")
+    created := r.FormValue("created")
 
 	ts := db.NewTimestamp()
 	d := &db.Dating{
 		Id:       db.MongoStringToId(id),
 		Dating:   core.Dating{Dating: name, Description: descr},
-		Created:  ts,
+		Created:  db.Timestamp(created),
 		Modified: ts}
 	if err := aa.DataProv.UpdateDating(d); err != nil {
 		return err
