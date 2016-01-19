@@ -1,5 +1,5 @@
-// Package user implements the type that defines a user with username, password, role and usual other information about users.
 package utils
+// Package user implements the type that defines a user with username, password, role and usual other information about users.
 
 import (
 	"fmt"
