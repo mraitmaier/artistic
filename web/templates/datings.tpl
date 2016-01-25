@@ -36,7 +36,70 @@
                 <h1 id="data-list-header">Datings</h1>
                 <!-- datings table is created dynamically by JS -->
                 <div id="datings-table-div">
-                {{template "dating-list" .Datings}}
+
+               {{if .Datings}}
+
+                <table class="table table-striped table-hover small" id="dating-list-table">
+                <thead>
+                    <tr> <th class="col-sm-1">#</th> <th class="col-sm-1">Dating</th> 
+                         <th class="col-sm-8">Description</th> <th class="col-sm-2">Actions</th> </tr>
+                </thead>
+
+                <tfoot>
+                    <tr class="bg-primary">
+                        <td colspan="8"> <!-- this is hardcoded, because it doesn't change. -->
+                             <strong>8 datings found.</strong> <!-- this is hardcoded, because it doesn't change. -->
+                        </td>
+                    </tr>
+                </tfoot>
+
+                <tbody>
+                    {{range $index, $element := .Datings}}
+                    {{$num := add $index 1}}
+                    <tr id="dating-row-{{$num}}">
+                        <td>{{$num}}</td>
+                        <td>{{$element.Dating.Dating}}</td>
+                        <td>{{$element.Dating.Description}}</td>
+                        <td>
+                            <span data-toggle="tooltip" data-placement="up" title="View details">
+                            <a href="" data-toggle="modal" data-target="#viewDatingModal"
+                                        data-id="{{$element.Id.Hex}}"
+                                        data-created="{{$element.Created}}"
+                                        data-modified="{{$element.Modified}}"
+                                        data-dating="{{$element.Dating.Dating}}"
+                                        data-desc="{{$element.Dating.Description}}">
+                                <span class="glyphicon glyphicon-eye-open"></span>
+                            </a>
+                            </span>
+                            &nbsp;&nbsp;
+                            <span data-toggle="tooltip" data-placement="up" title="Modify details">
+                            <a href="" data-toggle="modal" data-target="#modifyDatingModal"
+                                        data-id="{{$element.Id.Hex}}"
+                                        data-created="{{$element.Created}}"
+                                        data-modified="{{$element.Modified}}"
+                                        data-dating="{{$element.Dating.Dating}}"
+                                        data-desc="{{$element.Dating.Description}}">
+                                <span class="glyphicon glyphicon-edit"></span>
+                            </a>
+                            </span>
+
+                        </td>
+                    </tr>
+                    {{end}}
+                </tbody>
+
+                </table>
+
+
+    <!-- add modals -->
+    {{template "view_dating_modal" .Datings}}
+    {{template "modify_dating_modal" .Datings}}
+    <!-- end of modals definition -->
+
+                {{else}}
+                    <p>There are no datings defined yet.</p>
+                {{end}}
+           
             </div>
         </div> <!-- row -->
     </div> <!-- container fluid -->
@@ -49,19 +112,60 @@
     <script src="/static/js/bootstrap.min.js"></script>
     <script src="/static/js/artistic.js"></script>
     <script>
-
     // when page is ready...
     $(document).ready( function() {
 
-        // parse the JSON data...
-        {{/*//var data = JSON.parse({{.Json}}); */}}
+        $('#viewDatingModal').on('show.bs.modal', function (event) {
 
-        // create a table
-        //$("#datings-table-div").append(createDatingsTable(data));
-        //$("#datings-table-div").append(createDatingsTable(data));
-        //createDatingsTable(data);
+            var btn = $(event.relatedTarget); // button that triggerd event
+
+            // extract info from data-dating attribute
+            //var hexid = btn.data('id');
+            var dating = btn.data('dating');
+            var description = btn.data('desc');
+            var created = btn.data('created');
+            var modified = btn.data('modified');
+
+            // Update the modal's content.
+            var modal = $(this);
+            modal.find('.modal-title').text('The "' + dating + '" Dating Details');
+            //modal.find('.modal-body #hexid').val(hexid);
+            modal.find('.modal-body #datingv').val(dating);
+            modal.find('.modal-body #descriptionv').val(description);
+            modal.find('.modal-body #createdv').text(created);
+            modal.find('.modal-body #modifiedv').text(modified);
+        });
+
+        $('#modifyDatingModal').on('show.bs.modal', function (event) {
+
+            var btn = $(event.relatedTarget); // button that triggerd event
+
+            // extract info from data-dating attribute
+            var hexid = btn.data('id');
+            var dating = btn.data('dating');
+            var description = btn.data('desc');
+            var created = btn.data('created');
+            var modified = btn.data('modified');
+
+            // Update the modal's content.
+            var modal = $(this);
+            modal.find('.modal-title').text('Modify Dating "' + dating + '"');
+            modal.find('.modal-body #hexid').val(hexid);
+            modal.find('.modal-body #dating').val(dating);
+            modal.find('.modal-body #description').val(description);
+            modal.find('.modal-body #created').val(created);   // hidden val
+            modal.find('.modal-body #createdd').text(created); // only display
+            modal.find('.modal-body #modifiedd').text(modified); //only display
+        });
 
     });
+
+	// This should post form (PUT method) to modify a dating
+	var modifyDating = function(form_id, id) {
+    	var url = '/dating/' + id + '/put';
+        //alert("ID=" + id); //DEBUG
+    	postForm(form_id, url);
+	}
 
     </script>
 
@@ -71,28 +175,50 @@
 
 {{define "dating-list"}}
     {{if .}}
-    <table class="table table-striped table-hover" id="dating-list-table">
+    <table class="table table-striped table-hover small" id="dating-list-table">
     <thead>
-        <tr> <th>#</th> <th>Dating</th> <th>Description</th> <th>Actions</th> </tr>
+        <tr> <th class="col-sm-1">#</th> <th class="col-sm-1">Dating</th> 
+             <th class="col-sm-8">Description</th> <th class="col-sm-2">Actions</th> </tr>
     </thead>
+
+    <tfoot>
+        <tr class="bg-primary">
+            <td colspan="8" class="text-right"> <!-- this is hardcoded, because it doesn't change. -->
+                 <strong>8 datings found.</strong> <!-- this is hardcoded, because it doesn't change. -->
+            </td>
+        </tr>
+    </tfoot>
 
     <tbody>
         {{range $index, $element := .}}
         {{$id := add $index 1}}
         <tr id="dating-row-{{$id}}">
             <td>{{$id}}</td>
-            <td>{{$element.Dating.Dating}}</td>
-            <td>{{$element.Dating.Description}}</td>
-            <td>
-                <a href="#" data-toggle="tooltip" data-placement="left" title="View dating details" id="view-dating"
-                                         onclick="rerouteUsingGet('dating', 'view', {{$element.Id}});">
+            <td>{{$element.Dating}}</td>
+            <td>{{$element.Description}}</td>
+            <td class="text-right">
+                <span data-toggle="tooltip" data-placement="up" title="View details">
+                <a href="" data-toggle="modal" data-target="#viewDatingModal"
+                            data-id="{{$element.Id.Hex}}"
+                            data-created="{{$element.Created}}"
+                            data-modified="{{$element.Modified}}"
+                            data-dating="{{$element.Dating}}"
+                            data-desc="{{$element.Description}}">
                     <span class="glyphicon glyphicon-eye-open"></span>
                 </a>
-                &nbsp;
-                <a href="#" data-toggle="tooltip" data-placement="left" title="Edit dating" id="edit-dating"
-                                         onclick="rerouteUsingGet('dating', 'modify', {{$element.Id}});">
-                    <span class="glyphicon glyphicon-pencil" ></span>
+                </span>
+                &nbsp;&nbsp;
+                <span data-toggle="tooltip" data-placement="up" title="Modify details">
+                <a href="" data-toggle="modal" data-target="#modifyDatingModal"
+                            data-id="{{$element.Id.Hex}}"
+                            data-created="{{$element.Created}}"
+                            data-modified="{{$element.Modified}}"
+                            data-dating="{{$element.Dating}}"
+                            data-desc="{{$element.Description}}">
+                    <span class="glyphicon glyphicon-edit"></span>
                 </a>
+                </span>
+
             </td>
         </tr>
         {{end}}
@@ -100,173 +226,118 @@
 
     </table>
     {{else}}
-        <p>The are no datings defined yet.</p>
+        <p>There are no datings defined yet.</p>
     {{end}}
+
 {{end}}
 
-{{define "dating"}}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Artistic - Dating</title>
+{{define "view_dating_modal"}}
+<div class="modal fade" id="viewDatingModal" tabindex="-1" role="dialog" aria-lebeleledby="ViewDatingModalLabel">
+<div class="modal-dialog">
+<div class="modal-content">
 
-    <!-- Bootstrap -->
-    <!--  <link href="css/bootstrap.min.css" rel="stylesheet"> -->
-    <link href="/static/css/bootstrap.min.css" rel="stylesheet"> 
-
-    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-    <![endif]-->
-
-    <!-- custom CSS, additional to CSS -->
-    <link href="/static/css/custom.css" rel="stylesheet">
-</head>
-
-<body>
-    {{template "navbar" .User.Fullname}}
-
+    <div class="modal-header">
     <div class="container-fluid">
         <div class="row">
-            <div class="col-md-2" id="menu">
-                <h1 id="menu-header"></h1>
-                {{template "accordion"}}
-            </div>
-
-            <div class="col-md-10" id="data-list">
-        {{if eq .Cmd "view"}} 
-                <h1 id="data-list-header">View Dating</h1>
-                {{template "single-dating-view" .Dating}}
-        {{else if eq .Cmd "modify"}}
-                <h1 id="data-list-header">Modify Dating</h1>
-                {{template "single-dating-modify" .Dating}}
-        {{else if eq .Cmd ""}} 
-                <h1 id="data-list-header">View Dating</h1>
-                {{template "single-dating-view" .Dating}}
-        {{end}}
-            </div>
+            <h4 class="modal-title col-md-10" id="viewDatingModalLabel">Empty Dating Details</h4>
+            <button type="button" class="btn btn-default btn-sm col-md-2" data-dismiss="modal">Close</button>
         </div> <!-- row -->
-    </div> <!-- container fluid -->
+    </div> <!-- container-fluid -->
+    </div> <!-- modal-header -->
 
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <!--   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script> -->
-    <script  src="/static/js/jquery.min.js"></script>
+    <div class="modal-body">
+    <div class="container-fluid">
+        <div class="row">
 
-    <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="/static/js/bootstrap.min.js"></script>
-    <script src="/static/js/datings.js"></script>
-    <script>
+    <form id="view_dating_form" class="form-horizontal">
+         <!--  <input type="hidden" id="hexid" name="hexid"></input> -->
+        <div class="form-group form-group-sm">
+            <label for="datingv" class="col-sm-3 control-label">Dating</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" id="datingv" name="datingv" readonly></input>
+            </div>
+        </div>
+        <div class="form-group form-group-sm">
+            <label for="descriptionv" class="col-sm-3 control-label">Description</label>
+            <div class="col-sm-offset-9"></div>
+			<div class="col-sm-12">
+                <textarea class="form-control" rows="5" id="descriptionv" name="descriptionv" readonly></textarea>
+            </div>
+        </div>
+        <!--
+        <div class="form-group form-group-sm">
+            <label for="hexid" class="col-sm-3 control-label">Hex ID</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" id="hexid" name="hexid" readonly></input>
+            </div>
+        </div>
+        -->
+   		<div class="form-group form-group-sm small">
+            <div class="col-sm-2 text-right"><strong>Created:</strong></div>
+            <div id="createdv" name="createdv" class="col-sm-4 text-left">Error</div>
+            <div class="col-sm-2 text-right"><strong>Modified:</strong></div>
+            <div id="modifiedv" name="modifiedv" class="col-sm-4 text-left">Error</div>
+        </div>
+    </form>
 
-    // when page is ready...
-    $(document).ready( function() {
+        </div>
+    </div>
+    </div> <!-- modal-body -->
 
-        // parse the JSON data...
-        {{/*var data = JSON.parse({{.Json}}); */}}
-
-        // create a table
-        //$("#datings-table-div").append(createDatingsTable(data));
-        //$("#datings-table-div").append(createDatingsTable(data));
-        //createDatingsTable(data);
-
-    });
-
-    </script>
-</body>
-</html>
+</div>
+</div>
+</div>
 {{end}}
 
-{{define "single-dating-view"}}
-<div id="view-dating-table-div" class="container-fluid">
+{{define "modify_dating_modal"}}
+<div class="modal fade" id="modifyDatingModal" tabindex="-1" role="dialog" aria-lebeleledby="modifyDatingModalLabel">
+<div class="modal-dialog">
+<div class="modal-content">
 
-    <div class="row">
-        <table id="view-dating-table" class="table table-hover">
-        <tbody>
-            <tr> <td class="col-md-2">Name</td> <td class="col-md-10">{{.Dating.Dating}}</td> </tr>
-            <tr> <td class="col-md-2">Description</td> <td class="col-md-10">{{.Dating.Description}}</td> </tr>
-            <!--
-            <tr> <td class="col-md-2">Created</td><td class="col-md-10">{printf "%q" .Dating.Created.String}</td></tr> 
-            <tr> <td class="col-md-2">Last Modified</td> <td class="col-md-10">{printf "%q" .Dating.Modified.String}</td> </tr>
-            -->
-        </tbody>
-        </table>
-    </div><!-- row -->
+    <div class="modal-header">
+    <div class="container-fluid">
+        <div class="row">
+            <h4 class="modal-title col-md-8" id="modifyDatingModalLabel">Empty Dating Details</h4>
+             <button type="button" class="btn btn-primary btn-sm col-sm-2" 
+                     onclick="modifyDating('modify_dating_form', $('#hexid').val()); $('#modifyDatingModal').modal('hide');">Modify
+             </button>
+            <button type="button" class="btn btn-default btn-sm col-md-2" data-dismiss="modal">Close</button>
+        </div> <!-- row -->
+    </div> <!-- container-fluid -->
+    </div> <!-- modal-header -->
 
-    <div class="row">&nbsp;</row> <!-- empty row -->
-
-    <div class="row">
-        <div class="col-md-1 col-md-offset-7">
-            <a type="button" class="btn btn-primary" href="/datings">
-                <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;&nbsp;Back
-            </a>
+    <div class="modal-body">
+    <div class="container-fluid">
+        <div class="row">
+        <form id="modify_dating_form" class="form-horizontal">
+            <input type="hidden" id="hexid" name="hexid" />
+        <div class="form-group form-group-sm">
+            <label for="dating" class="col-sm-3 control-label">Dating</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" id="dating" name="dating" readonly></input>
+            </div>
         </div>
-    </div> <!-- row -->
-
-</div> <!-- container-fluid -->
-{{end}}
-
-{{define "single-dating-modify"}}
-<div id="modify-dating-table-div" class="container-fluid">
-<form class="form-vertical" role="form" method="post" id="dating-modify-form">
-    <fieldset>
-
-    <div class="row">
-    <div class="form-group"> 
-        <label for="dating-name" class="col-md-2 control-label">Name</label>
-        <div class="col-md-6">
-            <input type="text" class="form-control" id="dating-name" name="dating-name" value="{{.Dating.Dating}}" readonly></input>
+        <div class="form-group form-group-sm">
+            <label for="description" class="col-sm-3 control-label">Description</label>
+            <div class="col-sm-offset-9"></div>
+			<div class="col-sm-12">
+                <textarea class="form-control" rows="5" id="description" name="description"></textarea>
+            </div>
         </div>
-    </div>
-    </div>
-
-    <div class="row">
-    <div class="form-group"> 
-        <label for="dating-description" class="col-md-2 control-label"> Description</label>
-        <div class="col-md-6">
-            <textarea type="text" class="form-control"  rows="5" id="dating-description" name="dating-description">
-            {{.Dating.Description}}
-            </textarea>
+   		<div class="form-group form-group-sm small">
+            <input type="hidden" id="created" name="created" />
+            <div class="col-sm-2 text-right"><strong>Created:</strong></div>
+            <div id="createdd" name="createdd" class="col-sm-4 text-left">Error</div>
+            <div class="col-sm-2 text-right"><strong>Modified:</strong></div>
+            <div id="modifiedd" name="modifiedd" class="col-sm-4 text-left">Error</div>
         </div>
-    </div>
-    </div>
 
-<!--
-    <div class="row">
-    <div class="form-group"> 
-        <label class="col-md-2 control-label" for="created">Created</label>
-        <div class="col-md-4">
-            <input type="text" class="form-control" id="created" name="created" value="{.Dating.Created.String}" readonly>
-            </input>
-        </div>
-        <label class="col-md-2 control-label" for="modified">Last Modified</label>
-        <div class="col-md-4">
-            <input type="text" class="form-control" id="modified" name="modified" value="{.Dating.Modified.String}" readonly>
-            </input>
-        </div>
-    </div>
-    </div>
--->
+        </div> <!-- row -->
+    </div> <!-- container-fluid -->
+    </form>
+    </div> <!-- modal-body -->
 
-    <div class="row">&nbsp;</row> <!-- empty row -->
-
-    <div class="row">
-    <div class="form-group">
-        <div class="col-md-4">
-            <button class="btn btn-primary" type="submit" id="dating-submit">Modify</button>
-        </div>
-        <div class="col-md-1 col-md-offset-3">
-            <a type="button" class="btn btn-primary" href="/datings">
-                <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;&nbsp;Back
-            </a>
-        </div>
-    </div>
-    </div>
-
-    </fieldset>
-</form>
-</div> <!-- container-fluid -->
+</div>
+</div>
+</div>
 {{end}}

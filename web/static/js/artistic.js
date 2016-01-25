@@ -1,5 +1,5 @@
 /*
- * techniques.js - custom JS code dealing with the Techniques
+ * artistic.js - custom JS code 
  *
  */
 
@@ -18,11 +18,8 @@ function validateUserForm() {
 
 // check 
 function checkPasswords(pwd1, pwd2) {
-    var status = false;
-
     if (pwd1 === pwd2) { return true; }
-
-    return status;
+    return false;
 }
 
 
@@ -39,7 +36,6 @@ function validatePasswordChange() {
 
 // send a HTTP request (GET, POST, DELETE, PUT...)
 function sendRequest(method, url) {
-
     var req = new XMLHttpRequest();
     req.open(method, url, true);
     req.send(null);
@@ -48,18 +44,14 @@ function sendRequest(method, url) {
 
 // submit form as POST to a given URL
 function postForm(form_id, url) {
-
     var form = document.getElementById(form_id);
-
     form.setAttribute("action", url);
     form.setAttribute("method", "post");
-
     form.submit();
 }
 
 // create an URL to send
 function createURL(operation, item, id) {
-
     var s = "/" + item + "/" + operation + "/" + id;
     return s
 }
@@ -69,14 +61,12 @@ function createURL(operation, item, id) {
 // - commands (cmd) are "view", "insert", "delete" and "modify" 
 // - id is the DB ID of the item
 function sendDeleteReq(item, cmd, id ) {
-
     var url = createURL(cmd, item, id);
     sendRequest('DELETE', url);
 }
 
 // aux function for techniques, should be removed I guess...
 function rerouteTechnique(method, cmd, id) {
-
     var url = createURL(cmd, "technique", id);
     sendRequest(method, url);
 }
@@ -87,11 +77,9 @@ function rerouteTechnique(method, cmd, id) {
 // - id is the DB ID of the item
 // When command is to delete the item, first ask for permission.
 function rerouteUsingGet(item, cmd, id) {
-
     if (cmd === "delete") {
         if (!(confirm("Do you really want to delete " + item + "?"))) { return; }
     }
-
     var url = "/" + item + "/" + cmd + "/" + id;
     window.location.href = url;
 }

@@ -43,7 +43,7 @@
     </div>
     <div class="panel-collapse collapse in" id="other-collapse">
         <div class="panel-body">
-            <p><a href="/datings">Datings</a></p>
+            <p><a href="/dating">Datings</a></p>
             <p><a href="/techniques">Techniques</a></p>
             <p><a href="/styles">Styles</a></p>
         </div>

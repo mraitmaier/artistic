@@ -317,7 +317,7 @@ func (m *MongoDbConn) CountDatings() (int, error) {
 }
 
 // Retrieves all datings from database.
-func (m *MongoDbConn) GetAllDatings() ([]Dating, error) {
+func (m *MongoDbConn) GetAllDatings() ([]*Dating, error) {
 
 	// acquire lock
 	dblock.Lock()
@@ -330,7 +330,7 @@ func (m *MongoDbConn) GetAllDatings() ([]Dating, error) {
 	}
 
 	// get all users from DB
-	d := make([]Dating, 0)
+	d := make([]*Dating, 0)
 	if err := db.C("datings").Find(bson.D{}).All(&d); err != nil {
 		return nil, err
 	}
@@ -376,6 +376,7 @@ func (m *MongoDbConn) UpdateDating(d *Dating) error {
 	}
 
 	// update the dating in DB
+    d.Modified = NewTimestamp() // Update modified timestamp before commiting
 	if err := db.C("datings").Update(bson.M{"_id": d.Id}, d); err != nil {
 		return err
 	}

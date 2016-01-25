@@ -83,7 +83,7 @@ type DataProvider interface {
     UpdateStyle(*Style) error
     DeleteStyle(*Style) error
 
-    GetAllDatings() ([]Dating, error)
+    GetAllDatings() ([]*Dating, error)
     GetDating(string) (*Dating, error)
     UpdateDating(*Dating) error
     CountDatings() (int, error)

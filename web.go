@@ -5,9 +5,9 @@ package main
 //
 
 import (
-    "github.com/mraitmaier/artistic/core"
-    "github.com/mraitmaier/artistic/db"
-    //"github.com/mraitmaier/artistic/utils"
+	"github.com/mraitmaier/artistic/core"
+	"github.com/mraitmaier/artistic/db"
+	//"github.com/mraitmaier/artistic/utils"
 	"errors"
 	"fmt"
 	"github.com/gorilla/mux"
@@ -70,8 +70,8 @@ func registerHandlers(aa *ArtisticApp) {
 	r.Handle("/styles", stylesHandler(aa))
 	r.Handle("/style/{cmd}/{id}", styleHandler(aa))
 	r.Handle("/style/{cmd}/", styleHandler(aa))
-	r.Handle("/datings", datingsHandler(aa))
-	r.Handle("/dating/{cmd}/{id}", datingHandler(aa))
+	r.Handle("/dating", datingHandler(aa))
+	r.Handle("/dating/{id}/{cmd}", datingHandler(aa))
 	r.Handle("/error404", err404Handler(aa))
 	r.Handle("/error", errorHandler(aa))
 	r.Handle("/license", licenseHandler(aa))
@@ -400,117 +400,6 @@ func faviconHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, favicon)
 }
 
-// datings page handler
-func datingsHandler(aa *ArtisticApp) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
-		if loggedin, user := userIsAuthenticated(aa, r); loggedin {
-
-			log := aa.Log // get logger instance
-
-			// get all datings from DB
-			datings, err := aa.DataProv.GetAllDatings()
-			if err != nil {
-				log.Error(fmt.Sprintf("[%s] Problem getting all datings: %s", user.Username, err.Error()))
-				http.Redirect(w, r, "/error", http.StatusFound)
-				return
-			}
-
-			// create ad-hoc struct to be sent to page template
-			var web = struct {
-				User    *db.User
-				Datings []db.Dating
-			}{user, datings}
-
-			if err := renderPage("datings", &web, aa, w, r); err != nil {
-				aa.Log.Error(fmt.Sprintf("[%s] Cannot render the 'datings' template: %q.", user.Username, err.Error()))
-				return
-			}
-			aa.Log.Info(fmt.Sprintf("[%s] Displaying the %q page.", user.Username, r.RequestURI))
-
-		} else {
-			redirectToLoginPage(w, r, aa)
-		}
-	}) // return handler closure
-}
-
-// POST request handler for datings (private).
-func postDatingHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp) error {
-
-	// get data to modify
-	id := mux.Vars(r)["id"]
-	name := r.FormValue("dating-name")
-	descr := r.FormValue("dating-description")
-    created := r.FormValue("created")
-
-	ts := db.NewTimestamp()
-	d := &db.Dating{
-		Id:       db.MongoStringToId(id),
-		Dating:   core.Dating{Dating: name, Description: descr},
-		Created:  db.Timestamp(created),
-		Modified: ts}
-	if err := aa.DataProv.UpdateDating(d); err != nil {
-		return err
-	}
-	aa.Log.Info(fmt.Sprintf("Successfully updated dating %q\n", name))
-
-	return nil
-}
-
-// GET request handler for datings (private).
-func getDatingHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp, user *db.User) error {
-
-	id := mux.Vars(r)["id"]
-	cmd := mux.Vars(r)["cmd"]
-
-	// get a dating with given ID from DB
-	dating, err := aa.DataProv.GetDating(id)
-	if err != nil {
-		http.Redirect(w, r, "/error", http.StatusFound)
-		return fmt.Errorf("Problem getting a dating from DB: %q", err.Error())
-	}
-
-	// create ad-hoc struct to be sent to page template
-	var web = struct {
-		User   *db.User
-		Cmd    string // "view" or "modify"; we don't allow "delete"...
-		Dating *db.Dating
-	}{user, cmd, dating}
-
-	return renderPage("dating", &web, aa, w, r)
-}
-
-// Handle request for single dating: view & modify operations.
-func datingHandler(aa *ArtisticApp) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
-		if loggedin, user := userIsAuthenticated(aa, r); loggedin {
-
-			log := aa.Log // get logger instance
-
-			switch r.Method {
-
-			case "GET":
-				if err := getDatingHandler(w, r, aa, user); err != nil {
-					log.Error(fmt.Sprintf("[%s] Dating GET handler: %s.", user.Username, err.Error()))
-					break // force break!
-				}
-				aa.Log.Info(fmt.Sprintf("[%s] Displaying the %q page.", user.Username, r.RequestURI))
-
-			case "POST":
-				if err := postDatingHandler(w, r, aa); err != nil {
-					log.Error(fmt.Sprintf("[%s] Dating POST handler: %s.", user.Username, err.Error()))
-				}
-				http.Redirect(w, r, "/datings", http.StatusFound)
-
-			} // switch
-
-		} else {
-			redirectToLoginPage(w, r, aa)
-		}
-	}) // return handler closure
-}
-
 // styles page handler
 func stylesHandler(aa *ArtisticApp) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -832,6 +721,111 @@ func postTechniqueHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticAp
 	}
 
 	return err
+}
+
+// This is handler that handler the "/dating" URL.
+func datingHandler(app *ArtisticApp) http.Handler {
+
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+        // if user is autheticated, display the appropriate page
+		if loggedin, user := userIsAuthenticated(app, r); loggedin {
+
+		var err error
+
+		switch r.Method {
+
+		case "GET":
+			if err = datingHTTPGetHandler(w, r, app, user); err != nil {
+				app.Log.Error(fmt.Sprintf("Dating HTTP GET %s", err.Error()))
+			}
+
+		case "POST":
+			if err = datingHTTPPostHandler(w, r, app); err != nil {
+				app.Log.Error (fmt.Sprintf("Dating HTTP POST %s", err.Error()))
+            }
+			// unconditionally reroute to main dating page
+			http.Redirect(w, r, "/dating", http.StatusFound)
+
+		case "DELETE":
+			app.Log.Info("Dating HTTP DELETE request received. Redirecting to main 'dating' page.")
+			// unconditionally reroute to main test cases page
+			// Use HTTP 303 (see other) to force GET to redirect as DELETE request is normally 
+            // followed by another DELETE
+			http.Redirect(w, r, "/dating", http.StatusSeeOther)
+
+		case "PUT":
+			app.Log.Info("Dating HTTP PUT request received. Redirecting to main 'dating' page.")
+			// unconditionally reroute to main test cases page
+			// Use HTTP 303 (see other) to force GET to redirect as PUT request is normally followed by 
+            // another PUT
+			http.Redirect(w, r, "/dating", http.StatusSeeOther)
+
+		default:
+            // otherwise just display main 'index' page
+			if err := renderPage("index", nil, app, w, r); err != nil {
+				app.Log.Error(fmt.Sprintf("Index HTTP GET %s", err.Error()))
+				return
+			}
+		}
+
+		} else {
+            // if user not authenticated
+			redirectToLoginPage(w, r, app)
+		}
+	})
+}
+
+// This is HTTP POST handler for datings.
+func datingHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *ArtisticApp) error {
+
+	id := mux.Vars(r)["id"]
+	cmd := mux.Vars(r)["cmd"]
+
+	var err error
+	switch strings.ToLower(cmd) {
+
+	case "put":
+		if id == "" {
+			return fmt.Errorf("Modify requirement: ID is empty")
+		}
+		if d := parseDatingFormValues(r); d != nil {
+			d.Id = db.MongoStringToId(id)
+			err = app.DataProv.UpdateDating(d)
+		}
+
+	default:
+		err = fmt.Errorf("Illegal POST request for dating")
+	}
+	return err
+}
+
+// Helper function that parses the '/dating' POST request values and creates a new instance of Dating.
+func parseDatingFormValues(r *http.Request) *db.Dating {
+
+	name := strings.TrimSpace(r.FormValue("dating"))
+	desc := strings.TrimSpace(r.FormValue("description"))
+	created := strings.TrimSpace(r.FormValue("created"))
+
+	d := db.NewDating( &core.Dating{name, desc} )
+	d.Created = db.Timestamp(created)
+	return d
+}
+
+// This is HTTP GET handler for datings.
+func datingHTTPGetHandler(w http.ResponseWriter, r *http.Request, app *ArtisticApp, u *db.User) error {
+
+		datings, err := app.DataProv.GetAllDatings()
+		if err != nil {
+			http.Redirect(w, r, "/err404", http.StatusFound)
+			return fmt.Errorf("Problem getting datings from DB: '%s'", err.Error())
+		}
+		// create ad-hoc struct to be sent to page template
+		var web = struct {
+			Datings []*db.Dating
+			Num  int
+			User *db.User
+		}{datings, len(datings), u}
+	return renderPage("datings", web, app, w, r)
 }
 
 // WebMessage is the structure for displaying messages on web page
