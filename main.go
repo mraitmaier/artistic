@@ -1,4 +1,5 @@
 package main
+
 //
 // main.go -
 //
@@ -6,11 +7,11 @@ package main
 import (
 	"flag"
 	"fmt"
-	"os"
-	"time"
-	"os/signal"
-	"github.com/mraitmaier/artistic/db"
 	"github.com/mraitmaier/artistic/core"
+	"github.com/mraitmaier/artistic/db"
+	"os"
+	"os/signal"
+	"time"
 )
 
 const (
@@ -92,13 +93,13 @@ func main() {
 	}
 	aa.Log.Info("Connection to MongoDB established.")
 
-    // now initialize DB at startup
-    if err = initDB(aa); err != nil {
-        msg := fmt.Sprintf("Fatal error initializing database: '%s'. Exiting", err.Error())
+	// now initialize DB at startup
+	if err = initDB(aa); err != nil {
+		msg := fmt.Sprintf("Fatal error initializing database: '%s'. Exiting", err.Error())
 		aa.Log.Critical(msg)
 		fmt.Printf(msg)
 		return
-    }
+	}
 
 	// catch CTRL-C signal and perform cleanup before app is terminated
 	c := make(chan os.Signal, 1)
@@ -118,39 +119,39 @@ func main() {
 	}
 }
 
-// The initDB function checks some stuff at startup and creates some records if needed. 
+// The initDB function checks some stuff at startup and creates some records if needed.
 func initDB(aa *ArtisticApp) error {
 
-    var err error
-    var status bool
+	var err error
+	var status bool
 
 	// Check number of users defined in DB and create a default one if needed
 	if status, err = handleUsers(aa.DataProv); err != nil {
 		return fmt.Errorf("Cannot check users in database: '%s'", err.Error())
 	}
-    if status {
-        aa.Log.Info("Default user created: 'admin/admin123!'")
-        fmt.Println("IMPORTANT: Default user created: 'admin/admin123!'; please change at first login!")
-    }
+	if status {
+		aa.Log.Info("Default user created: 'admin/admin123!'")
+		fmt.Println("IMPORTANT: Default user created: 'admin/admin123!'; please change at first login!")
+	}
 
-    // Check the number of Datings in DB and create the records if needed
-    if status, err = handleDatings(aa.DataProv); err != nil {
+	// Check the number of Datings in DB and create the records if needed
+	if status, err = handleDatings(aa.DataProv); err != nil {
 		return fmt.Errorf("Cannot check datings in database: '%s'", err.Error())
-    }
-    if status {
-	    aa.Log.Info("Dating records created")
-    }
+	}
+	if status {
+		aa.Log.Info("Dating records created")
+	}
 
-    return err
+	return err
 }
 
-// The handleUsers function checks the number of users in DB at startup and creates a default user when none is present. 
-// Otherwise noone could login into app and do anything... 
+// The handleUsers function checks the number of users in DB at startup and creates a default user when none is present.
+// Otherwise noone could login into app and do anything...
 func handleUsers(dp db.DataProvider) (bool, error) {
 
 	var cnt int
 	var err error
-    status := false
+	status := false
 
 	if cnt, err = dp.CountUsers(); err != nil {
 		return status, err
@@ -162,7 +163,7 @@ func handleUsers(dp db.DataProvider) (bool, error) {
 		u.Fullname = "Change Myname"
 		u.Email = "change_me@somewhere.org"
 		err = dp.InsertUser(u)
-        status = true
+		status = true
 	}
 	return status, err
 }
@@ -174,7 +175,7 @@ func handleDatings(dp db.DataProvider) (bool, error) {
 
 	var cnt int
 	var err error
-    status := false
+	status := false
 
 	if cnt, err = dp.CountDatings(); err != nil {
 		return status, err
@@ -192,8 +193,7 @@ func handleDatings(dp db.DataProvider) (bool, error) {
 		datings = append(datings, db.NewDating(&core.Dating{"unknown", "Unknown dating"}))
 
 		err = dp.InsertDatings(datings)
-        status = true
+		status = true
 	}
 	return status, err
 }
-

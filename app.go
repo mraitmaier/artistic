@@ -8,9 +8,9 @@ import (
 	"runtime"
 	//    "time"
 	//    "errors"
-	"path/filepath"
 	"github.com/mraitmaier/artistic/db"
 	"github.com/mraitmaier/artistic/utils"
+	"path/filepath"
 )
 
 //var cleanupTime = time.Second * 1

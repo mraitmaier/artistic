@@ -3,8 +3,8 @@ package main
 //   log.go -
 
 import (
-	"github.com/mraitmaier/artistic/utils"
 	"fmt"
+	"github.com/mraitmaier/artistic/utils"
 	"io/ioutil"
 	"path"
 	"path/filepath"

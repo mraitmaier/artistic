@@ -5,9 +5,9 @@ package main
 //
 
 import (
-	"github.com/mraitmaier/artistic/db"
 	"fmt"
 	"github.com/gorilla/mux"
+	"github.com/mraitmaier/artistic/db"
 	"net/http"
 	"strings"
 )
@@ -197,16 +197,16 @@ func modifyExistingUser(w http.ResponseWriter, r *http.Request, aa *ArtisticApp)
 	t.Fullname = full
 	t.Email = email
 	t.Phone = phone
-    if disabled == "no" {
-        t.Disabled = false
-    } else {
-        t.Disabled = true
-    }
-    if change == "no" {
-        t.MustChangePassword = false
-    } else {
-        t.MustChangePassword = true
-    }
+	if disabled == "no" {
+		t.Disabled = false
+	} else {
+		t.Disabled = true
+	}
+	if change == "no" {
+		t.MustChangePassword = false
+	} else {
+		t.MustChangePassword = true
+	}
 
 	// do it...
 	if err = aa.DataProv.UpdateUser(t); err != nil {
@@ -239,16 +239,16 @@ func insertNewUser(w http.ResponseWriter, r *http.Request, aa *ArtisticApp) (str
 	t.Fullname = full
 	t.Email = email
 	t.Phone = phone
-    if disabled == "no" {
-        t.Disabled = false
-    } else {
-        t.Disabled = true
-    }
-    if change == "no" {
-        t.MustChangePassword = false
-    } else {
-        t.MustChangePassword = true
-    }
+	if disabled == "no" {
+		t.Disabled = false
+	} else {
+		t.Disabled = true
+	}
+	if change == "no" {
+		t.MustChangePassword = false
+	} else {
+		t.MustChangePassword = true
+	}
 
 	// do it...
 	if err = aa.DataProv.InsertUser(t); err != nil {
@@ -277,17 +277,17 @@ func changeUserPassword(w http.ResponseWriter, r *http.Request, aa *ArtisticApp)
 
 	// check password first and return error if they're not valid
 	if err = u.ChangePassword(old, pwd, pwd2); err != nil {
-        return "", err
-    }
+		return "", err
+	}
 
-    /*
-	if pwd != pwd2 {
-		return "", fmt.Errorf("new passwords do not match")
-	}
-	if !u.ComparePassword(old) {
-		return "", fmt.Errorf("invalid old password")
-	}
-    */
+	/*
+		if pwd != pwd2 {
+			return "", fmt.Errorf("new passwords do not match")
+		}
+		if !u.ComparePassword(old) {
+			return "", fmt.Errorf("invalid old password")
+		}
+	*/
 
 	// now do it...
 	if err = aa.DataProv.UpdateUser(u); err != nil {

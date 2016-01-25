@@ -5,10 +5,10 @@ package main
 //
 
 import (
-    "github.com/mraitmaier/artistic/core"
-    "github.com/mraitmaier/artistic/db"
 	"fmt"
 	"github.com/gorilla/mux"
+	"github.com/mraitmaier/artistic/core"
+	"github.com/mraitmaier/artistic/db"
 	"net/http"
 	"strings"
 )

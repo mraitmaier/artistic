@@ -3,12 +3,12 @@ package main
 // auth.go
 
 import (
-	"github.com/mraitmaier/artistic/db"
-	"github.com/mraitmaier/artistic/utils"
 	"bytes"
 	"crypto/sha512"
 	"encoding/binary"
 	"fmt"
+	"github.com/mraitmaier/artistic/db"
+	"github.com/mraitmaier/artistic/utils"
 	"math/rand"
 	"net/http"
 	"os"
