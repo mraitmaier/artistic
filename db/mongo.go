@@ -412,7 +412,7 @@ func (m *MongoDbConn) InsertDatings(datings []*Dating) error {
 ///////////////////////////// Styles
 
 // Retrieves all styles from DB with given DB descriptor.
-func (m *MongoDbConn) GetAllStyles() ([]Style, error) {
+func (m *MongoDbConn) GetAllStyles() ([]*Style, error) {
 
 	// acquire lock
 	dblock.Lock()
@@ -425,7 +425,7 @@ func (m *MongoDbConn) GetAllStyles() ([]Style, error) {
 	}
 
 	// prepare the empty slice for users
-	s := make([]Style, 0)
+	s := make([]*Style, 0)
 
 	// get all users from DB
 	if err := db.C("styles").Find(bson.D{}).All(&s); err != nil {
@@ -513,7 +513,7 @@ func (m *MongoDbConn) adminStyle(cmd DbCommand, s *Style) error {
 ///////////////////////////// Techniques
 
 // Retrieves all techniques from DB with given DB descriptor.
-func (m *MongoDbConn) GetAllTechniques() ([]Technique, error) {
+func (m *MongoDbConn) GetAllTechniques() ([]*Technique, error) {
 
 	// acquire lock
 	dblock.Lock()
@@ -526,7 +526,7 @@ func (m *MongoDbConn) GetAllTechniques() ([]Technique, error) {
 	}
 
 	// get all users from DB
-	t := make([]Technique, 0)
+	t := make([]*Technique, 0)
 	if err := db.C("techniques").Find(bson.D{}).All(&t); err != nil {
 		return nil, err
 	}
@@ -591,9 +591,11 @@ func (m *MongoDbConn) adminTechnique(cmd DbCommand, t *Technique) error {
 	switch cmd {
 
 	case DBCmdUpdate:
+        t.Modified = NewTimestamp() // update modified timestamp first...
 		err = coll.UpdateId(t.Id, t)
 
 	case DBCmdInsert:
+        t.Created = NewTimestamp() // create new timestamp first...
 		err = coll.Insert(t)
 
 	case DBCmdDelete:
@@ -602,7 +604,6 @@ func (m *MongoDbConn) adminTechnique(cmd DbCommand, t *Technique) error {
 	default:
 		err = fmt.Errorf("Handling techniques: Unknown DB command.")
 	}
-
 	return err
 }
 

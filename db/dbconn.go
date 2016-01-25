@@ -71,13 +71,13 @@ type DataProvider interface {
     UpdateArtist(*Artist) error
     DeleteArtist(*Artist) error
 
-    GetAllTechniques() ([]Technique, error)
+    GetAllTechniques() ([]*Technique, error)
     GetTechnique(string) (*Technique, error)
     InsertTechnique(*Technique) error
     UpdateTechnique(*Technique) error
     DeleteTechnique(*Technique) error
 
-    GetAllStyles() ([]Style, error)
+    GetAllStyles() ([]*Style, error)
     GetStyle(string) (*Style, error)
     InsertStyle(*Style) error
     UpdateStyle(*Style) error

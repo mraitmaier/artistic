@@ -42,12 +42,12 @@
                 <table class="table table-striped table-hover small" id="dating-list-table">
                 <thead>
                     <tr> <th class="col-sm-1">#</th> <th class="col-sm-1">Dating</th> 
-                         <th class="col-sm-8">Description</th> <th class="col-sm-2">Actions</th> </tr>
+                         <th class="col-sm-9">Description</th> <th class="col-sm-1 text-right">Actions</th> </tr>
                 </thead>
 
                 <tfoot>
                     <tr class="bg-primary">
-                        <td colspan="8"> <!-- this is hardcoded, because it doesn't change. -->
+                        <td colspan="4">
                              <strong>8 datings found.</strong> <!-- this is hardcoded, because it doesn't change. -->
                         </td>
                     </tr>
@@ -60,7 +60,7 @@
                         <td>{{$num}}</td>
                         <td>{{$element.Dating.Dating}}</td>
                         <td>{{$element.Dating.Description}}</td>
-                        <td>
+                        <td class="text-right">
                             <span data-toggle="tooltip" data-placement="up" title="View details">
                             <a href="" data-toggle="modal" data-target="#viewDatingModal"
                                         data-id="{{$element.Id.Hex}}"
@@ -301,7 +301,7 @@
              <button type="button" class="btn btn-primary btn-sm col-sm-2" 
                      onclick="modifyDating('modify_dating_form', $('#hexid').val()); $('#modifyDatingModal').modal('hide');">Modify
              </button>
-            <button type="button" class="btn btn-default btn-sm col-md-2" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-default btn-sm col-md-2" data-dismiss="modal">Cancel</button>
         </div> <!-- row -->
     </div> <!-- container-fluid -->
     </div> <!-- modal-header -->

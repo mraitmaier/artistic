@@ -64,9 +64,9 @@ func registerHandlers(aa *ArtisticApp) {
 	r.Handle("/user/{cmd}/{id}", userHandler(aa))
 	r.Handle("/user/{cmd}/", userHandler(aa))
 	r.Handle("/log", logHandler(aa))
-	r.Handle("/techniques", techniquesHandler(aa))
-	r.Handle("/technique/{cmd}/{id}", techniqueHandler(aa))
-	r.Handle("/technique/{cmd}/", techniqueHandler(aa))
+	r.Handle("/technique", techniqueHandler(aa))
+	r.Handle("/technique/{id}/{cmd}", techniqueHandler(aa))
+//	r.Handle("/technique/{cmd}/", techniqueHandler(aa))
 	r.Handle("/styles", stylesHandler(aa))
 	r.Handle("/style/{cmd}/{id}", styleHandler(aa))
 	r.Handle("/style/{cmd}/", styleHandler(aa))
@@ -87,9 +87,6 @@ func registerHandlers(aa *ArtisticApp) {
 	r.Handle("/artist/{cmd}/{id}", artistHandler(aa))
 	r.Handle("/artist/{cmd}/", artistHandler(aa))
 	r.HandleFunc("/favicon.ico", faviconHandler)
-	// websocket handler
-	//r.Handle("/ws", wsHandler(aa) )
-	//r.Handle("/wss", wsHandler(aa) )
 	r.NotFoundHandler = err404Handler(aa)
 
 	// Call the default URL router...
@@ -186,15 +183,6 @@ func redirectToLoginPage(w http.ResponseWriter, r *http.Request, aa *ArtisticApp
 	aa.Log.Warning("User not authenticated. ")
 	http.Redirect(w, r, "/login", http.StatusFound)
 }
-
-/*
-// aux function redirecting to error page.
-func redirectToErrorPage(name string, user *utils.User, w http.ResponseWriter, r *http.Request, aa *ArtisticApp) {
-
-	aa.Log.Error(fmt.Sprintf("[%s] Cannot render the %q template.", name, user.Username))
-	http.Redirect(w, r, "/error", http.StatusFound)
-}
-*/
 
 // Aux function that renders the page (template!) with given (template) name.
 // Input parameters are:
@@ -419,7 +407,7 @@ func stylesHandler(aa *ArtisticApp) http.Handler {
 			// create ad-hoc struct to be sent to page template
 			var web = struct {
 				User   *db.User
-				Styles []db.Style
+				Styles []*db.Style
 			}{user, styles}
 
 			// render the page
@@ -561,6 +549,7 @@ func postStyleHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp, u
 	return err
 }
 
+/*
 // techniques page handler
 func techniquesHandler(aa *ArtisticApp) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -687,6 +676,7 @@ func getTechniqueHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp
 	return renderPage("technique", &web, aa, w, r)
 }
 
+//
 func postTechniqueHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp, user *db.User) error {
 
 	// get data to modify
@@ -722,6 +712,7 @@ func postTechniqueHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticAp
 
 	return err
 }
+*/
 
 // This is handler that handler the "/dating" URL.
 func datingHandler(app *ArtisticApp) http.Handler {
@@ -786,7 +777,7 @@ func datingHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *Artistic
 
 	case "put":
 		if id == "" {
-			return fmt.Errorf("Modify requirement: ID is empty")
+			return fmt.Errorf("Modify dating: ID is empty")
 		}
 		if d := parseDatingFormValues(r); d != nil {
 			d.Id = db.MongoStringToId(id)
@@ -841,3 +832,126 @@ type WebMessage struct {
 func (m *WebMessage) String() string {
 	return fmt.Sprintf("%s: %s", m.MsgType, m.MsgText)
 }
+
+// This is handler that handler the "/technique" URL.
+func techniqueHandler(app *ArtisticApp) http.Handler {
+
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+        // if user is autheticated, display the appropriate page
+		if loggedin, user := userIsAuthenticated(app, r); loggedin {
+
+		var err error
+
+		switch r.Method {
+
+		case "GET":
+			if err = techniqueHTTPGetHandler(w, r, app, user); err != nil {
+				app.Log.Error(fmt.Sprintf("Technique HTTP GET %s", err.Error()))
+			}
+
+		case "POST":
+			if err = techniqueHTTPPostHandler(w, r, app); err != nil {
+				app.Log.Error (fmt.Sprintf("Technique HTTP POST %s", err.Error()))
+            }
+			// unconditionally reroute to main technique page
+			http.Redirect(w, r, "/technique", http.StatusFound)
+
+		case "DELETE":
+			app.Log.Info("Technique HTTP DELETE request received. Redirecting to main 'technique' page.")
+			// unconditionally reroute to main test cases page
+			// Use HTTP 303 (see other) to force GET to redirect as DELETE request is normally 
+            // followed by another DELETE
+			http.Redirect(w, r, "/technique", http.StatusSeeOther)
+
+		case "PUT":
+			app.Log.Info("Technique HTTP PUT request received. Redirecting to main 'technique' page.")
+			// unconditionally reroute to main test cases page
+			// Use HTTP 303 (see other) to force GET to redirect as PUT request is normally followed by 
+            // another PUT
+			http.Redirect(w, r, "/technique", http.StatusSeeOther)
+
+		default:
+            // otherwise just display main 'index' page
+			if err := renderPage("index", nil, app, w, r); err != nil {
+				app.Log.Error(fmt.Sprintf("Index HTTP GET %s", err.Error()))
+				return
+			}
+		}
+
+		} else {
+            // if user not authenticated
+			redirectToLoginPage(w, r, app)
+		}
+	})
+}
+
+// This is HTTP POST handler for datings.
+func techniqueHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *ArtisticApp) error {
+
+	id := mux.Vars(r)["id"]
+	cmd := mux.Vars(r)["cmd"]
+
+	var err error
+	switch strings.ToLower(cmd) {
+
+    case "":
+        // insert new technique, when 'cmd' is empty...
+        if t := parseTechniqueFormValues(r); t != nil {
+            err = app.DataProv.InsertTechnique(t)
+        }
+
+	case "put":
+		if id == "" {
+            return fmt.Errorf("Modify technique: ID is empty")
+		}
+		if d := parseTechniqueFormValues(r); d != nil {
+			d.Id = db.MongoStringToId(id)
+			err = app.DataProv.UpdateTechnique(d)
+		}
+
+    case "delete":
+        if id == "" {
+            return fmt.Errorf("Delete technique: ID is empty")
+        }
+        t := db.NewTechnique()
+		t.Id = db.MongoStringToId(id)
+        err = app.DataProv.DeleteTechnique(t)
+
+
+	default:
+		err = fmt.Errorf("Illegal POST request for technique")
+	}
+	return err
+}
+
+// Helper function that parses the '/dating' POST request values and creates a new instance of Dating.
+func parseTechniqueFormValues(r *http.Request) *db.Technique {
+
+	name := strings.TrimSpace(r.FormValue("name"))
+	desc := strings.TrimSpace(r.FormValue("description"))
+	created := strings.TrimSpace(r.FormValue("created"))
+
+	t := db.NewTechnique()
+    t.Name = name
+    t.Description = desc
+	t.Created = db.Timestamp(created)
+	return t
+}
+
+// This is HTTP GET handler for datings.
+func techniqueHTTPGetHandler(w http.ResponseWriter, r *http.Request, app *ArtisticApp, u *db.User) error {
+
+		t, err := app.DataProv.GetAllTechniques()
+		if err != nil {
+			http.Redirect(w, r, "/err404", http.StatusFound)
+			return fmt.Errorf("Problem getting techniques from DB: '%s'", err.Error())
+		}
+		// create ad-hoc struct to be sent to page template
+		var web = struct {
+			Techniques []*db.Technique
+			Num  int
+			User *db.User
+		}{t, len(t), u}
+	return renderPage("techniques", web, app, w, r)
+}
+
