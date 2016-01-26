@@ -91,6 +91,19 @@ func registerHandlers(aa *ArtisticApp) {
 	http.Handle("/", r)
 }
 
+// WebMessage is the structure for displaying messages on web page
+type WebMessage struct {
+
+	// message type: warning, danger, success, info
+	MsgType string
+
+	// actual text message
+	MsgText string
+}
+
+func (m *WebMessage) String() string {
+	return fmt.Sprintf("%s: %s", m.MsgType, m.MsgText)
+}
 // initializes and starts web server
 func webStart(aa *ArtisticApp, wwwpath string) error {
 	aa.WebInfo = new(WebInfo)
@@ -166,7 +179,7 @@ func cleanSessDir(aa *ArtisticApp) bool {
 
 	if aa.WebInfo.sessDir != "" {
 		if err := os.RemoveAll(aa.WebInfo.sessDir); err != nil {
-			aa.Log.Error(err.Error())
+			aa.Log.Error(fmt.Sprintf("Remove session directory %q", err.Error()))
 			return status
 		}
 		status = true
@@ -177,7 +190,7 @@ func cleanSessDir(aa *ArtisticApp) bool {
 // aux function redirecting to login page.
 func redirectToLoginPage(w http.ResponseWriter, r *http.Request, aa *ArtisticApp) {
 
-	aa.Log.Warning("User not authenticated. ")
+	aa.Log.Warning("User not authenticated")
 	http.Redirect(w, r, "/login", http.StatusFound)
 }
 
@@ -250,7 +263,7 @@ func logoutHandler(aa *ArtisticApp) http.Handler {
 			if err := logout(aa, w, r); err != nil {
 				log.Error(err.Error())
 			} else {
-				log.Info(fmt.Sprintf("Logging out user %q.", user.Username))
+				log.Info(fmt.Sprintf("[%s] Logging out", user.Username))
 			}
 		}
 		http.Redirect(w, r, "/login", http.StatusFound)
@@ -309,20 +322,19 @@ func loginHandler(aa *ArtisticApp) http.Handler {
 			log.Info(fmt.Sprintf("Trying to authenticate user %q...", user))
 			status, err := authenticateUser(user, pwd, aa, w, r)
 			if !status || err != nil {
+				log.Alert(fmt.Sprintf("User %q NOT authenticated.", user))
 				err = aa.WebInfo.templates.ExecuteTemplate(w, "login", nil)
-				aa.Log.Info(fmt.Sprintf("[%s] Displaying the %q page.", user, r.RequestURI))
+				aa.Log.Info(fmt.Sprintf("Displaying the %q page.", r.RequestURI))
 				if err != nil {
 					log.Error(err.Error())
 				}
-				log.Alert(fmt.Sprintf("User %q NOT authenticated.", user))
 			}
 
 			// if authenticated, redirect to index page; otherwise display login
 			if status {
-				// context.Set(r, LoggedUser, user)
+			    log.Info(fmt.Sprintf("[%s] User authenticated, OK.", user))
 				http.Redirect(w, r, "/index", http.StatusFound)
 			}
-			log.Info(fmt.Sprintf("User %q authenticated, OK.", user))
 
 		// when HTTP GET is received, just display the default login template
 		case "GET":
@@ -332,7 +344,6 @@ func loginHandler(aa *ArtisticApp) http.Handler {
 			}
 			aa.Log.Info(fmt.Sprintf("Displaying the %q page.", r.RequestURI))
 		}
-
 	}) // return handler closure
 }
 
@@ -396,25 +407,27 @@ func datingHandler(app *ArtisticApp) http.Handler {
 
 			case "GET":
 				if err = datingHTTPGetHandler(w, r, app, user); err != nil {
-					app.Log.Error(fmt.Sprintf("Dating HTTP GET %s", err.Error()))
+					app.Log.Error(fmt.Sprintf("[%s] Dating HTTP GET %s", user.Username, err.Error()))
 				}
 
 			case "POST":
-				if err = datingHTTPPostHandler(w, r, app); err != nil {
-					app.Log.Error(fmt.Sprintf("Dating HTTP POST %s", err.Error()))
+				if err = datingHTTPPostHandler(w, r, app, user); err != nil {
+					app.Log.Error(fmt.Sprintf("[%s] Dating HTTP POST %s", user.Username, err.Error()))
 				}
 				// unconditionally reroute to main dating page
 				http.Redirect(w, r, "/dating", http.StatusFound)
 
 			case "DELETE":
-				app.Log.Info("Dating HTTP DELETE request received. Redirecting to main 'dating' page.")
+                msg := fmt.Sprintf("[%s] Dating HTTP DELETE request received. Redirecting to main 'dating' page.", user.Username)
+				app.Log.Info(msg)
 				// unconditionally reroute to main test cases page
 				// Use HTTP 303 (see other) to force GET to redirect as DELETE request is normally
 				// followed by another DELETE
 				http.Redirect(w, r, "/dating", http.StatusSeeOther)
 
 			case "PUT":
-				app.Log.Info("Dating HTTP PUT request received. Redirecting to main 'dating' page.")
+                msg := fmt.Sprintf("[%s] Dating HTTP PUT request received. Redirecting to main 'dating' page.", user.Username)
+				app.Log.Info(msg)
 				// unconditionally reroute to main test cases page
 				// Use HTTP 303 (see other) to force GET to redirect as PUT request is normally followed by
 				// another PUT
@@ -423,7 +436,7 @@ func datingHandler(app *ArtisticApp) http.Handler {
 			default:
 				// otherwise just display main 'index' page
 				if err := renderPage("index", nil, app, w, r); err != nil {
-					app.Log.Error(fmt.Sprintf("Index HTTP GET %s", err.Error()))
+					app.Log.Error(fmt.Sprintf("[%s] Index HTTP GET %s", user.Username, err.Error()))
 					return
 				}
 			}
@@ -436,7 +449,7 @@ func datingHandler(app *ArtisticApp) http.Handler {
 }
 
 // This is HTTP POST handler for datings.
-func datingHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *ArtisticApp) error {
+func datingHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *ArtisticApp, u *db.User) error {
 
 	id := mux.Vars(r)["id"]
 	cmd := mux.Vars(r)["cmd"]
@@ -451,7 +464,7 @@ func datingHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *Artistic
 		if d := parseDatingFormValues(r); d != nil {
 			d.Id = db.MongoStringToId(id)
 			err = app.DataProv.UpdateDating(d)
-            app.Log.Info(fmt.Sprintf("Updating Dating '%s'", d.Dating))
+            app.Log.Info(fmt.Sprintf("[%s] Updating Dating '%s'", u.Username, d.Dating))
 		}
 
 	default:
@@ -486,22 +499,8 @@ func datingHTTPGetHandler(w http.ResponseWriter, r *http.Request, app *ArtisticA
 		Num     int
 		User    *db.User
 	}{datings, len(datings), u}
-    app.Log.Info("Displaying '/dating' page")
+    app.Log.Info(fmt.Sprintf("[%s] Displaying '/dating' page", u.Username))
 	return renderPage("datings", web, app, w, r)
-}
-
-// WebMessage is the structure for displaying messages on web page
-type WebMessage struct {
-
-	// message type: warning, danger, success, info
-	MsgType string
-
-	// actual text message
-	MsgText string
-}
-
-func (m *WebMessage) String() string {
-	return fmt.Sprintf("%s: %s", m.MsgType, m.MsgText)
 }
 
 // This is handler that handler the "/technique" URL.
@@ -517,25 +516,29 @@ func techniqueHandler(app *ArtisticApp) http.Handler {
 
 			case "GET":
 				if err = techniqueHTTPGetHandler(w, r, app, user); err != nil {
-					app.Log.Error(fmt.Sprintf("Technique HTTP GET %s", err.Error()))
+					app.Log.Error(fmt.Sprintf("[%s] Technique HTTP GET %s", user.Username, err.Error()))
 				}
 
 			case "POST":
-				if err = techniqueHTTPPostHandler(w, r, app); err != nil {
-					app.Log.Error(fmt.Sprintf("Technique HTTP POST %s", err.Error()))
+				if err = techniqueHTTPPostHandler(w, r, app, user); err != nil {
+					app.Log.Error(fmt.Sprintf("[%s] Technique HTTP POST %s", user.Username, err.Error()))
 				}
 				// unconditionally reroute to main technique page
 				http.Redirect(w, r, "/technique", http.StatusFound)
 
 			case "DELETE":
-				app.Log.Info("Technique HTTP DELETE request received. Redirecting to main 'technique' page.")
+                msg := fmt.Sprintf("[%s] Technique HTTP DELETE request received. Redirecting to main 'technique' page.", 
+                    user.Username)
+                app.Log.Info(msg)
 				// unconditionally reroute to main test cases page
 				// Use HTTP 303 (see other) to force GET to redirect as DELETE request is normally
 				// followed by another DELETE
 				http.Redirect(w, r, "/technique", http.StatusSeeOther)
 
 			case "PUT":
-				app.Log.Info("Technique HTTP PUT request received. Redirecting to main 'technique' page.")
+                msg := fmt.Sprintf("[%s] Technique HTTP PUT request received. Redirecting to main 'technique' page.", 
+                    user.Username)
+                app.Log.Info(msg)
 				// unconditionally reroute to main test cases page
 				// Use HTTP 303 (see other) to force GET to redirect as PUT request is normally followed by
 				// another PUT
@@ -544,7 +547,7 @@ func techniqueHandler(app *ArtisticApp) http.Handler {
 			default:
 				// otherwise just display main 'index' page
 				if err := renderPage("index", nil, app, w, r); err != nil {
-					app.Log.Error(fmt.Sprintf("Index HTTP GET %s", err.Error()))
+					app.Log.Error(fmt.Sprintf("[%s] Index HTTP GET %s", user.Username, err.Error()))
 					return
 				}
 			}
@@ -557,7 +560,7 @@ func techniqueHandler(app *ArtisticApp) http.Handler {
 }
 
 // This is HTTP POST handler for techniques
-func techniqueHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *ArtisticApp) error {
+func techniqueHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *ArtisticApp, u *db.User) error {
 
 	id := mux.Vars(r)["id"]
 	cmd := mux.Vars(r)["cmd"]
@@ -570,7 +573,7 @@ func techniqueHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *Artis
 		if t := parseTechniqueFormValues(r); t != nil {
 			err = app.DataProv.InsertTechnique(t)
 		} else {
-			app.Log.Info(fmt.Sprintf("Creating new Technique '%s'", t.Name))
+			app.Log.Info(fmt.Sprintf("[%s] Creating new Technique '%s'", u.Username, t.Name))
 		}
 
 	case "put":
@@ -580,7 +583,7 @@ func techniqueHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *Artis
 		if d := parseTechniqueFormValues(r); d != nil {
 			d.Id = db.MongoStringToId(id)
 			err = app.DataProv.UpdateTechnique(d)
-			app.Log.Info(fmt.Sprintf("Updating Technique '%s'", d.Name))
+			app.Log.Info(fmt.Sprintf("[%s] Updating Technique '%s'", u.Username, d.Name))
 		}
 
 	case "delete":
@@ -590,7 +593,7 @@ func techniqueHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *Artis
 		t := db.NewTechnique()
 		t.Id = db.MongoStringToId(id)
 		err = app.DataProv.DeleteTechnique(t)
-		app.Log.Info(fmt.Sprintf("Removing Technique '%s'", t.Name))
+		app.Log.Info(fmt.Sprintf("[%s] Removing Technique '%s'", u.Username, t.Name))
 
 	default:
 		err = fmt.Errorf("Illegal POST request for technique")
@@ -626,7 +629,7 @@ func techniqueHTTPGetHandler(w http.ResponseWriter, r *http.Request, app *Artist
 		Num        int
 		User       *db.User
 	}{t, len(t), u}
-	app.Log.Info("Displaying '/technique' page")
+	app.Log.Info(fmt.Sprintf("[%s] Displaying '/technique' page", u.Username))
 	return renderPage("techniques", web, app, w, r)
 }
 
@@ -643,25 +646,27 @@ func styleHandler(app *ArtisticApp) http.Handler {
 
 			case "GET":
 				if err = styleHTTPGetHandler(w, r, app, user); err != nil {
-					app.Log.Error(fmt.Sprintf("Style HTTP GET %s", err.Error()))
+					app.Log.Error(fmt.Sprintf("[%s] Style HTTP GET %s", user.Username, err.Error()))
 				}
 
 			case "POST":
-				if err = styleHTTPPostHandler(w, r, app); err != nil {
-					app.Log.Error(fmt.Sprintf("Style HTTP POST %s", err.Error()))
+				if err = styleHTTPPostHandler(w, r, app, user); err != nil {
+					app.Log.Error(fmt.Sprintf("[%s] Style HTTP POST %s", user.Username, err.Error()))
 				}
 				// unconditionally reroute to main style page
 				http.Redirect(w, r, "/style", http.StatusFound)
 
 			case "DELETE":
-				app.Log.Info("Style HTTP DELETE request received. Redirecting to main 'style' page.")
+                msg := fmt.Sprintf("[%s] Style HTTP DELETE request received. Redirecting to main 'style' page.", user.Username)
+                app.Log.Info(msg)
 				// unconditionally reroute to main style page
 				// Use HTTP 303 (see other) to force GET to redirect as DELETE request is normally
 				// followed by another DELETE
 				http.Redirect(w, r, "/style", http.StatusSeeOther)
 
 			case "PUT":
-				app.Log.Info("Style HTTP PUT request received. Redirecting to main 'style' page.")
+                msg := fmt.Sprintf("[%s] Style HTTP PUT request received. Redirecting to main 'style' page.", user.Username)
+                app.Log.Info(msg)
 				// unconditionally reroute to main style page
 				// Use HTTP 303 (see other) to force GET to redirect as PUT request is normally followed by
 				// another PUT
@@ -670,7 +675,7 @@ func styleHandler(app *ArtisticApp) http.Handler {
 			default:
 				// otherwise just display main 'index' page
 				if err := renderPage("index", nil, app, w, r); err != nil {
-					app.Log.Error(fmt.Sprintf("Index HTTP GET %s", err.Error()))
+					app.Log.Error(fmt.Sprintf("[%s] Index HTTP GET %s", user.Username, err.Error()))
 					return
 				}
 			}
@@ -683,7 +688,7 @@ func styleHandler(app *ArtisticApp) http.Handler {
 }
 
 // This is HTTP POST handler for styles.
-func styleHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *ArtisticApp) error {
+func styleHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *ArtisticApp, u *db.User) error {
 
 	id := mux.Vars(r)["id"]
 	cmd := mux.Vars(r)["cmd"]
@@ -696,7 +701,7 @@ func styleHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *ArtisticA
 		if s := parseStyleFormValues(r); s != nil {
 			err = app.DataProv.InsertStyle(s)
 		} else {
-			app.Log.Info(fmt.Sprintf("Creating new Style '%s'", s.Name))
+			app.Log.Info(fmt.Sprintf("[%s] Creating new Style '%s'", u.Username, s.Name))
 		}
 
 	case "put":
@@ -706,7 +711,7 @@ func styleHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *ArtisticA
 		if s := parseStyleFormValues(r); s != nil {
 			s.Id = db.MongoStringToId(id)
 			err = app.DataProv.UpdateStyle(s)
-			app.Log.Info(fmt.Sprintf("Updating Style '%s'", s.Name))
+			app.Log.Info(fmt.Sprintf("[%s] Updating Style '%s'", u.Username, s.Name))
 		}
 
 	case "delete":
@@ -716,7 +721,7 @@ func styleHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *ArtisticA
 		s := db.NewStyle()
 		s.Id = db.MongoStringToId(id)
 		err = app.DataProv.DeleteStyle(s)
-		app.Log.Info(fmt.Sprintf("Removing style '%s'", s.Name))
+		app.Log.Info(fmt.Sprintf("[%s] Removing style '%s'", u.Username, s.Name))
 
 	default:
 		err = fmt.Errorf("Illegal POST request for style")
@@ -752,7 +757,7 @@ func styleHTTPGetHandler(w http.ResponseWriter, r *http.Request, app *ArtisticAp
 		Num        int
 		User       *db.User
 	}{s, len(s), u}
-	app.Log.Info("Displaying '/style' page")
+	app.Log.Info(fmt.Sprintf("[%s] Displaying '/style' page", u.Username))
 	return renderPage("styles", web, app, w, r)
 }
 
