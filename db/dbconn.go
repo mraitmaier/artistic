@@ -57,7 +57,7 @@ type DbConnector interface {
 // Interface that defines the data provider
 type DataProvider interface {
 
-    GetAllUsers() ([]User, error)
+    GetAllUsers() ([]*User, error)
     GetUser(string) (*User, error)
     GetUserByUsername(string) (*User, error)
     InsertUser(*User) error

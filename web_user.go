@@ -32,7 +32,7 @@ func usersHandler(aa *ArtisticApp) http.Handler {
 			// create ad-hoc struct to be sent to page template
 			var web = struct {
 				User  *db.User
-				Users []db.User
+				Users []*db.User
 			}{user, users}
 
 			// render the page
@@ -297,76 +297,146 @@ func changeUserPassword(w http.ResponseWriter, r *http.Request, aa *ArtisticApp)
 	return u.Username, err
 }
 
-// a user profile handler
-func profileHandler(aa *ArtisticApp) http.Handler {
+// Parse HTTP form values for user; this is used by /user and /profile
+func parseUserFormValues(r *http.Request) *db.User {
+
+	// get data to modify
+	id := mux.Vars(r)["id"]
+
+	// get POST form values and create a struct
+	name := strings.TrimSpace(r.FormValue("username"))
+	pwd := strings.TrimSpace(r.FormValue("password"))
+	role := strings.TrimSpace(r.FormValue("role"))
+	full := strings.TrimSpace(r.FormValue("fullname"))
+	email := strings.TrimSpace(r.FormValue("email"))
+	phone := strings.TrimSpace(r.FormValue("phone"))
+	disabled := strings.ToLower(strings.TrimSpace(r.FormValue("disabled")))
+	mustchange := strings.ToLower(strings.TrimSpace(r.FormValue("mustchange")))
+	created := strings.TrimSpace(r.FormValue("created"))
+
+	// create a user and check passwords
+	u := db.CreateUser(name, pwd, role, false)
+	u.Id = db.MongoStringToId(id)
+	u.Fullname = full
+	u.Email = email
+	u.Phone = phone
+	u.Created = db.Timestamp(created)
+	if disabled == "no" {
+		u.Disabled = false
+	} else {
+		u.Disabled = true
+	}
+	if mustchange == "no" {
+		u.MustChangePassword = false
+	} else {
+		u.MustChangePassword = true
+	}
+	return u
+}
+
+// This is handler that handler the "/profile" URL.
+func profileHandler(app *ArtisticApp) http.Handler {
+
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// if user is autheticated, display the appropriate page
+		if loggedin, user := userIsAuthenticated(app, r); loggedin {
 
-		if loggedin, user := userIsAuthenticated(aa, r); loggedin {
-
-			log := aa.Log // get logger instance
+			var err error
 
 			switch r.Method {
 
 			case "GET":
-				if err := getProfileHandler(w, r, aa, user); err != nil {
-					log.Error(fmt.Sprintf("[%s] Profile GET handler: %q.", user.Username, err.Error()))
-					//http.Redirect(w, r, "/users", http.StatusFound)
-					break // force break!
+				if err = profileHTTPGetHandler(w, r, app, user); err != nil {
+					app.Log.Error(fmt.Sprintf("[%s] Profile HTTP GET %s", user.Username, err.Error()))
 				}
-				log.Info(fmt.Sprintf("[%s] Displaying the %q page.", user.Username, r.RequestURI))
 
 			case "POST":
-				if err := postProfileHandler(w, r, aa, user); err != nil {
-					log.Error(fmt.Sprintf("[%s] Profile POST handler: %q.", user.Username, err.Error()))
+				if err = profileHTTPPostHandler(w, r, app, user); err != nil {
+					app.Log.Error(fmt.Sprintf("[%s] Profile HTTP POST %s", user.Username, err.Error()))
 				}
-				http.Redirect(w, r, "/users", http.StatusFound)
+				// unconditionally reroute to main style page
+				http.Redirect(w, r, "/profile", http.StatusFound)
+
+			case "DELETE":
+				msg := fmt.Sprintf("[%s] Profile HTTP DELETE request received. Redirecting to main 'profile' page.", user.Username)
+				app.Log.Info(msg)
+				// unconditionally reroute to main profile page
+				// Use HTTP 303 (see other) to force GET to redirect as DELETE request is normally
+				// followed by another DELETE
+				http.Redirect(w, r, "/profile", http.StatusSeeOther)
+
+			case "PUT":
+				msg := fmt.Sprintf("[%s] Profile HTTP PUT request received. Redirecting to main 'profile' page.", user.Username)
+				app.Log.Info(msg)
+				// unconditionally reroute to main profile page
+				// Use HTTP 303 (see other) to force GET to redirect as PUT request is normally followed by
+				// another PUT
+				http.Redirect(w, r, "/profile", http.StatusSeeOther)
+
+			default:
+				// otherwise just display main 'index' page
+				if err := renderPage("index", nil, app, w, r); err != nil {
+					app.Log.Error(fmt.Sprintf("[%s] Index HTTP GET %s", user.Username, err.Error()))
+					return
+				}
 			}
 
 		} else {
-			redirectToLoginPage(w, r, aa)
+			// if user not authenticated
+			redirectToLoginPage(w, r, app)
 		}
-	}) // return handler closure
+	})
 }
 
-//  HTTP GET handler for "/userprofile/<cmd>" URLs.
-func getProfileHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp, user *db.User) error {
+// This is HTTP POST handler for profile
+func profileHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *ArtisticApp, u *db.User) error {
 
-	cmd := mux.Vars(r)["cmd"]
-
-	// create ad-hoc struct to be sent to page template
-	var web = struct {
-		User *db.User
-		Cmd  string // "view", "modify", "changepwd"...
-	}{user, cmd}
-
-	return renderPage("userprofile", &web, aa, w, r)
-}
-
-func postProfileHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp, user *db.User) error {
-
-	// get data to modify
+	id := mux.Vars(r)["id"]
 	cmd := mux.Vars(r)["cmd"]
 
 	var err error
-	//var username string
+	switch strings.ToLower(cmd) {
 
-	switch cmd {
-
-	case "modify":
-		//if username, err = modifyExistingUser(w, r, aa); err != nil {
-		if _, err = modifyExistingUser(w, r, aa); err != nil {
-			err = fmt.Errorf("[%s] MODIFY Profile: %q", user.Username, err.Error())
+	case "put":
+		if id == "" {
+			return fmt.Errorf("Modify profile: ID is empty")
+		}
+		if s := parseUserFormValues(r); s != nil {
+			s.Id = db.MongoStringToId(id)
+			err = app.DataProv.UpdateUser(s)
+			app.Log.Info(fmt.Sprintf("[%s] Updating Profile '%s'", s.Username, s.Fullname))
 		}
 
 	case "changepwd":
-		//if username, err = changeUserPassword(w, r, aa); err != nil {
-		if _, err = changeUserPassword(w, r, aa); err != nil {
-			err = fmt.Errorf("[%s] CHANGEPWD Profile: %q", user.Username, err.Error())
+		if id == "" {
+			return fmt.Errorf("Change password for profile: ID is empty")
+		}
+		if username, err := changeUserPassword(w, r, app); err != nil {
+			return fmt.Errorf("Change password (%q)", err.Error())
+		} else {
+			app.Log.Info(fmt.Sprintf("[%s] Successfully changed password for user %q.", u.Username, username))
 		}
 
 	default:
-		err = fmt.Errorf("Unknown command %q", cmd)
+		err = fmt.Errorf("Illegal POST request for style")
 	}
-
 	return err
+}
+
+// This is HTTP GET handler for styles
+func profileHTTPGetHandler(w http.ResponseWriter, r *http.Request, app *ArtisticApp, u *db.User) error {
+
+	s, err := app.DataProv.GetAllUsers()
+	if err != nil {
+		http.Redirect(w, r, "/err404", http.StatusFound)
+		return fmt.Errorf("Problem getting users from DB: '%s'", err.Error())
+	}
+	// create ad-hoc struct to be sent to page template
+	var web = struct {
+		Users []*db.User
+		Num   int
+		User  *db.User
+	}{s, len(s), u}
+	app.Log.Info(fmt.Sprintf("[%s] Displaying '/profile' page", u.Username))
+	return renderPage("profile", web, app, w, r)
 }

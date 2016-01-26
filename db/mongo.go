@@ -107,7 +107,7 @@ func (m *MongoDbConn) CountUsers() (int, error) {
 }
 
 // Retrieves all users from database.
-func (m *MongoDbConn) GetAllUsers() ([]User, error) {
+func (m *MongoDbConn) GetAllUsers() ([]*User, error) {
 
 	// acquire lock
 	dblock.Lock()
@@ -120,10 +120,10 @@ func (m *MongoDbConn) GetAllUsers() ([]User, error) {
 	}
 
 	// create channel
-	ch := make(chan []User)
+	ch := make(chan []*User)
 
 	// start a new goroutine to get users from DB
-	go func(ch chan []User) {
+	go func(ch chan []*User) {
 
 		// check channel
 		if ch == nil {
@@ -131,7 +131,7 @@ func (m *MongoDbConn) GetAllUsers() ([]User, error) {
 		}
 
 		// prepare the empty slice for users
-		users := make([]User, 0)
+		users := make([]*User, 0)
 
 		// get all users from DB
 		if err := db.C("users").Find(bson.D{}).All(&users); err != nil {
@@ -286,9 +286,11 @@ func (m *MongoDbConn) adminUser(cmd DbCommand, u *User) error {
 	switch cmd {
 
 	case DBCmdUpdate:
+        u.Modified = NewTimestamp()
 		err = coll.UpdateId(u.Id, u)
 
 	case DBCmdInsert:
+        u.Created = NewTimestamp()
 		err = coll.Insert(u)
 
 	case DBCmdDelete:

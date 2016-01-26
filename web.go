@@ -73,9 +73,8 @@ func registerHandlers(aa *ArtisticApp) {
 	r.Handle("/error404", err404Handler(aa))
 	r.Handle("/error", errorHandler(aa))
 	r.Handle("/license", licenseHandler(aa))
-	r.Handle("/userprofile", profileHandler(aa))
-	r.Handle("/userprofile/{cmd}", profileHandler(aa))
-	r.Handle("/userprofile/{cmd}/{id}", profileHandler(aa))
+	r.Handle("/profile", profileHandler(aa))
+	r.Handle("/profile/{id}/{cmd}", profileHandler(aa))
 	r.Handle("/artists", artistsHandler(aa, db.ArtistTypeArtist))
 	r.Handle("/painters", artistsHandler(aa, db.ArtistTypePainter))
 	r.Handle("/sculptors", artistsHandler(aa, db.ArtistTypeSculptor))
@@ -104,6 +103,7 @@ type WebMessage struct {
 func (m *WebMessage) String() string {
 	return fmt.Sprintf("%s: %s", m.MsgType, m.MsgText)
 }
+
 // initializes and starts web server
 func webStart(aa *ArtisticApp, wwwpath string) error {
 	aa.WebInfo = new(WebInfo)
@@ -332,7 +332,7 @@ func loginHandler(aa *ArtisticApp) http.Handler {
 
 			// if authenticated, redirect to index page; otherwise display login
 			if status {
-			    log.Info(fmt.Sprintf("[%s] User authenticated, OK.", user))
+				log.Info(fmt.Sprintf("[%s] User authenticated, OK.", user))
 				http.Redirect(w, r, "/index", http.StatusFound)
 			}
 
@@ -418,7 +418,7 @@ func datingHandler(app *ArtisticApp) http.Handler {
 				http.Redirect(w, r, "/dating", http.StatusFound)
 
 			case "DELETE":
-                msg := fmt.Sprintf("[%s] Dating HTTP DELETE request received. Redirecting to main 'dating' page.", user.Username)
+				msg := fmt.Sprintf("[%s] Dating HTTP DELETE request received. Redirecting to main 'dating' page.", user.Username)
 				app.Log.Info(msg)
 				// unconditionally reroute to main test cases page
 				// Use HTTP 303 (see other) to force GET to redirect as DELETE request is normally
@@ -426,7 +426,7 @@ func datingHandler(app *ArtisticApp) http.Handler {
 				http.Redirect(w, r, "/dating", http.StatusSeeOther)
 
 			case "PUT":
-                msg := fmt.Sprintf("[%s] Dating HTTP PUT request received. Redirecting to main 'dating' page.", user.Username)
+				msg := fmt.Sprintf("[%s] Dating HTTP PUT request received. Redirecting to main 'dating' page.", user.Username)
 				app.Log.Info(msg)
 				// unconditionally reroute to main test cases page
 				// Use HTTP 303 (see other) to force GET to redirect as PUT request is normally followed by
@@ -464,7 +464,7 @@ func datingHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *Artistic
 		if d := parseDatingFormValues(r); d != nil {
 			d.Id = db.MongoStringToId(id)
 			err = app.DataProv.UpdateDating(d)
-            app.Log.Info(fmt.Sprintf("[%s] Updating Dating '%s'", u.Username, d.Dating))
+			app.Log.Info(fmt.Sprintf("[%s] Updating Dating '%s'", u.Username, d.Dating))
 		}
 
 	default:
@@ -499,7 +499,7 @@ func datingHTTPGetHandler(w http.ResponseWriter, r *http.Request, app *ArtisticA
 		Num     int
 		User    *db.User
 	}{datings, len(datings), u}
-    app.Log.Info(fmt.Sprintf("[%s] Displaying '/dating' page", u.Username))
+	app.Log.Info(fmt.Sprintf("[%s] Displaying '/dating' page", u.Username))
 	return renderPage("datings", web, app, w, r)
 }
 
@@ -527,18 +527,18 @@ func techniqueHandler(app *ArtisticApp) http.Handler {
 				http.Redirect(w, r, "/technique", http.StatusFound)
 
 			case "DELETE":
-                msg := fmt.Sprintf("[%s] Technique HTTP DELETE request received. Redirecting to main 'technique' page.", 
-                    user.Username)
-                app.Log.Info(msg)
+				msg := fmt.Sprintf("[%s] Technique HTTP DELETE request received. Redirecting to main 'technique' page.",
+					user.Username)
+				app.Log.Info(msg)
 				// unconditionally reroute to main test cases page
 				// Use HTTP 303 (see other) to force GET to redirect as DELETE request is normally
 				// followed by another DELETE
 				http.Redirect(w, r, "/technique", http.StatusSeeOther)
 
 			case "PUT":
-                msg := fmt.Sprintf("[%s] Technique HTTP PUT request received. Redirecting to main 'technique' page.", 
-                    user.Username)
-                app.Log.Info(msg)
+				msg := fmt.Sprintf("[%s] Technique HTTP PUT request received. Redirecting to main 'technique' page.",
+					user.Username)
+				app.Log.Info(msg)
 				// unconditionally reroute to main test cases page
 				// Use HTTP 303 (see other) to force GET to redirect as PUT request is normally followed by
 				// another PUT
@@ -657,16 +657,16 @@ func styleHandler(app *ArtisticApp) http.Handler {
 				http.Redirect(w, r, "/style", http.StatusFound)
 
 			case "DELETE":
-                msg := fmt.Sprintf("[%s] Style HTTP DELETE request received. Redirecting to main 'style' page.", user.Username)
-                app.Log.Info(msg)
+				msg := fmt.Sprintf("[%s] Style HTTP DELETE request received. Redirecting to main 'style' page.", user.Username)
+				app.Log.Info(msg)
 				// unconditionally reroute to main style page
 				// Use HTTP 303 (see other) to force GET to redirect as DELETE request is normally
 				// followed by another DELETE
 				http.Redirect(w, r, "/style", http.StatusSeeOther)
 
 			case "PUT":
-                msg := fmt.Sprintf("[%s] Style HTTP PUT request received. Redirecting to main 'style' page.", user.Username)
-                app.Log.Info(msg)
+				msg := fmt.Sprintf("[%s] Style HTTP PUT request received. Redirecting to main 'style' page.", user.Username)
+				app.Log.Info(msg)
 				// unconditionally reroute to main style page
 				// Use HTTP 303 (see other) to force GET to redirect as PUT request is normally followed by
 				// another PUT
@@ -754,10 +754,9 @@ func styleHTTPGetHandler(w http.ResponseWriter, r *http.Request, app *ArtisticAp
 	// create ad-hoc struct to be sent to page template
 	var web = struct {
 		Styles []*db.Style
-		Num        int
-		User       *db.User
+		Num    int
+		User   *db.User
 	}{s, len(s), u}
 	app.Log.Info(fmt.Sprintf("[%s] Displaying '/style' page", u.Username))
 	return renderPage("styles", web, app, w, r)
 }
-
