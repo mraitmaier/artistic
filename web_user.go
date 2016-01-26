@@ -24,7 +24,7 @@ func usersHandler(aa *ArtisticApp) http.Handler {
 			// get all users from DB
 			users, err := aa.DataProv.GetAllUsers()
 			if err != nil {
-				log.Error(fmt.Sprintf("[%s] Problem getting all users: %q", user, err.Error()))
+				log.Error(fmt.Sprintf("[%s] Problem getting all users: %q", user.Username, err.Error()))
 				http.Redirect(w, r, "/error", http.StatusFound)
 				return
 			}
@@ -66,7 +66,7 @@ func userHandler(aa *ArtisticApp) http.Handler {
 
 			case "POST":
 				if err := postUserHandler(w, r, aa, user); err != nil {
-					log.Error(fmt.Sprintf("[%s] User POST handler: %q.", user, err.Error()))
+					log.Error(fmt.Sprintf("[%s] User POST handler: %q.", user.Username, err.Error()))
 				}
 				http.Redirect(w, r, "/users", http.StatusFound)
 
@@ -76,7 +76,7 @@ func userHandler(aa *ArtisticApp) http.Handler {
 				t := new(db.User)
 				t.Id = db.MongoStringToId(id) // only valid ID needed to delete
 				if err := aa.DataProv.DeleteUser(t); err != nil {
-					log.Error(fmt.Sprintf("[%s] %s user id=%q, DB returned %q.", user, cmd, id, err))
+					log.Error(fmt.Sprintf("[%s] %s user id=%q, DB returned %q.", user.Username, cmd, id, err))
 					return
 				}
 				log.Info(fmt.Sprintf("[%s] Successfully deleted user %q.", user, t.Username))
@@ -111,7 +111,7 @@ func getUserHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp, use
 		if err != nil {
 			return fmt.Errorf("%s user id=%q, DB returned %q", cmd, id, err)
 		}
-		log.Info(fmt.Sprintf("[%s] %s user=%q Success.", user, strings.ToUpper(cmd), s.Username)) // OK log message
+		log.Info(fmt.Sprintf("[%s] %s user=%q Success.", user.Username, strings.ToUpper(cmd), s.Username)) // OK log message
 
 	case "insert": // do nothing here...
 
@@ -120,7 +120,7 @@ func getUserHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp, use
 		if err = aa.DataProv.DeleteUser(s); err != nil {
 			return fmt.Errorf("%s user id=%q, DB returned %q", cmd, id, err)
 		}
-		log.Info(fmt.Sprintf("[%s] Successfully deleted user %q.", user, s.Username))
+		log.Info(fmt.Sprintf("[%s] Successfully deleted user %q.", user.Username, s.Username))
 		http.Redirect(w, r, "/users", http.StatusFound)
 		return nil //  this is all about deleting items...
 
@@ -152,19 +152,19 @@ func postUserHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp, us
 		if username, err = insertNewUser(w, r, aa); err != nil {
 			return fmt.Errorf("Create (%q)", err.Error())
 		}
-		aa.Log.Info(fmt.Sprintf("[%s] Successfully inserted user %q.", user, username))
+		aa.Log.Info(fmt.Sprintf("[%s] Successfully inserted user %q.", user.Username, username))
 
 	case "modify":
 		if username, err = modifyExistingUser(w, r, aa); err != nil {
 			return fmt.Errorf("Modify (%q)", err.Error())
 		}
-		aa.Log.Info(fmt.Sprintf("[%s] Successfully miodified user %q.", user, username))
+		aa.Log.Info(fmt.Sprintf("[%s] Successfully miodified user %q.", user.Username, username))
 
 	case "changepwd":
 		if username, err = changeUserPassword(w, r, aa); err != nil {
 			return fmt.Errorf("Change password (%q)", err.Error())
 		}
-		aa.Log.Info(fmt.Sprintf("[%s] Successfully changed password for user %q.", user, username))
+		aa.Log.Info(fmt.Sprintf("[%s] Successfully changed password for user %q.", user.Username, username))
 
 	default:
 		err = fmt.Errorf("Unknown command %q", cmd)
@@ -309,7 +309,7 @@ func profileHandler(aa *ArtisticApp) http.Handler {
 
 			case "GET":
 				if err := getProfileHandler(w, r, aa, user); err != nil {
-					log.Error(fmt.Sprintf("[%s] Profile GET handler: %q.", user, err.Error()))
+					log.Error(fmt.Sprintf("[%s] Profile GET handler: %q.", user.Username, err.Error()))
 					//http.Redirect(w, r, "/users", http.StatusFound)
 					break // force break!
 				}
@@ -317,7 +317,7 @@ func profileHandler(aa *ArtisticApp) http.Handler {
 
 			case "POST":
 				if err := postProfileHandler(w, r, aa, user); err != nil {
-					log.Error(fmt.Sprintf("[%s] Profile POST handler: %q.", user, err.Error()))
+					log.Error(fmt.Sprintf("[%s] Profile POST handler: %q.", user.Username, err.Error()))
 				}
 				http.Redirect(w, r, "/users", http.StatusFound)
 			}
