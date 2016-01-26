@@ -495,9 +495,11 @@ func (m *MongoDbConn) adminStyle(cmd DbCommand, s *Style) error {
 	switch cmd {
 
 	case DBCmdUpdate:
+        s.Modified = NewTimestamp()
 		err = coll.UpdateId(s.Id, s)
 
 	case DBCmdInsert:
+        s.Created = NewTimestamp()
 		err = coll.Insert(s)
 
 	case DBCmdDelete:

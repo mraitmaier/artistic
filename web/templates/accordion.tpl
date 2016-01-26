@@ -45,7 +45,7 @@
         <div class="panel-body">
             <p><a href="/dating">Datings</a></p>
             <p><a href="/technique">Techniques</a></p>
-            <p><a href="/styles">Styles</a></p>
+            <p><a href="/style">Styles</a></p>
         </div>
     </div>
 

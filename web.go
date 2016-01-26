@@ -66,10 +66,8 @@ func registerHandlers(aa *ArtisticApp) {
 	r.Handle("/log", logHandler(aa))
 	r.Handle("/technique", techniqueHandler(aa))
 	r.Handle("/technique/{id}/{cmd}", techniqueHandler(aa))
-	//	r.Handle("/technique/{cmd}/", techniqueHandler(aa))
-	r.Handle("/styles", stylesHandler(aa))
-	r.Handle("/style/{cmd}/{id}", styleHandler(aa))
-	r.Handle("/style/{cmd}/", styleHandler(aa))
+	r.Handle("/style", styleHandler(aa))
+	r.Handle("/style/{id}/{cmd}", styleHandler(aa))
 	r.Handle("/dating", datingHandler(aa))
 	r.Handle("/dating/{id}/{cmd}", datingHandler(aa))
 	r.Handle("/error404", err404Handler(aa))
@@ -95,7 +93,6 @@ func registerHandlers(aa *ArtisticApp) {
 
 // initializes and starts web server
 func webStart(aa *ArtisticApp, wwwpath string) error {
-
 	aa.WebInfo = new(WebInfo)
 
 	// create new session cookie store
@@ -384,170 +381,7 @@ func logHandler(aa *ArtisticApp) http.Handler {
 }
 
 // favincon handler
-func faviconHandler(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, favicon)
-}
-
-// styles page handler
-func stylesHandler(aa *ArtisticApp) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
-		if loggedin, user := userIsAuthenticated(aa, r); loggedin {
-
-			log := aa.Log // get logger instance
-
-			// get all styles from DB
-			styles, err := aa.DataProv.GetAllStyles()
-			if err != nil {
-				log.Error(fmt.Sprintf("Problem getting all styles: %s.", err.Error()))
-				http.Redirect(w, r, "/error", http.StatusFound)
-				return
-			}
-
-			// create ad-hoc struct to be sent to page template
-			var web = struct {
-				User   *db.User
-				Styles []*db.Style
-			}{user, styles}
-
-			// render the page
-			if err = renderPage("styles", &web, aa, w, r); err != nil {
-				aa.Log.Error(fmt.Sprintf("[%s] Cannot render the 'styles' template: %q.", user.Username, err.Error()))
-				return
-			}
-			aa.Log.Info(fmt.Sprintf("[%s] Displaying the %q page.", user.Username, r.RequestURI))
-
-		} else {
-			redirectToLoginPage(w, r, aa)
-		}
-	}) // return handler closure
-}
-
-// a single style handler
-func styleHandler(aa *ArtisticApp) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
-		if loggedin, user := userIsAuthenticated(aa, r); loggedin {
-
-			log := aa.Log // get logger instance
-
-			switch r.Method {
-
-			case "GET":
-				if err := getStyleHandler(w, r, aa, user); err != nil {
-					log.Error(fmt.Sprintf("[%s] Style GET handler: %s.", user.Username, err.Error()))
-					break // force break!
-				}
-				log.Info(fmt.Sprintf("[%s] Displaying the %q page.", user.Username, r.RequestURI))
-
-			case "POST":
-				if err := postStyleHandler(w, r, aa, user); err != nil {
-					log.Error(fmt.Sprintf("[%s] Style POST handler: %s.", user.Username, err.Error()))
-				}
-				http.Redirect(w, r, "/styles", http.StatusFound)
-
-			case "DELETE":
-				id := mux.Vars(r)["id"]
-				//cmd := mux.Vars(r)["cmd"]
-				t := new(db.Style)
-				t.Id = db.MongoStringToId(id) // only valid ID needed to delete
-				if err := aa.DataProv.DeleteStyle(t); err != nil {
-					log.Error(fmt.Sprintf("[%s] DELETE Style id=%q (%s).", user.Username, id, err.Error()))
-					return
-				}
-				log.Info(fmt.Sprintf("[%s] Successfully deleted style %q.", user.Username, t.Name))
-				http.Redirect(w, r, "/styles", http.StatusFound)
-
-			case "PUT":
-				log.Warning(fmt.Sprintf("[%s] Received PUT request. :).", user.Username))
-			}
-
-		} else {
-			redirectToLoginPage(w, r, aa)
-		}
-	}) // return handler closure
-}
-
-func getStyleHandler(w http.ResponseWriter, r *http.Request,
-	aa *ArtisticApp, user *db.User) error {
-
-	id := mux.Vars(r)["id"]
-	cmd := mux.Vars(r)["cmd"]
-
-	log := aa.Log
-	var err error
-	s := db.NewStyle()
-
-	switch cmd {
-
-	case "view", "modify":
-		// get a style from DB
-		s, err = aa.DataProv.GetStyle(id)
-		if err != nil {
-			return fmt.Errorf("%s Style id=%q: %s", strings.ToUpper(cmd), id, err.Error())
-		}
-
-	case "insert":
-		// do nothing here...
-
-	case "delete":
-		s.Id = db.MongoStringToId(id) // only valid ID needed to delete
-		if err = aa.DataProv.DeleteStyle(s); err != nil {
-			return fmt.Errorf("DELETE Style id=%q: %s", id, err.Error())
-		}
-		log.Info(fmt.Sprintf("Successfully deleted style %q.", s.Name))
-		http.Redirect(w, r, "/styles", http.StatusFound)
-		return nil //  this is all about deleting items...
-
-	default:
-		return fmt.Errorf("Unknown command %q", cmd)
-	}
-
-	// create ad-hoc struct to be sent to page template
-	var web = struct {
-		User  *db.User
-		Cmd   string // "view", "modify", "create" or "delete"...
-		Style *db.Style
-	}{user, cmd, s}
-
-	return renderPage("style", &web, aa, w, r)
-}
-
-func postStyleHandler(w http.ResponseWriter, r *http.Request, aa *ArtisticApp, user *db.User) error {
-
-	// get data to modify
-	id := mux.Vars(r)["id"]
-	cmd := mux.Vars(r)["cmd"]
-
-	// get POST form values and create a struct
-	name := strings.TrimSpace(r.FormValue("style-name"))
-	descr := strings.TrimSpace(r.FormValue("style-description"))
-	ts := db.NewTimestamp()
-	t := &db.Style{Id: db.MongoStringToId(id), Style: core.Style{Name: name, Description: descr}, Created: ts, Modified: ts}
-
-	var err error
-
-	switch cmd {
-
-	case "insert":
-		if err = aa.DataProv.InsertStyle(t); err != nil {
-			return err
-		}
-		aa.Log.Info(fmt.Sprintf("[%s] Style INSERT %q Success.", user.Username, name))
-
-	case "modify":
-		if err = aa.DataProv.UpdateStyle(t); err != nil {
-			return err
-		}
-		aa.Log.Info(fmt.Sprintf("[%s] Style MODIFY %q Success.", user.Username, name))
-
-	default:
-		http.Redirect(w, r, "/styles", http.StatusFound)
-		err = fmt.Errorf("Unknown command %q", strings.ToUpper(cmd))
-	}
-
-	return err
-}
+func faviconHandler(w http.ResponseWriter, r *http.Request) { http.ServeFile(w, r, favicon) }
 
 // This is handler that handler the "/dating" URL.
 func datingHandler(app *ArtisticApp) http.Handler {
@@ -722,13 +556,13 @@ func techniqueHandler(app *ArtisticApp) http.Handler {
 	})
 }
 
-// This is HTTP POST handler for datings.
+// This is HTTP POST handler for techniques
 func techniqueHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *ArtisticApp) error {
 
 	id := mux.Vars(r)["id"]
 	cmd := mux.Vars(r)["cmd"]
-
 	var err error
+
 	switch strings.ToLower(cmd) {
 
 	case "":
@@ -764,7 +598,7 @@ func techniqueHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *Artis
 	return err
 }
 
-// Helper function that parses the '/dating' POST request values and creates a new instance of Dating.
+// Helper function that parses the '/technique' POST request values and creates a new instance of Technique
 func parseTechniqueFormValues(r *http.Request) *db.Technique {
 
 	name := strings.TrimSpace(r.FormValue("name"))
@@ -778,7 +612,7 @@ func parseTechniqueFormValues(r *http.Request) *db.Technique {
 	return t
 }
 
-// This is HTTP GET handler for datings.
+// This is HTTP GET handler for techniques
 func techniqueHTTPGetHandler(w http.ResponseWriter, r *http.Request, app *ArtisticApp, u *db.User) error {
 
 	t, err := app.DataProv.GetAllTechniques()
@@ -795,3 +629,130 @@ func techniqueHTTPGetHandler(w http.ResponseWriter, r *http.Request, app *Artist
 	app.Log.Info("Displaying '/technique' page")
 	return renderPage("techniques", web, app, w, r)
 }
+
+// This is handler that handler the "/style" URL.
+func styleHandler(app *ArtisticApp) http.Handler {
+
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// if user is autheticated, display the appropriate page
+		if loggedin, user := userIsAuthenticated(app, r); loggedin {
+
+			var err error
+
+			switch r.Method {
+
+			case "GET":
+				if err = styleHTTPGetHandler(w, r, app, user); err != nil {
+					app.Log.Error(fmt.Sprintf("Style HTTP GET %s", err.Error()))
+				}
+
+			case "POST":
+				if err = styleHTTPPostHandler(w, r, app); err != nil {
+					app.Log.Error(fmt.Sprintf("Style HTTP POST %s", err.Error()))
+				}
+				// unconditionally reroute to main style page
+				http.Redirect(w, r, "/style", http.StatusFound)
+
+			case "DELETE":
+				app.Log.Info("Style HTTP DELETE request received. Redirecting to main 'style' page.")
+				// unconditionally reroute to main style page
+				// Use HTTP 303 (see other) to force GET to redirect as DELETE request is normally
+				// followed by another DELETE
+				http.Redirect(w, r, "/style", http.StatusSeeOther)
+
+			case "PUT":
+				app.Log.Info("Style HTTP PUT request received. Redirecting to main 'style' page.")
+				// unconditionally reroute to main style page
+				// Use HTTP 303 (see other) to force GET to redirect as PUT request is normally followed by
+				// another PUT
+				http.Redirect(w, r, "/style", http.StatusSeeOther)
+
+			default:
+				// otherwise just display main 'index' page
+				if err := renderPage("index", nil, app, w, r); err != nil {
+					app.Log.Error(fmt.Sprintf("Index HTTP GET %s", err.Error()))
+					return
+				}
+			}
+
+		} else {
+			// if user not authenticated
+			redirectToLoginPage(w, r, app)
+		}
+	})
+}
+
+// This is HTTP POST handler for styles.
+func styleHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *ArtisticApp) error {
+
+	id := mux.Vars(r)["id"]
+	cmd := mux.Vars(r)["cmd"]
+
+	var err error
+	switch strings.ToLower(cmd) {
+
+	case "":
+		// insert new style, when 'cmd' is empty...
+		if s := parseStyleFormValues(r); s != nil {
+			err = app.DataProv.InsertStyle(s)
+		} else {
+			app.Log.Info(fmt.Sprintf("Creating new Style '%s'", s.Name))
+		}
+
+	case "put":
+		if id == "" {
+			return fmt.Errorf("Modify style: ID is empty")
+		}
+		if s := parseStyleFormValues(r); s != nil {
+			s.Id = db.MongoStringToId(id)
+			err = app.DataProv.UpdateStyle(s)
+			app.Log.Info(fmt.Sprintf("Updating Style '%s'", s.Name))
+		}
+
+	case "delete":
+		if id == "" {
+			return fmt.Errorf("Delete style: ID is empty")
+		}
+		s := db.NewStyle()
+		s.Id = db.MongoStringToId(id)
+		err = app.DataProv.DeleteStyle(s)
+		app.Log.Info(fmt.Sprintf("Removing style '%s'", s.Name))
+
+	default:
+		err = fmt.Errorf("Illegal POST request for style")
+	}
+	return err
+}
+
+// Helper function that parses the '/style' POST request values and creates a new instance of Style
+func parseStyleFormValues(r *http.Request) *db.Style {
+
+	name := strings.TrimSpace(r.FormValue("name"))
+	desc := strings.TrimSpace(r.FormValue("description"))
+	created := strings.TrimSpace(r.FormValue("created"))
+
+	s := db.NewStyle()
+	s.Name = name
+	s.Description = desc
+	s.Created = db.Timestamp(created)
+	return s
+}
+
+// This is HTTP GET handler for styles
+func styleHTTPGetHandler(w http.ResponseWriter, r *http.Request, app *ArtisticApp, u *db.User) error {
+
+	s, err := app.DataProv.GetAllStyles()
+	if err != nil {
+		http.Redirect(w, r, "/err404", http.StatusFound)
+		return fmt.Errorf("Problem getting styles from DB: '%s'", err.Error())
+	}
+	// create ad-hoc struct to be sent to page template
+	var web = struct {
+		Styles []*db.Style
+		Num        int
+		User       *db.User
+	}{s, len(s), u}
+	app.Log.Info("Displaying '/style' page")
+	return renderPage("styles", web, app, w, r)
+}
+

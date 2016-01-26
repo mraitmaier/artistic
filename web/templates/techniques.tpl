@@ -236,7 +236,6 @@
                 <label for="name" class="col-sm-2 control-label">Name</label>
                 <div class="col-sm-10">
                   <input type="text" class="form-control" id="name" name="name" placeholder="Technique Name" required> 
-                           <!-- onblur="return validateInput($(this).val(), 'Requirement Name');" required> -->
                 </div>
             </div>
             <div class="form-group form-group-sm">
@@ -337,7 +336,7 @@
         <div class="form-group form-group-sm">
             <label for="name" class="col-sm-3 control-label">Name</label>
             <div class="col-sm-9">
-                <input type="text" class="form-control" id="name" name="name"></input>
+                <input type="text" class="form-control" id="name" name="name" required></input>
             </div>
         </div>
         <div class="form-group form-group-sm">
