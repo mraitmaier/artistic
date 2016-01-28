@@ -86,7 +86,7 @@
     </div> <!-- container fluid -->
 
    <!-- add modals -->
-    {{template "change_passwd_modal" .User}}
+    {{template "change_pwd_modal" .User}}
     {{template "modify_profile_modal" .User}}
     <!-- end of modals definition -->
 
@@ -101,9 +101,6 @@
     <script src="/static/js/artistic.js"></script>
     <script>
 
-    // when page is ready...
-    $(document).ready( function() {
-
        $('#modProfileModal').on('show.bs.modal', function (event) {
 
             var btn = $(event.relatedTarget); // button that triggerd event
@@ -111,7 +108,7 @@
             var hexid = btn.data('id');
             var username = btn.data('username');
             var password = btn.data('password');
-            var role = btn.data('role');
+            var urole = btn.data('role');
             var fullname = btn.data('fullname');
             var email = btn.data('email');
             var phone = btn.data('phone');
@@ -126,7 +123,7 @@
             modal.find('.modal-body #hexid').val(hexid);
             modal.find('.modal-body #username').val(username);
             modal.find('.modal-body #password').val(password);
-            modal.find('.modal-body #role').val(role);
+            modal.find('.modal-body #urole').val(urole);
             modal.find('.modal-body #fullname').val(fullname);
             modal.find('.modal-body #email').val(email);
             modal.find('.modal-body #phone').val(phone);
@@ -136,18 +133,25 @@
             modal.find('.modal-body #createdd').text(created); // only display
             modal.find('.modal-body #modifiedd').text(modified); //only display
     	});
-    });
+
+        $('changePwdModal').on('show.bs.modal', function (event) {
+
+            var btn = $(event.relatedTarget); // button that triggerd event
+            // extract info from data-dating attribute
+            var hexid = btn.data('id');
+            var username = btn.data('username');
+            //var fullname = btn.data('fullname');
+
+            // Update the modal's content.
+            var modal = $(this);
+            modal.find('.modal-body #hexid').val(hexid);
+            modal.find('.modal-body #username').val(username);
+            //modal.find('.modal-body #fullname').val(fullname);
+        });
 
 		// This should post form (PUT method) to modify a profile
 		var modifyProfile = function(form_id, id) {
-    		var url = '/profile/' + id + '/put';
-            //    	alert("ID=" + id); //DEBUG
-    		postForm(form_id, url);
-		}
-
-		// This should post form (PUT method) to change a password
-		var changePwd = function(form_id, id) {
-    		var url = '/profile/' + id + '/changepwd';
+    		var url = '/profile/' + id
             //    	alert("ID=" + id); //DEBUG
     		postForm(form_id, url);
 		}
@@ -181,7 +185,7 @@
         <form id="modify_profile_form" class="form-horizontal">
             <input type="hidden" id="hexid" name="hexid" />
         	<input type="hidden" id="password" name="password" />
-        	<input type="hidden" id="role" name="role" />
+        	<input type="hidden" id="urole" name="urole" />
         	<input type="hidden" id="disabled" name="disabled" />
         	<input type="hidden" id="mustchange" name="mustchange" />
 
@@ -227,8 +231,8 @@
 </div>
 </div>
 {{end}}
-
-{{define "change_passwd_modal"}}
+Your 
+{{define "change_pwd_modal"}}
 <div class="modal fade" id="changePwdModal" tabindex="-1" role="dialog" aria-lebeleledby="changePwdModalLabel">
 <div class="modal-dialog">
 <div class="modal-content">
@@ -236,7 +240,7 @@
     <div class="modal-header">
     <div class="container-fluid">
         <div class="row">
-            <h4 class="modal-title col-md-8" id="changePwdModalLabel">Change Password</h4>
+            <h4 class="modal-title col-md-8" id="changePwdModalLabel">Change Your Password</h4>
              <button type="button" class="btn btn-danger btn-sm col-sm-2" 
                      onclick="changePwd('change_pwd_form', $('#hexid').val()); $('#changePwdModal').modal('hide');"> Change 
              </button>
@@ -248,14 +252,16 @@
     <div class="modal-body">
     <div class="container-fluid">
     <form class="form-horizontal" method="post" onsubmit="validatePasswordChange();" id="change_pwd_form"> 
-            <input type="hidden" id="hexid" name="hexid" value="{{.Id.Hex}}"/>
+            <input type="hidden" id="hexid" name="hexid" value="{{.Id.Hex}}" />
+            <input type="hidden" id="prev" name="prev" value="profile" />
+
         <div class="row">
 
         <div class="form-group form-group-sm">
             <label for="oldpassword" class="col-sm-3 control-label">Old Password</label>
             <div class="col-sm-6">
                 <input type="password" class="form-control" id="oldpassword" name="oldpassword"
-                                       placeholder="enter old password" required></input>
+                                       placeholder="enter old password" required autofocus></input>
             </div>
         </div>
  
@@ -274,8 +280,8 @@
                                        placeholder="retype new password" required></input>
             </div>
         </div>
-        </div> <!-- row -->
 
+        </div> <!-- row -->
     </form>
 
     </div>

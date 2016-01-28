@@ -3,6 +3,29 @@
  *
  */
 
+// submit form as POST to a given URL
+function postForm(form_id, url) {
+    var form = document.getElementById(form_id);
+    form.setAttribute("action", url);
+    form.setAttribute("method", "post");
+    form.submit();
+}
+
+// submit a change password form
+function changePwd(form_id, id) {
+	
+	var url = '/pwd/' + id;
+	// alert("ID=-" + id + ", url=" + url");
+	postForm(form_id, url); 
+}
+
+//  convert a slrlng into title case 
+function toTitleCase(str) {
+    return str.replace(/(?:^|\s)\w/g, function (match) {
+        return match.toUpperCase();
+    });
+}
+
 function validateUserForm() {
 
     var pwd = document.getElementById("password").value;
@@ -22,7 +45,7 @@ function checkPasswords(pwd1, pwd2) {
     return false;
 }
 
-
+//
 function validatePasswordChange() {
 
     var old = document.getElementById("oldpassword").value;
@@ -39,15 +62,6 @@ function sendRequest(method, url) {
     var req = new XMLHttpRequest();
     req.open(method, url, true);
     req.send(null);
-}
-
-
-// submit form as POST to a given URL
-function postForm(form_id, url) {
-    var form = document.getElementById(form_id);
-    form.setAttribute("action", url);
-    form.setAttribute("method", "post");
-    form.submit();
 }
 
 // create an URL to send

@@ -26,7 +26,6 @@
     {{template "navbar" .User.Fullname}}
 
     <div class="container-fluid">
-
     <div class="row">
 
         <div class="col-md-2" id="menu">
@@ -36,7 +35,6 @@
 
         <div class="col-md-10" id="data-list">
             <h1 id="data-list-header">Styles</h1>
-
 
             <div id="new-req-btn">
             <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addStyleModal">
@@ -92,8 +90,6 @@
                                        data-name="{{$element.Style.Name}}"
                                        data-desc="{{$element.Style.Description}}">
                                 <span class="glyphicon glyphicon-edit"></span>
-                            </a>
-                            </span>       
                             &nbsp;&nbsp;
                             <span data-toggle="tooltip" data-placement="up" title="Remove"> 
                             <a data-toggle="modal" data-target="#removeStyleModal"
