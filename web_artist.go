@@ -128,17 +128,17 @@ func parseArtistFormValues(r *http.Request) *db.Artist {
 	architect := strings.TrimSpace(r.FormValue("architect"))
 	ceramicist := strings.TrimSpace(r.FormValue("ceramicist"))
 	bio := strings.TrimSpace(r.FormValue("biography"))
-    created := strings.TrimSpace(r.FormValue("created"))
+	created := strings.TrimSpace(r.FormValue("created"))
 
 	// create an Artist instance
-    a := db.NewArtist()
+	a := db.NewArtist()
 	a.Name = core.CreateName(first, middle, last)
-    a.RealName = core.CreateName(rfirst, rmiddle, rlast)
+	a.RealName = core.CreateName(rfirst, rmiddle, rlast)
 	a.Born = born
 	a.Died = died
 	a.Nationality = nation
 	a.Biography = bio
-    a.Created = db.Timestamp(created)
+	a.Created = db.Timestamp(created)
 	if painter == "yes" {
 		a.IsPainter = true
 	}
@@ -168,11 +168,10 @@ func artistHTTPGetHandler(w http.ResponseWriter, r *http.Request, app *ArtisticA
 	// create ad-hoc struct to be sent to page template
 	var web = struct {
 		Artists []*db.Artist
-		Num    int
+		Num     int
 		Type    db.ArtistType
-		User   *db.User
+		User    *db.User
 	}{a, len(a), t, u}
 	app.Log.Info(fmt.Sprintf("[%s] Displaying '/artist' page", u.Username))
-    return renderPage("artists", web, app, w, r) 
+	return renderPage("artists", web, app, w, r)
 }
-
