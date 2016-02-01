@@ -65,7 +65,7 @@ type DataProvider interface {
     DeleteUser(*User) error
     CountUsers() (int, error)
 
-    GetAllArtists(ArtistType) ([]Artist, error)
+    GetAllArtists(ArtistType) ([]*Artist, error)
     GetArtist(string) (*Artist, error)
     InsertArtist(*Artist) error
     UpdateArtist(*Artist) error

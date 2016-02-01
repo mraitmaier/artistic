@@ -30,12 +30,124 @@
 
             <div class="col-md-10" id="data-list">
                 <h1 id="data-list-header">{{get_artist_type .Type}}s</h1>
-                {{template "artist-list" .Artists}}
-                <button type="button" class="btn btn-primary" onclick="rerouteUsingGet('artist', 'insert', '');">
-                Add New Artist</button>
+
+            <div id="new-artist-btn">
+            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addArtistModal">
+                <span class="glyphicon glyphicon-plus"></span> &nbsp; Add a New Artist
+            </button>
+        	</div>
+            <br />
+
+            {{if .Artists}}
+                <table class="table table-striped table-hover small" id="artist-list-table">
+
+                <thead>
+                  <tr>
+                    <th class="col-sm-1">#</th>
+                    <th class="col-sm-2">Name</th>
+                    <th class="col-sm-2">RealName</th>
+                    <th class="col-sm-2">Born</th>
+                    <th class="col-sm-2">Died</th>
+                    <th class="col-sm-2">Nationality</th>
+                    <th class="col-sm-1">Actions</th>
+                  </tr>
+                </thead>
+
+                <tfoot>
+                    <tr class="bg-primary">
+                    <td colspan="7"> 
+                        <strong>
+                        {{.Num}} {{if eq .Num 1}} {{get_artist_type .Type}} {{else}} {{get_artist_type .Type}}s {{end}} found.
+                        </strong> 
+                    </td>
+                    </tr>
+                </tfoot>
+
+                <tbody>
+                  {{range $index, $element := .Artists}}
+                  {{ $cnt := add $index 1 }}
+                  <tr id="artist-row-{{$cnt}}">
+                    <td>{{$cnt}}</td>
+                    <td>{{$element.Name}}</td>
+                    <td>{{$element.RealName}}</td>
+                    <td>{{$element.Born}}</td>
+                    <td>{{$element.Died}}</td>
+                    <td>{{$element.Nationality}}</td>
+				    <td>
+  						<span data-toggle="tooltip" data-placement="up" title="View details">
+                            <a data-toggle="modal" data-target="#viewArtistModal"
+                                       data-id="{{$element.Id.Hex}}"
+                                       data-created="{{$element.Created}}"
+                                       data-modified="{{$element.Modified}}"
+                                       data-name="{{$element.Artist.Name}}"
+                                       data-realname="{{$element.Artist.RealName}}"
+                                       data-born="{{$element.Artist.Born}}"
+                                       data-died="{{$element.Artist.Died}}"
+                                       data-nationality="{{$element.Artist.Nationality}}"
+                                       data-biography="{{$element.Artist.Biography}}"
+                                       data-painter="{{$element.Artist.IsPainter}}"
+                                       data-sculptor="{{$element.Artist.IsSculptor}}"
+                                       data-architect="{{$element.Artist.IsArchitect}}"
+                                       data-ceramicist="{{$element.Artist.IsCeramicist}}"
+                                       data-printmaker="{{$element.Artist.IsPrintmaker}}">
+                                 <span class="glyphicon glyphicon-eye-open"></span>
+                            </a>
+                       </span>            
+                       &nbsp;&nbsp;
+                       <span data-toggle="tooltip" data-placement="up" title="Modify details"> 
+                            <a data-toggle="modal" data-target="#modifyArtistModal"
+                                       data-id="{{$element.Id.Hex}}"  
+                                       data-created="{{$element.Created}}" 
+                                       data-modified="{{$element.Modified}}" 
+                                       data-first="{{$element.Artist.Name.First}}"
+                                       data-middle="{{$element.Artist.Name.Middle}}"
+                                       data-last="{{$element.Artist.Name.Last}}"
+                                       data-realfirst="{{$element.Artist.RealName.First}}"
+                                       data-realmiddle="{{$element.Artist.RealName.Middle}}"
+                                       data-reallast="{{$element.Artist.RealName.Last}}"
+                                       data-born="{{$element.Artist.Born}}"
+                                       data-died="{{$element.Artist.Died}}"
+                                       data-nationality="{{$element.Artist.Nationality}}"
+                                       data-biography="{{$element.Artist.Biography}}"
+                                       data-painter="{{$element.Artist.IsPainter}}"
+                                       data-sculptor="{{$element.Artist.IsSculptor}}"
+                                       data-architect="{{$element.Artist.IsArchitect}}"
+                                       data-ceramicist="{{$element.Artist.IsCeramicist}}"
+                                       data-printmaker="{{$element.Artist.IsPrintmaker}}">
+                                 <span class="glyphicon glyphicon-edit"></span>
+                            </a>
+                       </span>            
+                       &nbsp;&nbsp;
+                       <span data-toggle="tooltip" data-placement="up" title="Remove"> 
+                            <a data-toggle="modal" data-target="#removeArtistModal"
+                                       data-id="{{$element.Id.Hex}}"  
+                                       data-name="{{$element.Artist.Name}}">
+                                <span class="glyphicon glyphicon-remove"></span>
+                            </a>
+                       </span>       
+
+                    </td>
+                  </tr>
+                  {{end}}
+                </tbody>
+                </table>
+
+    <!-- add modals -->
+    {{template "view_artist_modal"}}
+    {{template "modify_artist_modal"}}
+    {{template "remove_artist_modal"}}
+    <!-- end of modals definition -->   
+
+            {{else}}
+                <p>No artists were found.</p>
+            {{end}}
+
             </div>
         </div> <!-- row -->
     </div> <!-- container fluid -->
+
+    {{template "add_artist_modal"}}
+
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <!--   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script> -->
@@ -44,423 +156,486 @@
     <script src="/static/js/bootstrap.min.js"></script>
     <!-- custom JS code -->
     <script src="/static/js/artistic.js"></script>
+    <script>
+
+    $('#viewArtistModal').on('show.bs.modal', function (event) {
+
+        var button = $(event.relatedTarget);     // Button that triggered the modal
+        // Extract info from data-* requirement attribute
+        var id = button.data('id');  
+        var name = button.data('name');
+ 		var real = button.data('realname');
+ 		var born = button.data('born');
+ 		var died = button.data('died');
+ 		var nation = button.data('nationality');
+ 		var bio = button.data('biography');
+ 		var painter= button.data('painter');
+ 		var sculptor = button.data('sculptor');
+ 		var architect = button.data('architect');
+ 		var ceramic = button.data('ceramicist');
+ 		var print = button.data('printmaker');
+        var created = button.data('created');
+        var modified = button.data('modified');
+        // Update the modal's content. We'll use jQuery here, but you could use a data 
+        // binding library or other methods instead.
+        var modal = $(this)
+        modal.find('.modal-title').text(name);
+        //modal.find('.modal-body #hexid').val(id);
+        //modal.find('.modal-body #namev').text(name);
+        modal.find('.modal-body #realnamev').text(real);
+        modal.find('.modal-body #diedv').text(died);
+        modal.find('.modal-body #bornv').text(born);
+        modal.find('.modal-body #nationalityv').text(nation);
+        modal.find('.modal-body #biographyv').text(bio);
+        modal.find('.modal-body #createdv').text(created);
+        modal.find('.modal-body #modifiedv').text(modified);
+
+        var roles = ""
+        if (painter) {
+            roles += " Painter"
+        } 
+        if (sculptor) {
+            roles += " Sculptor"
+        } 
+        if (print) {
+            roles += " Printmaker"
+        } 
+        if (ceramic) {
+            roles += " Ceramicist"
+        } 
+        if (architect) {
+            roles += " Architect"
+        } 
+        modal.find('.modal-body #rolesv').text(roles);
+    })
+
+    $('#modifyArtistModal').on('show.bs.modal', function (event) {
+
+        var button = $(event.relatedTarget); // Button that triggered the modal
+        // Extract info from data-* requirement attribute
+        var id = button.data('id');  
+        var first = button.data('first');
+        var middle = button.data('middle');
+        var last = button.data('last');
+ 		var rfirst = button.data('realfirst');
+ 		var rmiddle = button.data('realmiddle');
+ 		var rlast = button.data('reallast');
+ 		var born = button.data('born');
+ 		var died = button.data('died');
+ 		var nation = button.data('nationality');
+ 		var bio = button.data('biography');
+ 		var painter= button.data('painter');
+ 		var sculptor = button.data('sculptor');
+ 		var architect = button.data('architect');
+ 		var ceramic = button.data('ceramicist');
+ 		var print = button.data('printmaker');
+        var created = button.data('created');
+        var modified = button.data('modified');
+        // Update the modal's content. We'll use jQuery here, but you could use a data binding library 
+        // or other methods instead.
+        var modal = $(this)
+        modal.find('.modal-title').text('Modify "' + first + " " + last + '" Details');
+        modal.find('.modal-body #hexid').val(id);
+        modal.find('.modal-body #firstm').val(first);
+        modal.find('.modal-body #middlem').val(middle);
+        modal.find('.modal-body #lastm').val(last);
+        modal.find('.modal-body #realfirstm').val(rfirst);
+        modal.find('.modal-body #realmiddlem').val(rmiddle);
+        modal.find('.modal-body #reallastm').val(rlast);
+        modal.find('.modal-body #diedm').val(died);
+        modal.find('.modal-body #bornm').val(born);
+        modal.find('.modal-body #nationalitym').val(nation);
+        modal.find('.modal-body #biographym').val(bio);
+        if (painter) {
+            modal.find('.modal-body #painterm').prop('checked', true);
+        }
+        if (sculptor) {
+            modal.find('.modal-body #sculptorm').prop('checked', true);
+        }
+        if (architect) {
+            modal.find('.modal-body #architectm').prop('checked', true);
+        }
+        if (ceramic) {
+            modal.find('.modal-body #ceramicistm').prop('checked', true);
+        }
+        if (print) {
+            modal.find('.modal-body #printmakerm').prop('checked', true);
+        }
+        modal.find('.modal-body #created').val(created);
+        modal.find('.modal-body #createdm').text(created);
+        modal.find('.modal-body #modifiedm').text(modified);
+    })
+
+// Handle the removals using modal pop-up 
+   $('#removeArtistModal').on('show.bs.modal', function(event) {
+    
+        var button = $(event.relatedTarget);
+        var id = button.data('id');
+        var name = button.data('name');
+        // Update the modal's content. We'll use jQuery here, but you could use a data binding library 
+        // or other methods instead.
+        var modal = $(this);
+        modal.find('.modal-body #removename').text(name);
+        modal.find('.modal-body #hexid').val(id);
+        modal.find('.modal-body #name').val(name);
+
+        // Let's define the 'remove' button onclick() callback... 
+        var url = '/artist/' + id + '/delete';
+        $('#removebtn').on('click', function(e) { 
+            postForm('remove_artist_form', url); 
+            $('#removeArtistModal').modal('hide');
+        });
+   });
+
+    // This should post a form to modify artist
+    var modifyArtist = function(form_id, id) {
+        var url = '/artist/' + id + '/put';
+        postForm(form_id, url);
+    }
+
+    </script>
 </body>
 </html>
 {{end}}
 
-{{define "artist-list"}}
-{{if .}}
-    <table class="table table-striped table-hover" id="artist-list-table">
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>Name</th>
-        <th>RealName</th>
-        <th>Born</th>
-        <th>Died</th>
-        <th>Nationality</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
+{{define "add_artist_modal"}}
+<div class="modal fade" id="addArtistModal" tabindex="-1" role="dialog" aria-labelledby="addArtistModalLabel">
+<div class="modal-dialog modal-lg">
+<div class="modal-content">
 
-    <tbody>
-      {{range $index, $element := .}}
-      {{ $id := add $index 1 }}
-      <tr id="artist-row-{{$id}}">
-        <td>{{$id}}</td>
-        <td>{{printf "%s" $element.Name}}</td>
-        <td>{{printf "%s" $element.RealName}}</td>
-        <td>{{printf "%s" $element.Born}}</td>
-        <td>{{printf "%s" $element.Died}}</td>
-        <td>{{printf "%s" $element.Nationality}}</td>
-        <td>
-          <a href="#" data-toggle="tooltip" data-placement="left" title="View artist details" id="view-artist-{{$id}}"
-                      onclick="rerouteUsingGet('artist', 'view', {{$element.Id}});">
-              <span class="glyphicon glyphicon-eye-open"></span>
-          </a>
-          &nbsp;
-          <a href="#" data-toggle="tooltip" data-placement="left" title="Modify artist data" id="edit-artist-{{$id}}"
-                      onclick="rerouteUsingGet('artist', 'modify', {{$element.Id}});">
-              <span class="glyphicon glyphicon-pencil"></span>
-          </a>
-          &nbsp;
-          <a href="#" data-toggle="tooltip" data-placement="left" title="Delete artist" id="delete-artist-{{$id}}"
-                      onclick="rerouteUsingGet('artist', 'delete', {{$element.Id}});">
-              <span class="glyphicon glyphicon-trash"></span>
-          </a>
-        </td>
-      </tr>
-      {{end}}
-    </tbody>
-    </table>
-{{else}}
-    <p>No artists were found.</p>
-{{end}}
-{{end}}
-
-{{define "artist"}}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Artistic - Artist Administration</title>
-
-    <!-- Bootstrap -->
-    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
-    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-    <![endif]-->
-    <!-- custom CSS, additional to bootstrap CSS -->
-    <link href="/static/css/custom.css" rel="stylesheet">
-</head>
-
-<body>
-    {{template "navbar" .User.Fullname}}
+    <div class="modal-header">
     <div class="container-fluid">
         <div class="row">
-
-            <div class="col-md-2" id="menu">
-                <h1 id="menu-header"></h1>
-                {{template "accordion"}}
-            </div>
-
-            <div class="col-md-10" id="data-view">
-    {{if eq .Cmd "view"}}
-            {{template "artist-view" .Artist}}
-    {{else if eq .Cmd "modify"}}
-            {{template "artist-modify" .Artist}}
-    {{else if eq .Cmd "insert"}}
-            <h1 id="data-view-header">Create New Artist</h1>
-            <p>Please enter the data to create a new artist.</p>
-            {{template "artist-create"}}
-    {{else if eq .Cmd ""}}
-            <h1 id="data-view-header">{{.Artist.Name}}</h1>
-            {{template "artist-view" .Artist}}
-    {{end}}
-            </div>
-
-      </div> <!-- row -->
+            <h3 class="modal-title col-sm-8" id="addArtistModalLabel">Add a New Artist</h3>
+            <button type="button" class="btn btn-primary btn-sm col-sm-2" 
+                    onclick="postForm('add-artist-form', '/artist'); $('#addArtistModal').modal('hide');"> Add </button>
+            <button type="button" class="btn btn-default btn-sm col-sm-2" data-dismiss="modal">Cancel</button>
+        </div> <!-- row -->
     </div> <!-- container-fluid -->
+    </div> <!-- modal-header -->
 
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <!--   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"> </script> -->
-    <script src="/static/js/jquery.min.js"></script>
-    <!-- Include all compiled plugins, or include individual files as needed -->
-    <script src="/static/js/bootstrap.min.js"></script>
-    <script src="/static/js/artistic.js"></script>
-</body>
-</html>
-{{end}}
-
-{{define "artist-create"}}
-<div class="container-fluid" id="create-artist-form-div">
-<form class="form-horizontal" role="form" method="post" id="create-artist-form" action="/artist/insert/">
+    <div class="modal-body">
+    <form class="form-horizontal" role="form" method="post" id="add-artist-form">
     <fieldset>
 
-    <div class="form-group has-success">
-        <div class="col-md-2 control-label"><b>Name</b></div>
-        <label for="first" class="col-md-1 control-label">First</label>
-        <div class="col-md-2">
-            <input type="text" class="form-control" id="first" name="first" value="" placeholder="first name" required />
+    <div class="form-group form-group-sm has-success">
+        <div class="col-sm-1 control-label"> <strong>Name</strong> </div>
+        <label for="first" class="col-sm-1 control-label">First</label>
+        <div class="col-sm-3">
+            <input type="text" class="form-control" id="first" name="first" placeholder="first name" required autofocus />
         </div>
-        
-        <label for="middle" class="col-md-1 control-label">Middle</label>
-        <div class="col-md-2">
-            <input type="text" class="form-control" id="middle" name="middle" value="" placeholder="middle" />
+        <label for="middle" class="col-sm-1 control-label">Middle</label>
+        <div class="col-sm-2">
+            <input type="text" class="form-control" id="middle" name="middle" placeholder="middle" />
         </div>
-        
-        <label for="last" class="col-md-1 control-label">Last</label>
-        <div class="col-md-3">
-            <input type="text" class="form-control" id="last" name="last" value="" placeholder="last" />
+        <label for="last" class="col-sm-1 control-label">Last</label>
+        <div class="col-sm-3">
+            <input type="text" class="form-control" id="last" name="last" placeholder="last name" />
         </div>
     </div> <!-- form-group -->
 
-    <div class="form-group">
-        <div class="col-md-2 control-label"><b>Real Name</b></div>
-        <label for="realfirst" class="col-md-1 control-label">First</label>
-        <div class="col-md-2">
+    <div class="form-group form-group-sm">
+        <div class="col-sm-1 control-label"><strong>Real Name</strong></div>
+        <label for="realfirst" class="col-sm-1 control-label">First</label>
+        <div class="col-sm-3">
             <input type="text" class="form-control" id="realfirst" name="realfirst" value="" placeholder="first name" />
         </div>
-        
-        <label for="realmiddle" class="col-md-1 control-label">Middle</label>
-        <div class="col-md-2">
+        <label for="realmiddle" class="col-sm-1 control-label">Middle</label>
+        <div class="col-sm-2">
             <input type="text" class="form-control" id="realmiddle" name="realmiddle" value="" placeholder="middle" />
         </div>
-        
-        <label for="reallast" class="col-md-1 control-label">Last</label>
-        <div class="col-md-3">
+        <label for="reallast" class="col-sm-1 control-label">Last</label>
+        <div class="col-sm-3">
             <input type="text" class="form-control" id="reallast" name="reallast" value="" placeholder="last" />
         </div>
     </div> <!-- form-group -->
 
-    <div class="form-group">
-        <label for="born" class="col-md-2 control-label">Born</label>
-        <div class="col-md-3">
+    <div class="form-group form-group-sm">
+        <label for="born" class="col-sm-2 control-label">Born</label>
+        <div class="col-sm-4">
             <input type="date" class="form-control" id="born" name="born" value="" />
         </div>
-        <label for="died" class="col-md-1 control-label">Died</label>
-        <div class="col-md-3">
+        <label for="died" class="col-sm-2 control-label">Died</label>
+        <div class="col-sm-4">
             <input type="date" class="form-control" id="died" name="died" value="" />
         </div>
     </div> <!-- form-group -->
 
-    <div class="form-group">
-        <label for="nationality" class="col-md-2 control-label">Nationality</label>
-        <div class="col-md-3">
+    <div class="form-group form-group-sm">
+        <label for="nationality" class="col-sm-2 control-label">Nationality</label>
+        <div class="col-sm-10">
             <input type="text" class="form-control" id="nationality" name="nationality" value="" placeholder="nationality" />
         </div>
     </div> <!-- form-group -->
 
-    <div class="form-group">
-        <label for="biography" class="control-label">Biography</label>
-        <textarea class="form-control" id="biography" name="biography" rows="5">Biography goes here... </textarea>
+    <div class="form-group form-group-sm">
+        <label for="biography" class="col-sm-2 control-label"> Biography </label>
+    </div> <!-- form-group -->
+    <div class="form-group form-group-sm">
+        <textarea class="col-sm-10 form-control" id="biography" name="biography" rows="6">Biography goes here... </textarea>
     </div> <!-- form-group -->
 
-    <!-- TODO -->
-
-    <div class="form-group form-inline">
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <div class="checkbox">
-            <label><input type="checkbox" id="painter" name="painter" value="yes">&nbsp;&nbsp;Painter</label>
+    <div class="form-group form-group-sm form-inline">
+        <div class="checkbox-inline col-sm-2">
+            <label class="control-label pull-right"><input type="checkbox" name="painter" value="yes"> Painter </label>
         </div> <!-- checkbox -->
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <div class="checkbox">
-            <label><input type="checkbox" id="sculptor" name="sculptor" value="yes">&nbsp;&nbsp;Sculptor</label>
+        <div class="checkbox-inline col-sm-2"> 
+            <label class="control-label pull-right"><input type="checkbox" name="sculptor" value="yes"> Sculptor </label>
         </div> <!-- checkbox -->
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <div class="checkbox">
-            <label><input type="checkbox" id="printmaker" name="printmaker" value="yes">&nbsp;&nbsp;Printmaker</label>
+        <div class="checkbox-inline col-sm-2">
+            <label class="control-label pull-right"><input type="checkbox" name="printmaker" value="yes"> Printmaker </label>
         </div> <!-- checkbox -->
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <div class="checkbox">
-            <label><input type="checkbox" id="ceramicist" name="ceramicist" value="yes">&nbsp;&nbsp;Ceramicist</label>
+        <div class="checkbox-inline col-sm-2">
+            <label class="control-label pull-right"><input type="checkbox" name="ceramicist" value="yes"> Ceramicist </label>
         </div> <!-- checkbox -->
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <div class="checkbox">
-            <label><input type="checkbox" id="architect" name="architect" value="yes">&nbsp;&nbsp;Architect</label>
+        <div class="checkbox-inline col-sm-2">
+            <label class="control-label pull-right"><input type="checkbox" name="architect" value="yes"> Architect </label>
         </div> <!-- checkbox -->
-   </div> <!-- form-group -->
-
-    <div class="form-group">
-        <div class="col-md-4">
-            <button class="btn btn-primary" type="submit" id="artist-submit">Create</button>
-            <button class="btn btn-default" type="reset">Clear</button>
-        </div>
-        <div class="col-md-1 col-md-offset-3">
-            <a class="btn btn-primary" href="/artists">
-                <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;&nbsp;Back
-            </a>
-        </div>
     </div> <!-- form-group -->
 
-    </fieldset>
-</form>
-</div> <!-- container-fluid -->
-{{end}}
-
-{{define "artist-view"}}
-<div class="container-fluid" id="view-artist-table-div">
-
-    <div class="row">
-        <h1 id="data-view-header">{{.Name}}</h1>
-     <!--   <div class="col-md-2 control-label"><b>Name</b></div>
-        <label for="name" class="col-md-1 control-label">Name</label>
-        <div class="col-md-2">
-            <input type="text" class="form-control" id="name" name="name" value="{{.Name}}" readonly />
-        </div> -->
-    </div>    
-
-    <div class="row">
-        <h3><span class="col-md-2">{{.Born}}</span><span class="col-md1">-</span><span class="col-md-2">{{.Died}}</span></h3>
-    </div>    
-
-    <div class="row">&nbsp;<!--empty row --></div>    
-
-    <div class="row"> <b>{{.RealName}}</b> </div>    
-
-    <div class="row">
-         {{if eq .IsPainter true}}<div class="col-md-1"><b>Painter&nbsp;&nbsp;</b></div>{{end}}
-         {{if eq .IsSculptor true}}<div class="col-md-1"><b>Sculptor&nbsp;&nbsp;</b></div>{{end}}
-         {{if eq .IsPrintmaker true}}<div class="col-md-1"><b>Printmaker&nbsp;&nbsp;</b></div>{{end}}
-         {{if eq .IsCeramicist true}}<div class="col-md-1"><b>Ceramicist&nbsp;&nbsp;</b></div>{{end}}
-         {{if eq .IsArchitect true}}<div class="col-md-1"><b>Architect&nbsp;&nbsp;</b></div>{{end}}
-    </div>    
-
-    <div class="row">
-        <p><div class="col-md-2"><b>Nationality</b></div><div class="col-md-10">{{.Nationality}}</div></p> 
-    </div>    
-
-    <div class="row">
-        <div class="control-label"><b>Biography</b></div><br />
-        <textarea class="form-control" id="biography" rows="10" readonly>{{.Biography}}</textarea>
-      <!--  <div class="col-md-2"><b>Biography</b></div><br />
-        <div class="col-md-6"><textarea rows="5" readonly>{{.Biography}}</textarea></div> -->
-    </div>    
-
-    <div class="row"> <div class="col-md-1 col-md-offset-9">
-        <a type="button" class="btn btn-primary" href="/artists">
-            <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;&nbsp;Back
-        </a>
-    </div>
-</div> <!-- container-fluid -->
-{{end}}
-
-{{define "artist-modify"}}
-<div class="container-fluid" id="modify-artist-form-div">
-    <div class="row">
-        <h1 id="data-view-header">Modify Artist</h1>
-    </div>
-
-<form class="form-horizontal" role="form" method="post" id="modify-artist-form">
-    <fieldset>
-
-    <div class="row form-group has-success">
-        <div class="col-md-2 control-label"><b>Name</b></div>
-        <label for="first" class="col-md-1 control-label">First</label>
-        <div class="col-md-2">
-            <input type="text" class="form-control" id="first" name="first" value="{{.Name.First}}" 
-                                                                placeholder="first name" required />
+<!--
+    <div class="form-group form-group-sm">
+        <div class="checkbox-inline col-sm-2">
+            <label class="control-label pull-right"><input type="checkbox" name="writer" value="yes"> Writer </label>
         </div>
-        
-        <label for="middle" class="col-md-1 control-label">Middle</label>
-        <div class="col-md-2">
-            <input type="text" class="form-control" id="middle" name="middle" value="{{.Name.Middle}}" placeholder="middle" />
-        </div>
-        
-        <label for="last" class="col-md-1 control-label">Last</label>
-        <div class="col-md-3">
-            <input type="text" class="form-control" id="last" name="last" value="{{.Name.Last}}" placeholder="last" />
-        </div>
-    </div> <!-- form-group -->
-
-    <div class="row form-group">
-        <div class="col-md-2 control-label"><b>Real Name</b></div>
-        <label for="realfirst" class="col-md-1 control-label">First</label>
-        <div class="col-md-2">
-            <input type="text" class="form-control" id="realfirst" name="realfirst" value="{{.RealName.First}}" />
+        <div class="checkbox-inline col-sm-2">
+            <label class="control-label pull-right"><input type="checkbox" name="poet" value="yes"> Poet </label>
         </div> 
-        <label for="realmiddle" class="col-md-1 control-label">Middle</label>
-        <div class="col-md-2">
-            <input type="text" class="form-control" id="realmiddle" name="realmiddle" value="{{.RealName.Middle}}" />
-        </div>
-        
-        <label for="reallast" class="col-md-1 control-label">Last</label>
-        <div class="col-md-3">
-            <input type="text" class="form-control" id="reallast" name="reallast" value="{{.RealName.Last}}" />
-        </div>
-    </div> <!-- form-group -->
-
-    <div class="row form-group">
-        <label for="born" class="col-md-2 control-label">Born</label>
-        <div class="col-md-3">
-            <input type="date" class="form-control" id="born" name="born" value="{{.Born}}" />
-        </div>
-        <label for="died" class="col-md-1 control-label">Died</label>
-        <div class="col-md-3">
-            <input type="date" class="form-control" id="died" name="died" value="{{.Died}}" />
-        </div>
-    </div> <!-- form-group -->
-
-    <div class="row form-group">
-        <label for="nationality" class="col-md-2 control-label">Nationality</label>
-        <div class="col-md-3">
-            <input type="text" class="form-control" id="nationality" name="nationality" value="{{.Nationality}}" />
-        </div>
-    </div> <!-- form-group -->
-
-    <div class="row form-group">
-        <label for="biography" class="control-label">Biography</label>
-        <textarea class="form-control" id="biography" name="biography" rows="5">{{.Biography}}</textarea>
-    </div> <!-- form-group -->
+    </div> 
+-->
 
     <!-- TODO -->
 
-    <div class="row form-group form-inline">
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <div class="col-md-2">
-        <div class="checkbox">
-            <label>
-            {{if eq .IsPainter true}}
-            <input type="checkbox" id="painter" name="painter" value="yes" checked>
-            {{else}}
-            <input type="checkbox" id="painter" name="painter" value="yes">
-            {{end}}
-            &nbsp;&nbsp;Painter</label>
-        </div> <!-- checkbox -->
-        </div>
-        <div class="col-md-2">
-        
-        <div class="checkbox">
-            <label class="text-right">
-            {{if eq .IsSculptor true}}
-            <input type="checkbox" id="sculptor" name="sculptor" value="yes" checked>
-            {{else}}
-            <input type="checkbox" id="sculptor" name="sculptor" value="yes">
-            {{end}}
-            &nbsp;&nbsp;Sculptor
-            </label>
-        </div> <!-- checkbox -->
-        </div>
-        <div class="col-md-2">
-        
-        <div class="checkbox">
-            <label class="text-right">
-            {{if eq .IsPrintmaker true}}
-            <input type="checkbox" id="printmaker" name="printmaker" value="yes" checked>
-            {{else}}
-            <input type="checkbox" id="printmaker" name="printmaker" value="yes">
-            {{end}}
-            &nbsp;&nbsp;Printmaker
-            </label>
-        </div> <!-- checkbox -->
-        </div>
-        <div class="col-md-2">
-        
-        <div class="checkbox">
-            <label>
-            {{if eq .IsCeramicist true}}
-            <input type="checkbox" id="ceramicist" name="ceramicist" value="yes" checked>
-            {{else}}
-            <input type="checkbox" id="ceramicist" name="ceramicist" value="yes">
-            &nbsp;&nbsp;Ceramicist
-            {{end}}
-            </label>
-        </div> <!-- checkbox -->
-        </div>
-        <div class="col-md-2">
-        
-        <div class="checkbox">
-            <label>
-            {{if eq .IsArchitect true}}
-            <input type="checkbox" id="architect" name="architect" value="yes" checked>
-            {{else}}
-            <input type="checkbox" id="architect" name="architect" value="yes">
-            {{end}}
-            &nbsp;&nbsp;Architect
-            </label>
-        </div> <!-- checkbox -->
-        </div>
-   </div> <!-- form-group -->
+       </fieldset>
+    </form>
 
-    <div class="row form-group">
-        <div class="col-md-4">
-            <button class="btn btn-primary" type="submit" id="artist-submit">Modify</button>
-            <button class="btn btn-default" type="reset">Clear</button>
-        </div>
-        <div class="col-md-1 col-md-offset-3">
-            <a class="btn btn-primary" href="/artists">
-                <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;&nbsp;Back
-            </a>
-        </div>
-    </div> <!-- form-group -->
+    </div> <!-- modal-body -->
+</div>
+</div>
+</div>
+{{end}}
 
-    </fieldset>
-</form>
-</div> <!-- container-fluid -->
+{{define "view_artist_modal"}}
+<div class="modal fade" id="viewArtistModal" tabindex="-1" role="dialog" aria-lebeleledby="ViewArtistModalLabel">
+<div class="modal-dialog modal-lg">
+<div class="modal-content">
 
+    <div class="modal-header">
+    <div class="container-fluid">
+        <div class="row">
+            <h3 class="modal-title col-md-10" id="viewArtistModalLabel"><span id="namev"></span></h3>
+            <button type="button" class="btn btn-default btn-sm col-md-2" data-dismiss="modal">Close</button>
+        </div> <!-- row -->
+    </div> <!-- container-fluid -->
+    </div> <!-- modal-header -->
+
+    <div class="modal-body">
+        <div class="container-fluid" id="view-artist-table-div">
+
+        <div class="row">
+            <strong><span id="rolesv"></span></strong>
+        </div> <!-- row -->
+
+        <div class="row">
+        &nbsp; <!-- empty row -->
+        </div> <!-- row -->
+
+        <div class="row">
+             <table id="view-user-table" class="table table-hover small">
+             <tbody>
+             <!--
+                 <tr> <td class="col-sm-3"></td> 
+                      <td id="rolesv" class="col-sm-9"></td> </tr>
+                -->
+                 <tr> <td class="col-sm-3"><b>Real Name<b/></td>
+                      <td class="col-sm-9"><span id="realnamev"></span></td> </tr>
+                 <tr> <td class="col-sm-3"><b>Born</b></td> 
+                      <td id="bornv" class="col-sm-9"></td> </tr>
+                 <tr> <td class="col-sm-3"><b>Died</b></td> 
+                      <td id="diedv" class="col-sm-9"></td> </tr>
+                 <tr> <td class="col-sm-3"><strong>Nationality</strong></td> 
+                      <td id="nationalityv" class="col-sm-9"></td> </tr>
+                 <tr> <td class="col-sm-3"><strong>Biography</strong></td> 
+                      <td id="biographyv" class="col-sm-9"></td> </tr>
+                 <tr> <td class="col-sm-3"><b>Created</b></td> 
+                      <td id="createdv" class="col-sm-9"></td> </tr>
+                 <tr> <td class="col-sm-3"><b>Last Modified</b></td> 
+                      <td id="modifiedv" class="col-sm-9"></td> </tr>
+             </tbody>
+             </table>
+        </div> <!-- row -->
+        </div> <!-- container-fluid -->
+    </div> <!-- modal-body -->
+
+</div>
+</div>
+</div>
+{{end}}
+
+{{define "modify_artist_modal"}}
+<div class="modal fade" id="modifyArtistModal" tabindex="-1" role="dialog" aria-lebeleledby="modifyArtistModalLabel">
+<div class="modal-dialog modal-lg">
+<div class="modal-content">
+
+    <div class="modal-header">
+    <div class="container-fluid">
+        <div class="row">
+            <h3 class="modal-title col-md-8" id="modifyArtistModalLabel">Empty Artist Details</h3>
+             <button type="button" class="btn btn-primary btn-sm col-sm-2" 
+                     onclick="modifyArtist('modify_artist_form',$('#hexid').val());$('#modifyArtistModal').modal('hide');">
+                     Modify
+             </button>
+            <button type="button" class="btn btn-default btn-sm col-md-2" data-dismiss="modal">Cancel</button>
+        </div> <!-- row -->
+    </div> <!-- container-fluid -->
+    </div> <!-- modal-header -->
+
+    <div class="modal-body">
+    <div class="container-fluid">
+        <div class="row">
+
+        <form id="modify_artist_form" class="form-horizontal">
+            <fieldset>
+                <input type="hidden" id="hexid" name="hexid" />
+                <div class="form-group form-group-sm">
+                    <div class="col-sm-1 control-label"> <strong>Name</strong> </div>
+                    <label for="first" class="col-sm-1 control-label">First</label>
+                    <div class="col-sm-3">
+                        <input type="text" class="form-control" id="firstm" name="first" required />
+                    </div>
+                    <label for="middle" class="col-sm-1 control-label">Middle</label>
+                    <div class="col-sm-2">
+                        <input type="text" class="form-control" id="middlem" name="middle" />
+                    </div>
+                    <label for="last" class="col-sm-1 control-label">Last</label>
+                    <div class="col-sm-3">
+                        <input type="text" class="form-control" id="lastm" name="last" />
+                    </div>
+                </div> <!-- form-group -->
+
+                <div class="form-group form-group-sm">
+                    <div class="col-sm-1 control-label"><strong>Real Name</strong></div>
+                    <label for="realfirst" class="col-sm-1 control-label">First</label>
+                    <div class="col-sm-3">
+                        <input type="text" class="form-control" id="realfirstm" name="realfirst" />
+                    </div>
+                    <label for="realmiddle" class="col-sm-1 control-label">Middle</label>
+                    <div class="col-sm-2">
+                        <input type="text" class="form-control" id="realmiddlem" name="realmiddle" />
+                    </div>
+                    <label for="reallast" class="col-sm-1 control-label">Last</label>
+                    <div class="col-sm-3">
+                        <input type="text" class="form-control" id="reallastm" name="reallast" />
+                    </div>
+                </div> <!-- form-group -->
+
+                <div class="form-group form-group-sm">
+                    <label for="born" class="col-sm-2 control-label">Born</label>
+                    <div class="col-sm-4">
+                        <input type="date" class="form-control" id="bornm" name="born" />
+                    </div>
+                    <label for="died" class="col-sm-2 control-label">Died</label>
+                    <div class="col-sm-4">
+                        <input type="date" class="form-control" id="diedm" name="died" />
+                    </div>
+                </div> <!-- form-group -->
+
+                <div class="form-group form-group-sm">
+                    <label for="nationality" class="col-sm-2 control-label">Nationality</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="nationalitym" name="nationality" />
+                    </div>
+                </div> <!-- form-group -->
+
+                <div class="form-group form-group-sm">
+                    <label for="biography" class="col-sm-2 control-label"> Biography </label>
+                </div> <!-- form-group -->
+                <div class="form-group form-group-sm">
+                    <textarea class="col-sm-10 form-control" id="biographym" name="biography" rows="6"></textarea>
+                </div> <!-- form-group -->
+
+                <div class="form-group form-group-sm form-inline">
+                    <div class="checkbox-inline col-sm-2">
+                        <label class="control-label pull-right">
+                            <input type="checkbox" id="painterm" name="painter" value="yes"/> Painter 
+                        </label>
+                    </div> <!-- checkbox -->
+                    <div class="checkbox-inline col-sm-2"> 
+                        <label class="control-label pull-right">
+                            <input type="checkbox" id="sculptorm" name="sculptor" value="yes"/> Sculptor 
+                        </label>
+                    </div> <!-- checkbox -->
+                    <div class="checkbox-inline col-sm-2">
+                        <label class="control-label pull-right">
+                            <input type="checkbox" id="printmakerm" name="printmaker" value="yes"/> Printmaker 
+                        </label>
+                    </div> <!-- checkbox -->
+                    <div class="checkbox-inline col-sm-2">
+                        <label class="control-label pull-right">
+                            <input type="checkbox" id="ceramicistm" name="ceramicist" value="yes"/> Ceramicist 
+                        </label>
+                    </div> <!-- checkbox -->
+                    <div class="checkbox-inline col-sm-2">
+                        <label class="control-label pull-right">
+                            <input type="checkbox" id="architectm" name="architect" value="yes" /> Architect 
+                        </label>
+                    </div> <!-- checkbox -->
+                </div> <!-- form-group -->
+
+<!--
+    <div class="form-group form-group-sm">
+        <div class="checkbox-inline col-sm-2">
+            <label class="control-label pull-right"><input type="checkbox" name="writer"> Writer </label>
+        </div>
+        <div class="checkbox-inline col-sm-2">
+            <label class="control-label pull-right"><input type="checkbox" name="poet"> Poet </label>
+        </div> 
+    </div> 
+-->
+
+    <!-- TODO -->
+        <div class="form-group form-group-sm small">
+            <input type="hidden" id="created" name="created"></input>
+            <div class="col-sm-2 text-right"><strong>Created:</strong></div>
+            <div id="createdm" name="createdm" class="col-sm-4 text-left">Error</div>
+            <div class="col-sm-2 text-right"><strong>Modified:</strong></div>
+            <div id="modifiedm" name="modifiedm" class="col-sm-4 text-left">Error</div>
+        </div>
+
+       </fieldset>
+        </form>
+        </div> <!-- row -->
+    </div> <!-- container-fluid -->
+    </div> <!-- modal-body -->
+
+</div>
+</div>
+</div>
+{{end}}
+
+{{define "remove_artist_modal"}}
+<div class="modal fade" id="removeArtistModal" tabindex="-1" role="dialog" aria-labelledby="removeArtistModalLabel">
+<div class="modal-dialog">
+<div class="modal-content">
+
+    <div class="modal-header">
+    <div class="container-fluid">
+        <div class="row">
+            <h3 class="modal-title col-sm-8" id="removeArtistModalLabel">Remove Artist</h3>
+            <button type="button" class="btn btn-primary btn-sm col-sm-2" id="removebtn"> Remove </button>
+            <button type="button" class="btn btn-default btn-sm col-sm-2" data-dismiss="modal"> Cancel </button>
+        </div> <!-- row -->
+    </div> <!-- container-fluid -->
+    </div> <!-- modal-header -->
+
+    <div class="modal-body">
+    <p> Would you really like to remove the artist '<span id="removename"></span>'?</p>
+    <form method="post" id="remove_artist_form">
+        <input type="hidden" name="id" id="id" />
+        <input type="hidden" name="name" id="name" />
+    </form>
+    </div>
+</div>
+</div>
+</div>
 {{end}}

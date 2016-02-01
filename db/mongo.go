@@ -611,8 +611,8 @@ func (m *MongoDbConn) adminTechnique(cmd DbCommand, t *Technique) error {
 	return err
 }
 
-///////////////////////////// Painters
-func (m *MongoDbConn) GetAllArtists(t ArtistType) ([]Artist, error) {
+///////////////////////////// Artists
+func (m *MongoDbConn) GetAllArtists(t ArtistType) ([]*Artist, error) {
 
 	// acquire DB lock
 	dblock.Lock()
@@ -625,10 +625,10 @@ func (m *MongoDbConn) GetAllArtists(t ArtistType) ([]Artist, error) {
 	}
 
 	// create channel
-	ch := make(chan []Artist)
+	ch := make(chan []*Artist)
 
 	// start a new goroutine to get users from DB
-	go func(ch chan []Artist) {
+	go func(ch chan []*Artist) {
 
 		// check channel
 		if ch == nil {
@@ -636,7 +636,7 @@ func (m *MongoDbConn) GetAllArtists(t ArtistType) ([]Artist, error) {
 		}
 
 		// prepare the empty slice for users
-		artists := make([]Artist, 0)
+		artists := make([]*Artist, 0)
 		var err error
 
 		// get all artists from DB
@@ -760,9 +760,11 @@ func (m *MongoDbConn) adminArtist(cmd DbCommand, a *Artist) error {
 	switch cmd {
 
 	case DBCmdUpdate:
+        a.Modified = NewTimestamp()
 		err = coll.UpdateId(a.Id, a)
 
 	case DBCmdInsert:
+        a.Created = NewTimestamp()
 		err = coll.Insert(a)
 
 	case DBCmdDelete:
@@ -771,6 +773,5 @@ func (m *MongoDbConn) adminArtist(cmd DbCommand, a *Artist) error {
 	default:
 		err = fmt.Errorf("Handling artists: Unknown DB command.")
 	}
-
 	return err
 }

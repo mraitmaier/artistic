@@ -310,7 +310,6 @@ func changeUserPassword(w http.ResponseWriter, r *http.Request, aa *ArtisticApp)
 	}
 
 	// now do it... but refresh modified timestamp before
-	u.Modified = db.NewTimestamp()
 	if err = aa.DataProv.UpdateUser(u); err != nil {
 		return "", err
 	}

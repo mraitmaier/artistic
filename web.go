@@ -32,9 +32,6 @@ type WebInfo struct {
 	// web session cookie store
 	store *sessions.CookieStore
 
-	// websocket connection
-	//wsConn *websocket.Conn
-
 	// (error, info etc.) message to be displayed on page
 	Msg WebMessage
 }
@@ -75,14 +72,14 @@ func registerHandlers(aa *ArtisticApp) {
 	r.Handle("/license", licenseHandler(aa))
 	r.Handle("/profile", profileHandler(aa))
 	r.Handle("/profile/{id}", profileHandler(aa))
-	r.Handle("/artists", artistsHandler(aa, db.ArtistTypeArtist))
-	r.Handle("/painters", artistsHandler(aa, db.ArtistTypePainter))
-	r.Handle("/sculptors", artistsHandler(aa, db.ArtistTypeSculptor))
-	r.Handle("/printmakers", artistsHandler(aa, db.ArtistTypePrintmaker))
-	r.Handle("/ceramicists", artistsHandler(aa, db.ArtistTypeCeramicist))
-	r.Handle("/architects", artistsHandler(aa, db.ArtistTypeArchitect))
-	r.Handle("/artist/{cmd}/{id}", artistHandler(aa))
-	r.Handle("/artist/{cmd}/", artistHandler(aa))
+	r.Handle("/artist", artistHandler(aa, db.ArtistTypeArtist))
+	r.Handle("/painter", artistHandler(aa, db.ArtistTypePainter))
+	r.Handle("/sculptor", artistHandler(aa, db.ArtistTypeSculptor))
+	r.Handle("/printmaker", artistHandler(aa, db.ArtistTypePrintmaker))
+	r.Handle("/ceramicist", artistHandler(aa, db.ArtistTypeCeramicist))
+	r.Handle("/architect", artistHandler(aa, db.ArtistTypeArchitect))
+	r.Handle("/artist/{id}/{cmd}", artistHandler(aa, db.ArtistTypeArtist))
+	//r.Handle("/artist/{cmd}/", artistHandler(aa))
 	r.HandleFunc("/favicon.ico", faviconHandler)
 	r.NotFoundHandler = err404Handler(aa)
 
