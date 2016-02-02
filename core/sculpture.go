@@ -7,8 +7,8 @@ import (
 
 type Sculpture struct {
 
-    // embedded struct
-	*Work
+	// embedded struct
+	Work
 }
 
 func (s *Sculpture) String() string { return s.Work.Title }
@@ -19,7 +19,7 @@ func (s *Sculpture) Json() (string, error) {
 }
 
 func NewSculpture() *Sculpture {
-    return &Sculpture{CreateNewWork()}
+	return &Sculpture{*CreateNewWork()}
 }
 
 func (s *Sculpture) Display() string { return s.Work.Display() }
@@ -37,10 +37,10 @@ func (s *Sculpture) DisplayExhibitions() string {
 // serialize a list of sculptures into JSON
 func sculpturesToJson(items []Sculpture) (data string, err error) {
 
-    var b []byte
-    if b, err = json.Marshal(items); err != nil {
-        return
-    }
-    data = string(b[:])
-    return
+	var b []byte
+	if b, err = json.Marshal(items); err != nil {
+		return
+	}
+	data = string(b[:])
+	return
 }

@@ -6,7 +6,7 @@ import (
 )
 
 type Print struct {
-	*Work
+	Work
 }
 
 func (p *Print) String() string { return p.Work.Title }
@@ -16,7 +16,7 @@ func (p *Print) Json() (string, error) {
 	return string(s[:]), err
 }
 
-func NewPrint() *Print { return &Print{CreateNewWork()} }
+func NewPrint() *Print { return &Print{*CreateNewWork()} }
 
 func (p *Print) Display() string { return p.Work.Display() }
 
@@ -30,14 +30,13 @@ func (p *Print) DisplayExhibitions() string {
 
 //func (p *Print) Created() string { return p.Work.Created() }
 
-
 // serialize a list of prints into JSON
 func printsToJson(items []Print) (data string, err error) {
 
-    var b []byte
-    if b, err = json.Marshal(items); err != nil {
-        return
-    }
-    data = string(b[:])
-    return
+	var b []byte
+	if b, err = json.Marshal(items); err != nil {
+		return
+	}
+	data = string(b[:])
+	return
 }

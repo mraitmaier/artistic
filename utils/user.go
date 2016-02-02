@@ -1,4 +1,5 @@
 package utils
+
 // Package user implements the type that defines a user with username, password, role and usual other information about users.
 
 import (
@@ -17,7 +18,7 @@ type User struct {
 	Username string
 
 	// password field is private so that all operations on password are controlled by the code in this file
-    Password string
+	Password string
 
 	// role is a private field so that all changes are controlled by code in this file
 	Role string
@@ -38,12 +39,12 @@ type User struct {
 	MustChangePassword bool
 
 	// AllowedRoles a closure that checks allowed roles for users
-    AllowedRoles  `bson:"-"`
+	AllowedRoles `bson:"-"`
 
-    // Visible is a flag - that might be used or not - indicating the user's visibility in the system (UI). 
-    // This is actually of limited use: it may be used for a user that cannot be deleted (something like 'god' user).
-    // The user is visible by default, of course.
-    Visible bool
+	// Visible is a flag - that might be used or not - indicating the user's visibility in the system (UI).
+	// This is actually of limited use: it may be used for a user that cannot be deleted (something like 'god' user).
+	// The user is visible by default, of course.
+	Visible bool
 }
 
 // NewUser creates a new User with only basic (mandatory!) properties defined.
@@ -66,7 +67,7 @@ func CreateUser(name, passwd, role, fullname, email, phone string, create bool, 
 	u.Phone = phone
 	u.Disabled = false
 	u.MustChangePassword = false
-    u.Visible = true
+	u.Visible = true
 	return u
 }
 
@@ -109,10 +110,10 @@ func (u *User) ChangePassword(old, newp, repeatedp string) error {
 		return fmt.Errorf("New password strings do not match.")
 	}
 
-    oldpwd, err := NewPassword(u.Password, false)
-    if err != nil {
-        return err
-    }
+	oldpwd, err := NewPassword(u.Password, false)
+	if err != nil {
+		return err
+	}
 	// check if we match the old password
 	if !oldpwd.Cmp(old) {
 		return fmt.Errorf("Invalid old password.")
@@ -142,11 +143,11 @@ func (u *User) ChangeRole(role string) error {
 // ComparePassword does what it says: it compares the given (plain-text) password with existing one.
 func (u *User) ComparePassword(toCompare string) bool {
 
-    p, err := NewPassword(u.Password, false)
-    if err != nil {
-        return false
-    }
-    return p.Cmp(toCompare)
+	p, err := NewPassword(u.Password, false)
+	if err != nil {
+		return false
+	}
+	return p.Cmp(toCompare)
 }
 
 // IsDisabled returns the value of the Disabled flag.

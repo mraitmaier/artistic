@@ -1,12 +1,11 @@
-
 package utils
 
 import (
 	"errors"
 	"fmt"
 	"net"
+	"strings"
 	"time"
-    "strings"
 )
 
 type Severity int
@@ -20,7 +19,7 @@ const (
 	Notice
 	Informational
 	Debug
-    UnknownSeverity
+	UnknownSeverity
 )
 
 func (s Severity) String() string {
@@ -50,26 +49,26 @@ func (s Severity) String() string {
 // Converts log level given as string into proper Severity value.
 // If invalid string is given, function returns 'UnknownSeverity' value.
 func SeverityFromString(lvl string) Severity {
-    loglvl := UnknownSeverity
-    switch strings.ToUpper(lvl) {
-    case "EMERGENCY":
-        loglvl = Emergency
-    case "ALERT":
-        loglvl = Alert
-    case "CRITICAL":
-        loglvl = Critical
-    case "ERROR":
-        loglvl = Error
-    case "WARNING":
-        loglvl = Warning
-    case "NOTICE":
-        loglvl = Notice
-    case "INFO":
-        loglvl = Informational
-    case "DEBUG":
-        loglvl = Debug
-    }
-    return loglvl
+	loglvl := UnknownSeverity
+	switch strings.ToUpper(lvl) {
+	case "EMERGENCY":
+		loglvl = Emergency
+	case "ALERT":
+		loglvl = Alert
+	case "CRITICAL":
+		loglvl = Critical
+	case "ERROR":
+		loglvl = Error
+	case "WARNING":
+		loglvl = Warning
+	case "NOTICE":
+		loglvl = Notice
+	case "INFO":
+		loglvl = Informational
+	case "DEBUG":
+		loglvl = Debug
+	}
+	return loglvl
 }
 
 //
@@ -110,7 +109,7 @@ const (
 )
 
 /*
- * SyslogMsg 
+ * SyslogMsg
  */
 type SyslogMsg struct {
 	Sev                 Severity

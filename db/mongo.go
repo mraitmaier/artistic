@@ -286,11 +286,11 @@ func (m *MongoDbConn) adminUser(cmd DbCommand, u *User) error {
 	switch cmd {
 
 	case DBCmdUpdate:
-        u.Modified = NewTimestamp()
+		u.Modified = NewTimestamp()
 		err = coll.UpdateId(u.Id, u)
 
 	case DBCmdInsert:
-        u.Created = NewTimestamp()
+		u.Created = NewTimestamp()
 		err = coll.Insert(u)
 
 	case DBCmdDelete:
@@ -378,7 +378,7 @@ func (m *MongoDbConn) UpdateDating(d *Dating) error {
 	}
 
 	// update the dating in DB
-    d.Modified = NewTimestamp() // Update modified timestamp before commiting
+	d.Modified = NewTimestamp() // Update modified timestamp before commiting
 	if err := db.C("datings").Update(bson.M{"_id": d.Id}, d); err != nil {
 		return err
 	}
@@ -403,11 +403,11 @@ func (m *MongoDbConn) InsertDatings(datings []*Dating) error {
 	}
 
 	// update the dating in DB
-    for _, d := range datings { 
-	    if err := db.C("datings").Insert(d); err != nil {
-		    return err
-	    }   
-    }
+	for _, d := range datings {
+		if err := db.C("datings").Insert(d); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
@@ -497,11 +497,11 @@ func (m *MongoDbConn) adminStyle(cmd DbCommand, s *Style) error {
 	switch cmd {
 
 	case DBCmdUpdate:
-        s.Modified = NewTimestamp()
+		s.Modified = NewTimestamp()
 		err = coll.UpdateId(s.Id, s)
 
 	case DBCmdInsert:
-        s.Created = NewTimestamp()
+		s.Created = NewTimestamp()
 		err = coll.Insert(s)
 
 	case DBCmdDelete:
@@ -595,11 +595,11 @@ func (m *MongoDbConn) adminTechnique(cmd DbCommand, t *Technique) error {
 	switch cmd {
 
 	case DBCmdUpdate:
-        t.Modified = NewTimestamp() // update modified timestamp first...
+		t.Modified = NewTimestamp() // update modified timestamp first...
 		err = coll.UpdateId(t.Id, t)
 
 	case DBCmdInsert:
-        t.Created = NewTimestamp() // create new timestamp first...
+		t.Created = NewTimestamp() // create new timestamp first...
 		err = coll.Insert(t)
 
 	case DBCmdDelete:
@@ -760,11 +760,11 @@ func (m *MongoDbConn) adminArtist(cmd DbCommand, a *Artist) error {
 	switch cmd {
 
 	case DBCmdUpdate:
-        a.Modified = NewTimestamp()
+		a.Modified = NewTimestamp()
 		err = coll.UpdateId(a.Id, a)
 
 	case DBCmdInsert:
-        a.Created = NewTimestamp()
+		a.Created = NewTimestamp()
 		err = coll.Insert(a)
 
 	case DBCmdDelete:
@@ -774,4 +774,220 @@ func (m *MongoDbConn) adminArtist(cmd DbCommand, a *Artist) error {
 		err = fmt.Errorf("Handling artists: Unknown DB command.")
 	}
 	return err
+}
+
+////////////////////// Paintings
+
+// GetAllPaintings retrieves all paintings from DB with given DB descriptor.
+func (m *MongoDbConn) GetAllPaintings() ([]*Painting, error) {
+
+	// acquire lock
+	dblock.Lock()
+	defer dblock.Unlock()
+
+	// get *mgo.Database instance
+	db := m.Sess.DB(m.name)
+	if db == nil {
+		return nil, errors.New("Getting paintings: DB descriptor empty.")
+	}
+
+	// create channel
+	ch := make(chan []*Painting)
+
+	// start a new goroutine to get users from DB
+	go func(ch chan []*Painting) {
+
+		// check channel
+		if ch == nil {
+			return
+		}
+
+		// prepare the empty slice for users
+		p := make([]*Painting, 0)
+
+		// get all users from DB
+		if err := db.C("paintings").Find(bson.D{}).All(&p); err != nil {
+			return
+		}
+
+		// write the users to the channel
+		ch <- p
+
+	}(ch)
+
+	// read the answer from channel
+	p := <-ch
+
+	return p, nil // OK
+}
+
+// GetPainting retrieves a single painting from the DB: we need an ID.
+func (m *MongoDbConn) GetPainting(id string) (*Painting, error) {
+
+	// acquire lock
+	dblock.Lock()
+	defer dblock.Unlock()
+
+	// get *mgo.Database instance
+	db := m.Sess.DB(m.name)
+	if db == nil {
+		return nil, errors.New("Getting single painting: MongoDB descriptor empty.")
+	}
+
+	// prepare channel
+	ch := make(chan *Painting)
+
+	// start goroutine to get a user
+	go func(id string, ch chan *Painting) {
+
+		p := NewPainting() // create empty user
+
+		// get a user from DB
+		err := db.C("paintings").Find(bson.M{"_id": MongoStringToId(id)}).One(&p)
+		if err != nil {
+			return
+		}
+
+		// write a user to channel
+		ch <- p
+	}(id, ch)
+
+	// read user from channel
+	p := <-ch
+
+	return p, nil // all OK
+}
+
+// UpdatePainting modifies a single painting in DB.
+func (m *MongoDbConn) UpdatePainting(p *Painting) error {
+	return m.adminPainting(DBCmdUpdate, p)
+}
+
+// InsertPainting creates a new painting in DB.
+func (m *MongoDbConn) InsertPainting(p *Painting) error {
+	// check the ID of the item to be inserted into DB
+	if p.Id == "" {
+		p.Id = NewMongoId()
+	}
+	return m.adminPainting(DBCmdInsert, p)
+}
+
+// DeletePainting removes a single painting from DB.
+func (m *MongoDbConn) DeletePainting(p *Painting) error {
+	return m.adminPainting(DBCmdDelete, p)
+}
+
+// Aux method that administers the painting records in DB
+func (m *MongoDbConn) adminPainting(cmd DbCommand, p *Painting) error {
+
+	dblock.Lock()
+	defer dblock.Unlock()
+
+	coll := m.Sess.DB(m.name).C("paintings")
+	if coll == nil {
+		return fmt.Errorf("Handling a painting: MongoDB descriptor empty.")
+	}
+
+	if p == nil {
+		return fmt.Errorf("Handling a painting: cannot create empty painting.")
+	}
+
+	var err error
+	switch cmd {
+
+	case DBCmdUpdate:
+		p.Modified = NewTimestamp() // update modified timestamp first...
+		err = coll.UpdateId(p.Id, p)
+
+	case DBCmdInsert:
+		p.Created = NewTimestamp() // create new timestamp first...
+		err = coll.Insert(p)
+
+	case DBCmdDelete:
+		err = coll.RemoveId(p.Id)
+
+	default:
+		err = fmt.Errorf("Handling paintings: Unknown DB command.")
+	}
+	return err
+}
+
+////
+//
+func (m *MongoDbConn) GetDatingNames() ([]string, error) {
+
+	// acquire lock
+	dblock.Lock()
+	defer dblock.Unlock()
+
+	// get *mgo.Database instance
+	var err error
+	db := m.Sess.DB(m.name)
+	if db == nil {
+		return nil, err
+	}
+
+	// get all dating names from DB
+	d := make([]*Dating, 0)
+	//if err := db.C("datings").Find(nil).Select(bson.M{"dating": 1}).All(&d); err != nil {
+	if err := db.C("datings").Find(bson.D{}).All(&d); err != nil { // XXX: This is not OK, but I can't get it the other way...
+		return nil, err
+	}
+	datings := make([]string, 0)
+	for _, val := range d {
+		datings = append(datings, val.Dating.Dating)
+	}
+	return datings, nil
+}
+
+func (m *MongoDbConn) GetStyleNames() ([]string, error) {
+
+	// acquire lock
+	dblock.Lock()
+	defer dblock.Unlock()
+
+	// get *mgo.Database instance
+	var err error
+	db := m.Sess.DB(m.name)
+	if db == nil {
+		return nil, err
+	}
+
+	// get all style names from DB
+	s := make([]*Style, 0)
+	//if err := db.C("styles").Find(bson.D{}).Select(bson.M{ "name": 1, "_id":0 }).All(&s); err != nil {
+	if err := db.C("styles").Find(bson.D{}).All(&s); err != nil { // XXX: This is not OK, but I can't get it the other way...
+		return nil, err
+	}
+	styles := make([]string, 0)
+	for _, val := range s {
+		styles = append(styles, val.Style.Name)
+	}
+	return styles, nil
+}
+
+func (m *MongoDbConn) GetTechniqueNames() ([]string, error) {
+
+	// acquire lock
+	dblock.Lock()
+	defer dblock.Unlock()
+
+	// get *mgo.Database instance
+	var err error
+	db := m.Sess.DB(m.name)
+	if db == nil {
+		return nil, err
+	}
+
+	// get all style names from DB
+	t := make([]*Technique, 0)
+	//if err := db.C("techniques").Find(bson.D{}).Select(bson.M{ "name": 1, "_id":0 }).All(&t); err != nil {
+	if err := db.C("techniques").Find(bson.D{}).All(&t); err != nil { // XXX: This is not OK, but I can't get it the other way...
+		return nil, err
+	}
+	techs := make([]string, 0)
+	for _, val := range t {
+		techs = append(techs, val.Technique.Name)
+	}
+	return techs, nil
 }

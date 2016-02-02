@@ -1,5 +1,5 @@
 /*
- * file.go -  misc utility functions for working with files 
+ * file.go -  misc utility functions for working with files
  *
  * History:
  *  1   Jul11   MR  The initial version
@@ -39,9 +39,9 @@ func LoadFile(path string) (text string, err error) {
 }
 
 /*
- * ReadTextFile - read a text file and return the contents as a string 
+ * ReadTextFile - read a text file and return the contents as a string
  *
- * If an error occurs during file read, we return an empty string (and 
+ * If an error occurs during file read, we return an empty string (and
  * an os.Error, of course).
  */
 func ReadTextFile(filename string) (string, error) {
@@ -53,7 +53,7 @@ func ReadTextFile(filename string) (string, error) {
 }
 
 /*
- * ReadLines - read a text file and return a list of lines 
+ * ReadLines - read a text file and return a list of lines
  *
  * If an error occurs during file read, we return only a list with single empty
  * string (and an os.Error, of course).
@@ -111,20 +111,20 @@ func CopyFile(dst, src string) (int64, error) {
 
 /* Reports whether the named file or directory exists. */
 func FileExists(name string) bool {
-    if _, err := os.Stat(name); err != nil {
-        if os.IsNotExist(err) {
-            return false
-        }
-    }
-    return true
+	if _, err := os.Stat(name); err != nil {
+		if os.IsNotExist(err) {
+			return false
+		}
+	}
+	return true
 }
 
 // Reports whether d is a directory.
 func IsDir(d string) (status bool) {
-    if fi, err := os.Stat(d); err == nil {
-        if fi.IsDir() {
-            status = true
-        }
-    }
-    return
+	if fi, err := os.Stat(d); err == nil {
+		if fi.IsDir() {
+			status = true
+		}
+	}
+	return
 }

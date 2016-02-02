@@ -3,16 +3,16 @@ package core
 import (
 	"encoding/json"
 	"fmt"
- //   "time"
+	//   "time"
 )
 
 type Artwork interface {
-    Json() (string, error)
-    Display() string
- //   Created() string
-    // Create() error
-    // Update() error
-    // Delete() error
+	Json() (string, error)
+	Display() string
+	//   Created() string
+	// Create() error
+	// Update() error
+	// Delete() error
 }
 
 type Work struct {
@@ -20,19 +20,19 @@ type Work struct {
 	Title string
 
 	/* an artist  */
-	*Artist
+	Artist string
 
 	/* This artwork is made in which technique? */
-	*Technique
+	Technique string
 
-    // artwork style
-    *Style
+	// artwork style
+	Style string
 
 	/* Size: dimensions, measures of the artwork */
 	Size string
 
 	/* dating of the artwork */
-	*Dating
+	Dating string
 
 	/* When was this artwork created (painted, sculpted etc.)? */
 	TimeOfCreation string
@@ -72,12 +72,6 @@ type Work struct {
 
 	/* URI (either local or web) to artwork's reproduction */
 	Picture string
-
-    /* timestamp when this instance was created */
-//    created string
-
-    /* a timestamp when this instance was last updated */
- //   updated string
 }
 
 /* work's string representation */
@@ -99,39 +93,35 @@ func (w *Work) Json() (string, error) {
 const DefaultWorkCapacity = 10
 
 func CreateNewWork() *Work {
-    /* generate a 'created' timestamp and apply it to the 'updated', too */
-//    creat := time.Now().Format("2012-12-15 15:04:05")
+	/* generate a 'created' timestamp and apply it to the 'updated', too */
 	s := make([]string, 0, DefaultWorkCapacity) // sources
 	e := make([]string, 0, DefaultWorkCapacity) // exhibitions
 	n := make([]Note, 0, DefaultWorkCapacity)   // remarks
-	w := &Dating{"unknown", "Default Description"}
-	return &Work{"", // title
-                CreateArtist(), // artist
-                NewTechnique("", ""), // technique
-                NewStyle("", ""), // style
-                "",     // size
-                w,      // dating
-                "",     // time of creation
-                "",     // motive
-                "",     // signature
-		        "",     // place
-                "",     // location
-                "",     // provenance
-                "",     // condition
-                "",     // condition description
-                "",     // description
-                e,      // exhibitions
-                s,      // sources
-                n,      // notes
-                ""  }   // picture
-  //              creat,  // created
-  //              creat}  // updated
+	return &Work{"",                            // title
+		"", // artist
+		"", // technique
+		"", // style
+		"", // size
+		"", // dating
+		"", // time of creation
+		"", // motive
+		"", // signature
+		"", // place
+		"", // location
+		"", // provenance
+		"", // condition
+		"", // condition description
+		"", // description
+		e,  // exhibitions
+		s,  // sources
+		n,  // notes
+		""} // picture
 }
 
 func (w *Work) Display() string {
 	s := fmt.Sprintf("%s, %s (%s)\n", w.Title,
-		w.Artist.String(), w.TimeOfCreation)
-	s = s + fmt.Sprintf("%s %s\n", w.Technique.String(), w.Size)
+		w.Artist, w.TimeOfCreation)
+	s = s + fmt.Sprintf("%s %s\n", w.Technique, w.Size)
 	s = s + fmt.Sprintf("%s %s\n", w.Motive, w.Signature)
 	s = s + fmt.Sprintln(w.Place)
 	s = s + fmt.Sprintln(w.Location)
@@ -169,17 +159,17 @@ func (w *Work) DisplayExhibitions() string {
 	return s
 }
 
-
 // serialize a list of artworks into JSON
 func artworksToJson(items []Artwork) (data string, err error) {
 
-    var b []byte
-    if b, err = json.Marshal(items); err != nil {
-        return
-    }
-    data = string(b[:])
-    return
+	var b []byte
+	if b, err = json.Marshal(items); err != nil {
+		return
+	}
+	data = string(b[:])
+	return
 }
+
 /* WorkList - a list of Works */
 type WorkList []Work
 

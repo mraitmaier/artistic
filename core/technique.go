@@ -1,8 +1,8 @@
 package core
 
 import (
+	"encoding/json"
 	"fmt"
-    "encoding/json"
 )
 
 // Technique - a type representing an art technique
@@ -16,7 +16,7 @@ type Technique struct {
 }
 
 func NewTechnique(name, description string) *Technique {
-    return &Technique{ name, description }
+	return &Technique{name, description}
 }
 
 func (t *Technique) String() string { return t.Name }
@@ -28,10 +28,10 @@ func (t *Technique) Display() string {
 // serialize a list of techniques into JSON
 func techniquesToJson(items []Technique) (data string, err error) {
 
-    var b []byte
-    if b, err = json.Marshal(items); err != nil {
-        return
-    }
-    data = string(b[:])
-    return
+	var b []byte
+	if b, err = json.Marshal(items); err != nil {
+		return
+	}
+	data = string(b[:])
+	return
 }

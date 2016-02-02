@@ -1,26 +1,26 @@
 package core
 
 import (
+	"encoding/json"
 	"fmt"
-    "encoding/json"
-//    "labix.org/v2/mgo/bson"
-//    "gopkg.in/mgo.v2/bson"
+	//    "labix.org/v2/mgo/bson"
+	//    "gopkg.in/mgo.v2/bson"
 )
 
-var AllowedDatings = []string{ "L", "S", "A", "a.q.", "a.q.n.", "p.q.", "p.q.n.", "unknown" }
+var AllowedDatings = []string{"L", "S", "A", "a.q.", "a.q.n.", "p.q.", "p.q.n.", "unknown"}
 
 /**
  * Dating - a structure representing a dating
  */
 type Dating struct {
-    // ID is created by DB automatically and is only a RO property
-    //Id db.DbIdentifier `bson:"_id"`
-//    Id bson.ObjectId `bson:"_id"`
+	// ID is created by DB automatically and is only a RO property
+	//Id db.DbIdentifier `bson:"_id"`
+	//    Id bson.ObjectId `bson:"_id"`
 
-    // a dating value is defined (as enum) above 
+	// a dating value is defined (as enum) above
 	Dating string
 
-    // this is description of a dating
+	// this is description of a dating
 	Description string
 }
 
@@ -36,10 +36,10 @@ func (d *Dating) Display() string {
 // serialize the list of datings into JSON
 func DatingsToJson(datings []Dating) (data string, err error) {
 
-    var b []byte
-    if b, err = json.Marshal(datings); err != nil {
-        return
-    }
-    data = string(b[:])
-    return
+	var b []byte
+	if b, err = json.Marshal(datings); err != nil {
+		return
+	}
+	data = string(b[:])
+	return
 }

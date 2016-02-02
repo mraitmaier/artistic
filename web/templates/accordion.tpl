@@ -29,7 +29,7 @@
     </div>
     <div class="panel-collapse collapse in" id="artworks-collapse">
         <div class="panel-body small" role="tabpanel" aria-labelledby="#artworks-menu-header">
-            <p>Paintings</p>
+            <p><a href="/painting">Paintings</a></p>
             <p>Sculptures</p>
             <p>Graphic Prints</p>
             <p>Buildings</p>

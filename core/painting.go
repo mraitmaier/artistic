@@ -12,11 +12,8 @@ import (
  * the inheritance in Go
  */
 type Painting struct {
-    // 
-	*Work
-
-    // is this painting actually a fresco?
-    IsFresco bool
+	//
+	Work
 }
 
 func (p *Painting) String() string { return p.Work.Title }
@@ -26,7 +23,7 @@ func (p *Painting) Json() (string, error) {
 	return string(s[:]), err
 }
 
-func NewPainting() *Painting { return &Painting{CreateNewWork(), false} }
+func NewPainting() *Painting { return &Painting{*CreateNewWork()} }
 
 func (p *Painting) Display() string { return p.Work.Display() }
 
@@ -42,14 +39,13 @@ func (p *Painting) DisplayExhibitions() string {
 //    return p.Work.Created()
 //}
 
-
 // serialize a list of paintings into JSON
 func paintingsToJson(items []Painting) (data string, err error) {
 
-    var b []byte
-    if b, err = json.Marshal(items); err != nil {
-        return
-    }
-    data = string(b[:])
-    return
+	var b []byte
+	if b, err = json.Marshal(items); err != nil {
+		return
+	}
+	data = string(b[:])
+	return
 }

@@ -2,7 +2,7 @@ package core
 
 import (
 	//"fmt"
-//	"time"
+	//	"time"
 	"encoding/json"
 )
 
@@ -38,17 +38,17 @@ type Artist struct {
 	//    Picture url.URL;
 	Picture string
 
-    /* artist flags, a person can be many things at once */
-    IsPainter bool      `bson:"is_painter"`
-    IsSculptor bool     `bson:"is_sculptor"`
-    IsPrintmaker bool   `bson:"is_printmaker" `
-    IsCeramicist bool   `bson:"is_ceramicist"`
+	/* artist flags, a person can be many things at once */
+	IsPainter    bool `bson:"is_painter"`
+	IsSculptor   bool `bson:"is_sculptor"`
+	IsPrintmaker bool `bson:"is_printmaker" `
+	IsCeramicist bool `bson:"is_ceramicist"`
 
-    IsArchitect bool    `bson:"is_architect"`
+	IsArchitect bool `bson:"is_architect"`
 
-    IsWriter bool       `bson:"is_writer"`
-    IsPoet bool         `bson:"is_poet"`
-    IsPlayWriter bool   `bson:"is_playwriter"`
+	IsWriter     bool `bson:"is_writer"`
+	IsPoet       bool `bson:"is_poet"`
+	IsPlayWriter bool `bson:"is_playwriter"`
 }
 
 const DefaultArtistCapacity = 10
@@ -57,22 +57,22 @@ func CreateArtist() *Artist {
 	n := make([]Note, 0, DefaultArtistCapacity)
 	s := make([]string, 0, DefaultArtistCapacity)
 	return &Artist{&Name{"", "", ""}, // Name
-                   &Name{"", "", ""}, // Real name
-		           "",      // Born
-                   "",      // Died
-                   "",      // Nationality
-                   s,       // Sources
-                   "",      // Biography
-                   n,       // Notes
-                   "",      // Picture
-                   false,   // IsPainter
-                   false,   // IsSculptor
-                   false,   // IsPrintmaker
-                   false,   // IsCeramicist
-                   false,   // IsArchitect
-                   false,   // IsWriter
-                   false,   // IsPoet
-                   false }  // IsPlayWriter
+		&Name{"", "", ""}, // Real name
+		"",                // Born
+		"",                // Died
+		"",                // Nationality
+		s,                 // Sources
+		"",                // Biography
+		n,                 // Notes
+		"",                // Picture
+		false,             // IsPainter
+		false,             // IsSculptor
+		false,             // IsPrintmaker
+		false,             // IsCeramicist
+		false,             // IsArchitect
+		false,             // IsWriter
+		false,             // IsPoet
+		false}             // IsPlayWriter
 }
 
 /*
@@ -90,19 +90,18 @@ func (p *Artist) Json() (string, error) {
 	return string(s[:]), err
 }
 
-
 // serialize a list of artists into JSON
 func artistsToJson(items []Artist) (data string, err error) {
 
-    var b []byte
-    if b, err = json.Marshal(items); err != nil {
-        return
-    }
-    data = string(b[:])
-    return
+	var b []byte
+	if b, err = json.Marshal(items); err != nil {
+		return
+	}
+	data = string(b[:])
+	return
 }
+
 /**
-    ArtistList - this is type representing a list of persons
+  ArtistList - this is type representing a list of persons
 */
 type ArtistList []Artist
-

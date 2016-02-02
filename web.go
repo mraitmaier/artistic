@@ -79,7 +79,8 @@ func registerHandlers(aa *ArtisticApp) {
 	r.Handle("/ceramicist", artistHandler(aa, db.ArtistTypeCeramicist))
 	r.Handle("/architect", artistHandler(aa, db.ArtistTypeArchitect))
 	r.Handle("/artist/{id}/{cmd}", artistHandler(aa, db.ArtistTypeArtist))
-	//r.Handle("/artist/{cmd}/", artistHandler(aa))
+	r.Handle("/painting", paintingHandler(aa))
+	r.Handle("/painting/{id}/{cmd}", paintingHandler(aa))
 	r.HandleFunc("/favicon.ico", faviconHandler)
 	r.NotFoundHandler = err404Handler(aa)
 
@@ -126,6 +127,9 @@ func webStart(aa *ArtisticApp, wwwpath string) error {
 		"length":          func(list []string) int { return len(list) },
 		"allowedroles":    func() []string { return db.AllRoles },
 		"get_artist_type": func(t db.ArtistType) string { return t.String() },
+		"get_datings":     func() []string { return getDatingNames(aa) },
+		"get_styles":      func() []string { return getStyleNames(aa) },
+		"get_techniques":  func() []string { return getTechniqueNames(aa) },
 		"totitle":         func(s string) string { return strings.Title(s) },
 		"toupper":         func(s string) string { return strings.ToUpper(s) },
 		"tolower":         func(s string) string { return strings.ToLower(s) }}
@@ -756,4 +760,34 @@ func styleHTTPGetHandler(w http.ResponseWriter, r *http.Request, app *ArtisticAp
 	}{s, len(s), u}
 	app.Log.Info(fmt.Sprintf("[%s] Displaying '/style' page", u.Username))
 	return renderPage("styles", web, app, w, r)
+}
+
+// aux function that gets the list of dating names
+func getDatingNames(app *ArtisticApp) []string {
+
+	d, err := app.DataProv.GetDatingNames()
+	if err != nil {
+		app.Log.Error(fmt.Sprintf("Error getting a list of datings: %q", err.Error()))
+	}
+	return d
+}
+
+// aux function that gets the list of style names
+func getStyleNames(app *ArtisticApp) []string {
+
+	s, err := app.DataProv.GetStyleNames()
+	if err != nil {
+		app.Log.Error(fmt.Sprintf("Error getting a list of styles: %q", err.Error()))
+	}
+	return s
+}
+
+// aux function that gets the list of technique names
+func getTechniqueNames(app *ArtisticApp) []string {
+
+	t, err := app.DataProv.GetTechniqueNames()
+	if err != nil {
+		app.Log.Error(fmt.Sprintf("Error getting a list of techniques: %q", err.Error()))
+	}
+	return t
 }

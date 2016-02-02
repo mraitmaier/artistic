@@ -23,7 +23,7 @@ func (n *Note) String() string {
 
 /* create a new note with given string; timestamp is created (and formatted)
  * automatically */
- /*
+/*
 func CreateNote(n string) *Note {
 	t := time.Now()
 	note := &Note{n, t.Format("2012-12-15 15:04:05")}
@@ -43,12 +43,12 @@ func AppendNote(notes []Note, n *Note) []Note {
 
 // Appends a new note to a list.
 func AppendNote(notes []Note, s string) []Note {
-    if notes != nil {
-        t := time.Now()
-        note := &Note{s, t.Format("2012-12-15 15:04:05")}
-        notes = append(notes, *note)
-    }
-    return notes
+	if notes != nil {
+		t := time.Now()
+		note := &Note{s, t.Format("2012-12-15 15:04:05")}
+		notes = append(notes, *note)
+	}
+	return notes
 }
 
 /* extend existing slice of notes with new slice of notes */
@@ -57,4 +57,3 @@ func ExtendNotes(existing []Note, toadd []Note) []Note {
 	return append(existing, toadd...)
 }
 */
-

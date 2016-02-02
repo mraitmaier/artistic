@@ -36,7 +36,6 @@
 
         <div class="col-md-10" id="data-list">
             <h1 id="data-list-header">Techniques</h1>
-            <br />
 
             <div id="new-req-btn">
             <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addTechniqueModal">
