@@ -364,23 +364,23 @@
              <table id="view-user-table" class="table table-hover small">
              <tbody>
                  <tr> <td class="col-sm-3"><strong>Architect(s)<strong/></td>
-                      <td class="col-sm-9" colspan="3"><span id="artist"></span></td> </tr>
+                      <td class="col-sm-9"><span id="artist"></span></td> </tr>
                  <tr> <td class="col-sm-3"><strong>Dimensions<strong/></td>
-                      <td class="col-sm-9" colspan="3"><span id="size"></span></td> </tr>
+                      <td class="col-sm-9"><span id="size"></span></td> </tr>
                  <tr> <td class="col-sm-3"><strong>Art Style</strong></td> 
                       <td class="col-sm-9" id="artstyle"></td>      </tr>
                  <tr> <td class="col-sm-3"><strong>Location<strong/></td>
-                      <td class="col-sm-9" colspan="3"><span id="location"></span></td> </tr>
+                      <td class="col-sm-9"><span id="location"></span></td> </tr>
                  <tr> <td class="col-sm-3"><strong>Condition<strong/></td>
-                      <td class="col-sm-9" colspan="3"><span id="condition"></span></td> </tr>
+                      <td class="col-sm-9"><span id="condition"></span></td> </tr>
                  <tr> <td class="col-sm-3"><strong>Condition Description<strong/></td>
-                      <td class="col-sm-9" colspan="3"><span id="conddescription"></span></td> </tr>
+                      <td class="col-sm-9"><span id="conddescription"></span></td> </tr>
                  <tr> <td class="col-sm-3"><strong>Description<strong/></td>
-                      <td class="col-sm-9" colspan="3"><span id="description"></span></td> </tr>
+                      <td class="col-sm-9"><span id="description"></span></td> </tr>
                  <tr> <td class="col-sm-3"><strong>Created</strong></td> 
-                      <td class="col-sm-3" id="createdv"></td> 
-                      <td class="col-sm-3"><strong>Last Modified</strong></td> 
-                      <td class="col-sm-3" id="modifiedv"></td> </tr>
+                      <td class="col-sm-9" id="createdv"></td> </tr> 
+                 <tr> <td class="col-sm-3"><strong>Last Modified</strong></td> 
+                      <td class="col-sm-9" id="modifiedv"></td> </tr>
              </tbody>
              </table>
         </div> <!-- row -->
