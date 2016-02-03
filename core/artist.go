@@ -42,7 +42,6 @@ type Artist struct {
 	IsPainter    bool `bson:"is_painter"`
 	IsSculptor   bool `bson:"is_sculptor"`
 	IsPrintmaker bool `bson:"is_printmaker" `
-	IsCeramicist bool `bson:"is_ceramicist"`
 
 	IsArchitect bool `bson:"is_architect"`
 
@@ -68,7 +67,6 @@ func CreateArtist() *Artist {
 		false,             // IsPainter
 		false,             // IsSculptor
 		false,             // IsPrintmaker
-		false,             // IsCeramicist
 		false,             // IsArchitect
 		false,             // IsWriter
 		false,             // IsPoet

@@ -88,7 +88,6 @@
                                        data-painter="{{$element.Artist.IsPainter}}"
                                        data-sculptor="{{$element.Artist.IsSculptor}}"
                                        data-architect="{{$element.Artist.IsArchitect}}"
-                                       data-ceramicist="{{$element.Artist.IsCeramicist}}"
                                        data-printmaker="{{$element.Artist.IsPrintmaker}}">
                                  <span class="glyphicon glyphicon-eye-open"></span>
                             </a>
@@ -112,7 +111,6 @@
                                        data-painter="{{$element.Artist.IsPainter}}"
                                        data-sculptor="{{$element.Artist.IsSculptor}}"
                                        data-architect="{{$element.Artist.IsArchitect}}"
-                                       data-ceramicist="{{$element.Artist.IsCeramicist}}"
                                        data-printmaker="{{$element.Artist.IsPrintmaker}}">
                                  <span class="glyphicon glyphicon-edit"></span>
                             </a>
@@ -199,9 +197,6 @@
         } 
         if (print) {
             roles += " Printmaker"
-        } 
-        if (ceramic) {
-            roles += " Ceramicist"
         } 
         if (architect) {
             roles += " Architect"
@@ -386,9 +381,6 @@
             <label class="control-label pull-right"><input type="checkbox" name="printmaker" value="yes"> Printmaker </label>
         </div> <!-- checkbox -->
         <div class="checkbox-inline col-sm-2">
-            <label class="control-label pull-right"><input type="checkbox" name="ceramicist" value="yes"> Ceramicist </label>
-        </div> <!-- checkbox -->
-        <div class="checkbox-inline col-sm-2">
             <label class="control-label pull-right"><input type="checkbox" name="architect" value="yes"> Architect </label>
         </div> <!-- checkbox -->
     </div> <!-- form-group -->
@@ -568,11 +560,6 @@
                     <div class="checkbox-inline col-sm-2">
                         <label class="control-label pull-right">
                             <input type="checkbox" id="printmakerm" name="printmaker" value="yes"/> Printmaker 
-                        </label>
-                    </div> <!-- checkbox -->
-                    <div class="checkbox-inline col-sm-2">
-                        <label class="control-label pull-right">
-                            <input type="checkbox" id="ceramicistm" name="ceramicist" value="yes"/> Ceramicist 
                         </label>
                     </div> <!-- checkbox -->
                     <div class="checkbox-inline col-sm-2">

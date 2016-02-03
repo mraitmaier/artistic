@@ -76,7 +76,6 @@ func registerHandlers(aa *ArtisticApp) {
 	r.Handle("/painter", artistHandler(aa, db.ArtistTypePainter))
 	r.Handle("/sculptor", artistHandler(aa, db.ArtistTypeSculptor))
 	r.Handle("/printmaker", artistHandler(aa, db.ArtistTypePrintmaker))
-	r.Handle("/ceramicist", artistHandler(aa, db.ArtistTypeCeramicist))
 	r.Handle("/architect", artistHandler(aa, db.ArtistTypeArchitect))
 	r.Handle("/artist/{id}/{cmd}", artistHandler(aa, db.ArtistTypeArtist))
 	r.Handle("/painting", paintingHandler(aa))

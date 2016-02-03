@@ -666,11 +666,6 @@ func (m *MongoDbConn) GetAllArtists(t ArtistType) ([]*Artist, error) {
 			if err = db.C("artists").Find(bson.M{"is_printmaker": true}).All(&artists); err != nil {
 				return
 			}
-
-		case ArtistTypeCeramicist:
-			if err = db.C("artists").Find(bson.M{"is_ceramicist": true}).All(&artists); err != nil {
-				return
-			}
 		}
 
 		// write the users to the channel

@@ -152,7 +152,6 @@ const (
 	ArtistTypeSculptor
 	ArtistTypeArchitect
 	ArtistTypePrintmaker
-	ArtistTypeCeramicist
 	ArtistTypeWriter
 	ArtistTypePoet
 	ArtistTypePlaywriter
@@ -171,8 +170,6 @@ func (t ArtistType) String() string {
 		s = "Architect"
 	case ArtistTypePrintmaker:
 		s = "Printmaker"
-	case ArtistTypeCeramicist:
-		s = "Ceramicist"
 	case ArtistTypeWriter:
 		s = "Writer"
 	case ArtistTypePoet:

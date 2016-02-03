@@ -126,7 +126,6 @@ func parseArtistFormValues(r *http.Request) *db.Artist {
 	sculptor := strings.TrimSpace(r.FormValue("sculptor"))
 	printmaker := strings.TrimSpace(r.FormValue("printmaker"))
 	architect := strings.TrimSpace(r.FormValue("architect"))
-	ceramicist := strings.TrimSpace(r.FormValue("ceramicist"))
 	bio := strings.TrimSpace(r.FormValue("biography"))
 	created := strings.TrimSpace(r.FormValue("created"))
 
@@ -144,9 +143,6 @@ func parseArtistFormValues(r *http.Request) *db.Artist {
 	}
 	if sculptor == "yes" {
 		a.IsSculptor = true
-	}
-	if ceramicist == "yes" {
-		a.IsCeramicist = true
 	}
 	if printmaker == "yes" {
 		a.IsPrintmaker = true
