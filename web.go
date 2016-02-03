@@ -128,17 +128,17 @@ func webStart(aa *ArtisticApp, wwwpath string) error {
 
 	//web page templates, with defined additional functions
 	funcs := template.FuncMap{
-		"add":             func(x, y int) int { return x + y },
-		"length":          func(list []string) int { return len(list) },
-		"allowedroles":    func() []string { return db.AllRoles },
-		"get_artist_type": func(t db.ArtistType) string { return t.String() },
-		"get_datings":     func() []string { return getDatingNames(aa) },
-		"get_styles":      func() []string { return getStyleNames(aa) },
-		"get_techniques":  func() []string { return getTechniqueNames(aa) },
-        "get_technique_types": func() []core.TechniqueType { return core.GetTechniqueTypes() },
-		"totitle":         func(s string) string { return strings.Title(s) },
-		"toupper":         func(s string) string { return strings.ToUpper(s) },
-		"tolower":         func(s string) string { return strings.ToLower(s) }}
+		"add":                 func(x, y int) int { return x + y },
+		"length":              func(list []string) int { return len(list) },
+		"allowedroles":        func() []string { return db.AllRoles },
+		"get_artist_type":     func(t db.ArtistType) string { return t.String() },
+		"get_datings":         func() []string { return getDatingNames(aa) },
+		"get_styles":          func() []string { return getStyleNames(aa) },
+		"get_techniques":      func() []string { return getTechniqueNames(aa) },
+		"get_technique_types": func() []core.TechniqueType { return core.GetTechniqueTypes() },
+		"totitle":             func(s string) string { return strings.Title(s) },
+		"toupper":             func(s string) string { return strings.ToUpper(s) },
+		"tolower":             func(s string) string { return strings.ToLower(s) }}
 	t := filepath.Join(wwwpath, "templates", "*.tpl")
 	aa.WebInfo.templates = template.Must(template.New("").Funcs(funcs).ParseGlob(t))
 

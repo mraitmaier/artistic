@@ -51,15 +51,15 @@ type Technique struct {
 	// description of the technique
 	Description string
 
-    // TechniqueType narrows down the technique: paint, sculpting, graphic etc. tecnique
-    Type TechniqueType
+	// TechniqueType narrows down the technique: paint, sculpting, graphic etc. tecnique
+	Type TechniqueType
 }
 
 func NewTechnique(name, description string) *Technique {
 	return &Technique{
-        Name: name,
-        Description: description, 
-        Type: UnknownTechnique}
+		Name:        name,
+		Description: description,
+		Type:        UnknownTechnique}
 }
 
 func (t *Technique) String() string { return t.Name }
