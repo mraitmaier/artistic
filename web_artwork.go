@@ -440,3 +440,146 @@ func printHTTPGetHandler(w http.ResponseWriter, r *http.Request, app *ArtisticAp
 	app.Log.Info(fmt.Sprintf("[%s] Displaying '/print' page", u.Username))
 	return renderPage("prints", web, app, w, r)
 }
+
+// This is handler that handler the "/building" URL.
+func buildingHandler(app *ArtisticApp) http.Handler {
+
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// if user is autheticated, display the appropriate page
+		if loggedin, user := userIsAuthenticated(app, r); loggedin {
+
+			var err error
+
+			switch r.Method {
+
+			case "GET":
+				if err = buildingHTTPGetHandler(w, r, app, user); err != nil {
+					app.Log.Error(fmt.Sprintf("[%s] Building HTTP GET %s", user.Username, err.Error()))
+				}
+
+			case "POST":
+				if err = buildingHTTPPostHandler(w, r, app, user); err != nil {
+					app.Log.Error(fmt.Sprintf("[%s] Building HTTP POST %s", user.Username, err.Error()))
+				}
+				// unconditionally reroute to main building page
+				http.Redirect(w, r, "/building", http.StatusFound)
+
+			case "DELETE":
+				msg := fmt.Sprintf("[%s] Building HTTP DELETE request received. Redirecting to main 'building' page.",
+					user.Username)
+				app.Log.Info(msg)
+				// unconditionally reroute to main building page
+				// Use HTTP 303 (see other) to force GET to redirect as DELETE request is normally
+				// followed by another DELETE
+				http.Redirect(w, r, "/building", http.StatusSeeOther)
+
+			case "PUT":
+				msg := fmt.Sprintf("[%s] Building HTTP PUT request received. Redirecting to main 'building' page.", user.Username)
+				app.Log.Info(msg)
+				// unconditionally reroute to main building page
+				// Use HTTP 303 (see other) to force GET to redirect as PUT request is normally followed by
+				// another PUT
+				http.Redirect(w, r, "/building", http.StatusSeeOther)
+
+			default:
+				// otherwise just display main 'index' page
+				if err := renderPage("index", nil, app, w, r); err != nil {
+					app.Log.Error(fmt.Sprintf("[%s] Index HTTP GET %s", user.Username, err.Error()))
+					return
+				}
+			}
+
+		} else {
+			// if user not authenticated
+			redirectToLoginPage(w, r, app)
+		}
+	})
+}
+
+// This is HTTP POST handler for buildings.
+func buildingHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *ArtisticApp, u *db.User) error {
+
+	id := mux.Vars(r)["id"]
+	cmd := mux.Vars(r)["cmd"]
+
+	var err error
+	switch strings.ToLower(cmd) {
+
+	case "":
+		// insert new building, when 'cmd' is empty...
+		if s := parseBuildingFormValues(r); s != nil {
+			err = app.DataProv.InsertBuilding(s)
+		} else {
+			app.Log.Info(fmt.Sprintf("[%s] Creating new building '%s'", u.Username, s.Title))
+		}
+
+	case "put":
+		if id == "" {
+			return fmt.Errorf("Modify building: ID is empty")
+		}
+		if s := parseBuildingFormValues(r); s != nil {
+			s.Id = db.MongoStringToId(id)
+			err = app.DataProv.UpdateBuilding(s)
+			app.Log.Info(fmt.Sprintf("[%s] Updating building '%s'", u.Username, s.Title))
+		}
+
+	case "delete":
+		if id == "" {
+			return fmt.Errorf("Delete building: ID is empty")
+		}
+		s := db.NewBuilding()
+		s.Id = db.MongoStringToId(id)
+		err = app.DataProv.DeleteBuilding(s)
+		app.Log.Info(fmt.Sprintf("[%s] Removing building '%s'", u.Username, s.Title))
+
+	default:
+		err = fmt.Errorf("Illegal POST request for building")
+	}
+	return err
+}
+
+// Helper function that parses the '/building' POST request values and creates a new instance of Building
+func parseBuildingFormValues(r *http.Request) *db.Building {
+
+	// get POST form values and create a struct
+	p := db.NewBuilding()
+	p.Title = strings.TrimSpace(r.FormValue("title"))
+	p.Artist = strings.TrimSpace(r.FormValue("artist"))
+	p.Style = strings.TrimSpace(r.FormValue("artstyle"))
+	p.Technique = strings.TrimSpace(r.FormValue("technique"))
+	p.Size = strings.TrimSpace(r.FormValue("size"))
+	p.Dating = r.FormValue("dating")
+	p.TimeOfCreation = strings.TrimSpace(r.FormValue("timecreat"))
+	p.Motive = strings.TrimSpace(r.FormValue("motive"))
+	p.Signature = strings.TrimSpace(r.FormValue("signature"))
+	p.Place = strings.TrimSpace(r.FormValue("place"))
+	p.Location = strings.TrimSpace(r.FormValue("location"))
+	p.Provenance = strings.TrimSpace(r.FormValue("provenance"))
+	p.Condition = strings.TrimSpace(r.FormValue("condition"))
+	p.ConditionDescription = strings.TrimSpace(r.FormValue("conddescription"))
+	p.Description = strings.TrimSpace(r.FormValue("description"))
+	//p.Exhibitions = strings.TrimSace(r.FormValue("exhibitions"))
+	//p.Sources = strings.TrimSpace(r.FormValue("sources"))
+	//p.Notes = strings.TrimSpace(r.FormValue("notes"))
+	//p.Picture = strings.TrimSpace(r.FormValue("picture"))
+	p.Created = db.Timestamp(strings.TrimSpace(r.FormValue("created")))
+	return p
+}
+
+// This is HTTP GET handler for buildings
+func buildingHTTPGetHandler(w http.ResponseWriter, r *http.Request, app *ArtisticApp, u *db.User) error {
+
+	p, err := app.DataProv.GetAllBuildings()
+	if err != nil {
+		http.Redirect(w, r, "/err404", http.StatusFound)
+		return fmt.Errorf("Problem getting buildings from DB: '%s'", err.Error())
+	}
+	// create ad-hoc struct to be sent to page template
+	var web = struct {
+		Buildings []*db.Building
+		Num       int
+		User      *db.User
+	}{p, len(p), u}
+	app.Log.Info(fmt.Sprintf("[%s] Displaying '/building' page", u.Username))
+	return renderPage("buildings", web, app, w, r)
+}

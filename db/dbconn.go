@@ -104,6 +104,12 @@ type DataProvider interface {
 	UpdatePrint(*Print) error
 	DeletePrint(*Print) error
 
+	GetAllBuildings() ([]*Building, error)
+	GetBuilding(string) (*Building, error)
+	InsertBuilding(*Building) error
+	UpdateBuilding(*Building) error
+	DeleteBuilding(*Building) error
+
 	// helper methods
 	GetDatingNames() ([]string, error)
 	GetStyleNames() ([]string, error)

@@ -260,3 +260,25 @@ type Print struct {
 func NewPrint() *Print {
 	return &Print{bson.NewObjectId(), *core.NewPrint(), NewTimestamp(), NewTimestamp()}
 }
+
+/// buildings
+
+// Building is a DB wrapper around core Building type and represent a building as an artwork.
+type Building struct {
+
+	// database ID
+	Id bson.ObjectId `bson:"_id"`
+
+	// original core Artwork interface is embedded
+	core.Building `bson:",inline"`
+
+	// created timestamp
+	Created Timestamp
+
+	// modified timestamp
+	Modified Timestamp
+}
+
+func NewBuilding() *Building {
+	return &Building{bson.NewObjectId(), *core.NewBuilding(), NewTimestamp(), NewTimestamp()}
+}

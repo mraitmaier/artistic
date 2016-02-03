@@ -1179,7 +1179,144 @@ func (m *MongoDbConn) adminPrint(cmd DbCommand, p *Print) error {
 	return err
 }
 
-////
+////////////////////// Buildings
+
+// GetAllBuildings retrieves all buildings from DB with given DB descriptor.
+func (m *MongoDbConn) GetAllBuildings() ([]*Building, error) {
+
+	// acquire lock
+	dblock.Lock()
+	defer dblock.Unlock()
+
+	// get *mgo.Database instance
+	db := m.Sess.DB(m.name)
+	if db == nil {
+		return nil, errors.New("Getting buildings: DB descriptor empty.")
+	}
+
+	// create channel
+	ch := make(chan []*Building)
+
+	// start a new goroutine to get buildings from DB
+	go func(ch chan []*Building) {
+
+		// check channel
+		if ch == nil {
+			return
+		}
+
+		// prepare the empty slice for users
+		p := make([]*Building, 0)
+
+		// get all users from DB
+		if err := db.C("buildings").Find(bson.D{}).All(&p); err != nil {
+			return
+		}
+
+		// write the users to the channel
+		ch <- p
+
+	}(ch)
+
+	// read the answer from channel
+	p := <-ch
+
+	return p, nil // OK
+}
+
+// GetBuilding retrieves a single buiding from the DB: we need an ID.
+func (m *MongoDbConn) GetBuilding(id string) (*Building, error) {
+
+	// acquire lock
+	dblock.Lock()
+	defer dblock.Unlock()
+
+	// get *mgo.Database instance
+	db := m.Sess.DB(m.name)
+	if db == nil {
+		return nil, errors.New("Getting a single building: MongoDB descriptor empty.")
+	}
+
+	// prepare channel
+	ch := make(chan *Building)
+
+	// start goroutine to get a building
+	go func(id string, ch chan *Building) {
+
+		p := NewBuilding()
+
+		// get a user from DB
+		err := db.C("buildings").Find(bson.M{"_id": MongoStringToId(id)}).One(&p)
+		if err != nil {
+			return
+		}
+
+		// write a user to channel
+		ch <- p
+	}(id, ch)
+
+	// read user from channel
+	p := <-ch
+
+	return p, nil // all OK
+}
+
+// UpdateBuilding modifies a single in DB.
+func (m *MongoDbConn) UpdateBuilding(b *Building) error {
+	return m.adminBuilding(DBCmdUpdate, b)
+}
+
+// InsertBuilding creates a new building in DB.
+func (m *MongoDbConn) InsertBuilding(b *Building) error {
+	// check the ID of the item to be inserted into DB
+	if b.Id == "" {
+		b.Id = NewMongoId()
+	}
+	return m.adminBuilding(DBCmdInsert, b)
+}
+
+// DeleteBuilding removes a single building from DB.
+func (m *MongoDbConn) DeleteBuilding(b *Building) error {
+	return m.adminBuilding(DBCmdDelete, b)
+}
+
+// Aux method that administers the building records in DB
+func (m *MongoDbConn) adminBuilding(cmd DbCommand, p *Building) error {
+
+	dblock.Lock()
+	defer dblock.Unlock()
+
+	coll := m.Sess.DB(m.name).C("buildings")
+	if coll == nil {
+		return fmt.Errorf("Handling a building: MongoDB descriptor empty.")
+	}
+
+	if p == nil {
+		return fmt.Errorf("Handling a building: cannot create empty painting.")
+	}
+
+	var err error
+	switch cmd {
+
+	case DBCmdUpdate:
+		p.Modified = NewTimestamp() // update modified timestamp first...
+		err = coll.UpdateId(p.Id, p)
+
+	case DBCmdInsert:
+		p.Created = NewTimestamp() // create new timestamp first...
+		err = coll.Insert(p)
+
+	case DBCmdDelete:
+		err = coll.RemoveId(p.Id)
+
+	default:
+		err = fmt.Errorf("Handling a building: Unknown DB command.")
+	}
+	return err
+}
+
+//// Additional methods
+
 //
 func (m *MongoDbConn) GetDatingNames() ([]string, error) {
 

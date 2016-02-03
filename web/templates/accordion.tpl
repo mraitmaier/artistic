@@ -31,7 +31,7 @@
             <p><a href="/painting"> Paintings </a></p>
             <p><a href="/sculpture"> Sculptures </a></p>
             <p><a href="/print"> Graphic Prints </a></p>
-            <p>Buildings</p>
+            <p><a href="/building"> Buildings </a></p>
         </div>
     </div>
 

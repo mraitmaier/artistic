@@ -84,6 +84,8 @@ func registerHandlers(aa *ArtisticApp) {
 	r.Handle("/sculpture/{id}/{cmd}", sculptureHandler(aa))
 	r.Handle("/print", printHandler(aa))
 	r.Handle("/print/{id}/{cmd}", printHandler(aa))
+	r.Handle("/building", buildingHandler(aa))
+	r.Handle("/building/{id}/{cmd}", buildingHandler(aa))
 	r.HandleFunc("/favicon.ico", faviconHandler)
 	r.NotFoundHandler = err404Handler(aa)
 
