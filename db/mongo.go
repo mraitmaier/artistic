@@ -1048,6 +1048,142 @@ func (m *MongoDbConn) adminSculpture(cmd DbCommand, p *Sculpture) error {
 	return err
 }
 
+////////////////////// Graphic prints
+
+// GetAllPrints retrieves all prints from DB with given DB descriptor.
+func (m *MongoDbConn) GetAllPrints() ([]*Print, error) {
+
+	// acquire lock
+	dblock.Lock()
+	defer dblock.Unlock()
+
+	// get *mgo.Database instance
+	db := m.Sess.DB(m.name)
+	if db == nil {
+		return nil, errors.New("Getting graphic prints: DB descriptor empty.")
+	}
+
+	// create channel
+	ch := make(chan []*Print)
+
+	// start a new goroutine to get prints from DB
+	go func(ch chan []*Print) {
+
+		// check channel
+		if ch == nil {
+			return
+		}
+
+		// prepare the empty slice for users
+		p := make([]*Print, 0)
+
+		// get all users from DB
+		if err := db.C("prints").Find(bson.D{}).All(&p); err != nil {
+			return
+		}
+
+		// write the users to the channel
+		ch <- p
+
+	}(ch)
+
+	// read the answer from channel
+	p := <-ch
+
+	return p, nil // OK
+}
+
+// GetPrint retrieves a single print from the DB: we need an ID.
+func (m *MongoDbConn) GetPrint(id string) (*Print, error) {
+
+	// acquire lock
+	dblock.Lock()
+	defer dblock.Unlock()
+
+	// get *mgo.Database instance
+	db := m.Sess.DB(m.name)
+	if db == nil {
+		return nil, errors.New("Getting single graphic print: MongoDB descriptor empty.")
+	}
+
+	// prepare channel
+	ch := make(chan *Print)
+
+	// start goroutine to get a user
+	go func(id string, ch chan *Print) {
+
+		p := NewPrint() // create empty print
+
+		// get a user from DB
+		err := db.C("prints").Find(bson.M{"_id": MongoStringToId(id)}).One(&p)
+		if err != nil {
+			return
+		}
+
+		// write a user to channel
+		ch <- p
+	}(id, ch)
+
+	// read user from channel
+	p := <-ch
+
+	return p, nil // all OK
+}
+
+// UpdatePrint modifies a single print in DB.
+func (m *MongoDbConn) UpdatePrint(p *Print) error {
+	return m.adminPrint(DBCmdUpdate, p)
+}
+
+// Insertprint creates a new print in DB.
+func (m *MongoDbConn) InsertPrint(p *Print) error {
+	// check the ID of the item to be inserted into DB
+	if p.Id == "" {
+		p.Id = NewMongoId()
+	}
+	return m.adminPrint(DBCmdInsert, p)
+}
+
+// DeletePrint removes a single graphic print from DB.
+func (m *MongoDbConn) DeletePrint(p *Print) error {
+	return m.adminPrint(DBCmdDelete, p)
+}
+
+// Aux method that administers the graphic print records in DB
+func (m *MongoDbConn) adminPrint(cmd DbCommand, p *Print) error {
+
+	dblock.Lock()
+	defer dblock.Unlock()
+
+	coll := m.Sess.DB(m.name).C("prints")
+	if coll == nil {
+		return fmt.Errorf("Handling a graphic print: MongoDB descriptor empty.")
+	}
+
+	if p == nil {
+		return fmt.Errorf("Handling a graphic print: cannot create empty painting.")
+	}
+
+	var err error
+	switch cmd {
+
+	case DBCmdUpdate:
+		p.Modified = NewTimestamp() // update modified timestamp first...
+		err = coll.UpdateId(p.Id, p)
+
+	case DBCmdInsert:
+		p.Created = NewTimestamp() // create new timestamp first...
+		err = coll.Insert(p)
+
+	case DBCmdDelete:
+		err = coll.RemoveId(p.Id)
+
+	default:
+		err = fmt.Errorf("Handling a graphic print: Unknown DB command.")
+	}
+	return err
+}
+
 ////
 //
 func (m *MongoDbConn) GetDatingNames() ([]string, error) {

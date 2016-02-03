@@ -14,8 +14,8 @@
                 <p><a href="/painter">Painters</a></p>
                 <p><a href="/sculptor">Sculptors</a></p>
                 <p><a href="/printmaker">Printmakers</a></p>
-                <p><a href="/architect">Architects</a></p>
                 <p><a href="/ceramicist">Ceramicists</a></p>
+                <p><a href="/architect">Architects</a></p>
         </div>
     </div>    
 
@@ -31,9 +31,9 @@
         <div class="panel-body small" role="tabpanel" aria-labelledby="#artworks-menu-header">
             <p><a href="/painting">Paintings</a></p>
             <p><a href="/sculpture">Sculptures</a></p>
-            <p>Graphic Prints</p>
-            <p>Buildings</p>
+            <p><a href="/print">Graphic Prints </a></p>
             <p>Ceramics</p>
+            <p>Buildings</p>
         </div>
     </div>
 

@@ -98,6 +98,12 @@ type DataProvider interface {
 	UpdateSculpture(*Sculpture) error
 	DeleteSculpture(*Sculpture) error
 
+	GetAllPrints() ([]*Print, error)
+	GetPrint(string) (*Print, error)
+	InsertPrint(*Print) error
+	UpdatePrint(*Print) error
+	DeletePrint(*Print) error
+
 	// helper methods
 	GetDatingNames() ([]string, error)
 	GetStyleNames() ([]string, error)
