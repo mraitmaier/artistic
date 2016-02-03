@@ -92,6 +92,12 @@ type DataProvider interface {
 	UpdatePainting(*Painting) error
 	DeletePainting(*Painting) error
 
+	GetAllSculptures() ([]*Sculpture, error)
+	GetSculpture(string) (*Sculpture, error)
+	InsertSculpture(*Sculpture) error
+	UpdateSculpture(*Sculpture) error
+	DeleteSculpture(*Sculpture) error
+
 	// helper methods
 	GetDatingNames() ([]string, error)
 	GetStyleNames() ([]string, error)

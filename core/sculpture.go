@@ -6,7 +6,6 @@ import (
 )
 
 type Sculpture struct {
-
 	// embedded struct
 	Work
 }

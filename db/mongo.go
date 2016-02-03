@@ -912,6 +912,142 @@ func (m *MongoDbConn) adminPainting(cmd DbCommand, p *Painting) error {
 	return err
 }
 
+////////////////////// sculpture
+
+// GetAllSculptures retrieves all paintings from DB with given DB descriptor.
+func (m *MongoDbConn) GetAllSculptures() ([]*Sculpture, error) {
+
+	// acquire lock
+	dblock.Lock()
+	defer dblock.Unlock()
+
+	// get *mgo.Database instance
+	db := m.Sess.DB(m.name)
+	if db == nil {
+		return nil, errors.New("Getting paintings: DB descriptor empty.")
+	}
+
+	// create channel
+	ch := make(chan []*Sculpture)
+
+	// start a new goroutine to get sculptures from DB
+	go func(ch chan []*Sculpture) {
+
+		// check channel
+		if ch == nil {
+			return
+		}
+
+		// prepare the empty slice for users
+		p := make([]*Sculpture, 0)
+
+		// get all users from DB
+		if err := db.C("sculptures").Find(bson.D{}).All(&p); err != nil {
+			return
+		}
+
+		// write the users to the channel
+		ch <- p
+
+	}(ch)
+
+	// read the answer from channel
+	p := <-ch
+
+	return p, nil // OK
+}
+
+// GetSculpture retrieves a single sculpture from the DB: we need an ID.
+func (m *MongoDbConn) GetSculpture(id string) (*Sculpture, error) {
+
+	// acquire lock
+	dblock.Lock()
+	defer dblock.Unlock()
+
+	// get *mgo.Database instance
+	db := m.Sess.DB(m.name)
+	if db == nil {
+		return nil, errors.New("Getting single painting: MongoDB descriptor empty.")
+	}
+
+	// prepare channel
+	ch := make(chan *Sculpture)
+
+	// start goroutine to get a user
+	go func(id string, ch chan *Sculpture) {
+
+		p := NewSculpture() // create empty user
+
+		// get a user from DB
+		err := db.C("sculptures").Find(bson.M{"_id": MongoStringToId(id)}).One(&p)
+		if err != nil {
+			return
+		}
+
+		// write a user to channel
+		ch <- p
+	}(id, ch)
+
+	// read user from channel
+	p := <-ch
+
+	return p, nil // all OK
+}
+
+// UpdateSculpture modifies a single sculpture in DB.
+func (m *MongoDbConn) UpdateSculpture(p *Sculpture) error {
+	return m.adminSculpture(DBCmdUpdate, p)
+}
+
+// InsertSculpture creates a new painting in DB.
+func (m *MongoDbConn) InsertSculpture(p *Sculpture) error {
+	// check the ID of the item to be inserted into DB
+	if p.Id == "" {
+		p.Id = NewMongoId()
+	}
+	return m.adminSculpture(DBCmdInsert, p)
+}
+
+// DeleteSculpture removes a single sculpture from DB.
+func (m *MongoDbConn) DeleteSculpture(p *Sculpture) error {
+	return m.adminSculpture(DBCmdDelete, p)
+}
+
+// Aux method that administers the painting records in DB
+func (m *MongoDbConn) adminSculpture(cmd DbCommand, p *Sculpture) error {
+
+	dblock.Lock()
+	defer dblock.Unlock()
+
+	coll := m.Sess.DB(m.name).C("sculptures")
+	if coll == nil {
+		return fmt.Errorf("Handling a sculpture: MongoDB descriptor empty.")
+	}
+
+	if p == nil {
+		return fmt.Errorf("Handling a sculpture: cannot create empty painting.")
+	}
+
+	var err error
+	switch cmd {
+
+	case DBCmdUpdate:
+		p.Modified = NewTimestamp() // update modified timestamp first...
+		err = coll.UpdateId(p.Id, p)
+
+	case DBCmdInsert:
+		p.Created = NewTimestamp() // create new timestamp first...
+		err = coll.Insert(p)
+
+	case DBCmdDelete:
+		err = coll.RemoveId(p.Id)
+
+	default:
+		err = fmt.Errorf("Handling sculptures: Unknown DB command.")
+	}
+	return err
+}
+
 ////
 //
 func (m *MongoDbConn) GetDatingNames() ([]string, error) {

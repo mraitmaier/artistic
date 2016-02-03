@@ -223,3 +223,23 @@ type Painting struct {
 func NewPainting() *Painting {
 	return &Painting{bson.NewObjectId(), *core.NewPainting(), NewTimestamp(), NewTimestamp()}
 }
+
+///
+type Sculpture struct {
+
+	// database ID
+	Id bson.ObjectId `bson:"_id"`
+
+	// original core Artwork interface is embedded
+	core.Sculpture `bson:",inline"`
+
+	// created timestamp
+	Created Timestamp
+
+	// modified timestamp
+	Modified Timestamp
+}
+
+func NewSculpture() *Sculpture {
+	return &Sculpture{bson.NewObjectId(), *core.NewSculpture(), NewTimestamp(), NewTimestamp()}
+}
