@@ -66,7 +66,7 @@ func NewTechnique() *Technique {
 }
 
 func CreateTechnique(name, descr string) *Technique {
-	return &Technique{bson.NewObjectId(), core.Technique{name, descr}, NewTimestamp(), NewTimestamp()}
+	return &Technique{bson.NewObjectId(), core.Technique{name, descr, core.UnknownTechnique}, NewTimestamp(), NewTimestamp()}
 }
 
 ////
