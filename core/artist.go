@@ -6,45 +6,45 @@ import (
 	"encoding/json"
 )
 
-// type representing the person
+// Artist is type representing a single artist
 // This type is a basis for all artists: painters, sculptors, writers etc.
 type Artist struct {
 
-	/* name of the artist */
+	//Name of the artist
 	*Name
 
-	/* real name if the person used pseudonim; with artists this is common */
+	//RealName: if the person used pseudonim; with artists this is common
 	RealName *Name
 
-	/* Date of birth */
+	// Born reperesents the date of birth
 	Born string
 
-	//
+	// Birthplace represents the place of birth
 	Birthplace string
 
-	/* Date of death */
+	// Died represents the date of death
 	Died string
 
-	//
+	// Deathplace represents the place of death
 	Deathplace string
 
-	/* his/her nationality */
+	// Nationality: his/her nationality
 	Nationality string
 
-	/* a list of sources about the person */
+	// Sources is a list of sources about the person
 	Sources []string
 
-	/* his/her biography, of course */
+	// Biography: his/her biography, of course
 	Biography string
 
-	/* private notes about the person */
+	// Notes is a list of private notes about the artist
 	Notes []Note
 
-	/* this is actually an URI */
+	// Pricture holds the path (URL) to artist's picture
 	//    Picture url.URL;
 	Picture string
 
-	// artist flags, a person can be many things at once
+	// Set of artist flags, an artist can be many things at once
 	IsPainter      bool `bson:"is_painter"`
 	IsSculptor     bool `bson:"is_sculptor"`
 	IsPrintmaker   bool `bson:"is_printmaker" `
@@ -57,11 +57,11 @@ type Artist struct {
 	IsPlayWriter   bool
 }
 
+// DefaultCapacity defines the default number of items for slices
 const DefaultCapacity = 10
 
+// CreateArtist creates a new instance of Artist.
 func CreateArtist() *Artist {
-	//n := make([]Note, 0, DefaultCapacity)
-	//s := make([]string, 0, DefaultCapacity)
 	return &Artist{
 		Name:           &Name{"", "", ""},
 		RealName:       &Name{"", "", ""},
@@ -86,21 +86,17 @@ func CreateArtist() *Artist {
 		IsPlayWriter:   false}
 }
 
-/*
- * Artist.String - a string representation of the Artist
- */
+// String returns a string representation of the Artist
 func (p *Artist) String() string { return p.Name.String() }
 
-/*
- * Artist.Json- a JSON-encoded representation of the Artist
- */
-func (p *Artist) Json() (string, error) {
+// JSON returns JSON-encoded representation of the Artist
+func (p *Artist) JSON() (string, error) {
 	s, err := json.Marshal(p)
 	return string(s[:]), err
 }
 
-// serialize a list of artists into JSON
-func artistsToJson(items []Artist) (data string, err error) {
+// Serialize a list of artists into JSON
+func artistsToJSON(items []Artist) (data string, err error) {
 
 	var b []byte
 	if b, err = json.Marshal(items); err != nil {
