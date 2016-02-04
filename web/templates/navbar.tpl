@@ -23,6 +23,8 @@
                 </form>
                 
                 <ul class="nav navbar-nav navbar-right">
+
+                {{if eq .Role "admin"}}
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Admin<b class="caret"></b> </a>
                         <ul class="dropdown-menu">
@@ -30,6 +32,7 @@
                             <!--<li><a href="/log">Log</a></li> -->
                         </ul>
                     </li>
+               {{end}}
  
                     <li>
                         <a href="#" data-toggle="tooltip" data-placement="left" title="About">
@@ -55,7 +58,7 @@
                         </a>
                     </li>
 
-                    <li><p class="navbar-text">Signed in as {{.}}</p></li>
+                    <li><p class="navbar-text">Signed in as {{.Fullname}}</p></li>
 
                     <li>
                         <a href="/logout" data-toggle="tooltip" data-placement="left" title="Sign out">

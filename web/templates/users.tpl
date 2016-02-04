@@ -22,7 +22,7 @@
 </head>
 
 <body>
-    {{template "navbar" .User.Fullname}}
+    {{template "navbar" .User}}
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-2" id="menu">
@@ -33,11 +33,13 @@
             <div class="col-md-10" id="data-list">
                 <h1 id="data-list-header">Users</h1>
 
+        {{if eq .User.Role "admin"}}
                 <div id="new-user-btn">
                     <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addUserModal">
                         <span class="glyphicon glyphicon-plus"></span> &nbsp; Add a New User
                     </button>
                 </div>
+        {{end}}
                 <br />
 
         {{if .Users}}
@@ -64,6 +66,7 @@
 
                     <tbody>
                         {{ $uname := .User.Username }}
+                        {{ $role := .User.Role }}
                         {{range $index, $element := .Users}}
                             {{ $cnt := add $index 1 }}
                             {{if eq $element.Visible true}}
@@ -94,7 +97,7 @@
                             	</a>
                             	</span>            
                             	&nbsp;&nbsp;
-                                {{if ne $element.User.Username $uname}}
+                                {{if and (ne $element.User.Username $uname) (eq $role "admin") }}
                             	<span data-toggle="tooltip" data-placement="up" title="Modify Details"> 
                             	<a data-toggle="modal" data-target="#modifyUserModal"
                                        data-id="{{$element.Id.Hex}}"  
@@ -122,6 +125,7 @@
                             	</span>       
                             	&nbsp;&nbsp;
                                 {{end}}
+                                {{if eq $role "admin"}}
                             	<span data-toggle="tooltip" data-placement="up" title="Change Password"> 
                             	<a data-toggle="modal" data-target="#changePasswdModal"
                                        data-id="{{$element.Id.Hex}}"  
@@ -130,6 +134,7 @@
                                 <span class="glyphicon glyphicon-random"></span>
                             	</a>
                             	</span>       
+                                {{end}}
                             </td>
                         </tr>
                             {{end}}
@@ -392,7 +397,7 @@
 
 {{define "view_user_modal"}}
 <div class="modal fade" id="viewUserModal" tabindex="-1" role="dialog" aria-lebeleledby="ViewUserModalLabel">
-<div class="modal-dialog">
+<div class="modal-dialog modal-lg">
 <div class="modal-content">
 
     <div class="modal-header">
@@ -442,7 +447,7 @@
 
 {{define "modify_user_modal"}}
 <div class="modal fade" id="modifyUserModal" tabindex="-1" role="dialog" aria-lebeleledby="modifyUserModalLabel">
-<div class="modal-dialog">
+<div class="modal-dialog modal-lg">
 <div class="modal-content">
 
     <div class="modal-header">
@@ -466,28 +471,26 @@
             <input type="hidden" id="hexid" name="hexid" />
 
       	<div class="form-group form-group-sm">
-            <label for="username" class="col-md-3 control-label">Username</label>
-        	<div class="col-md-9">
+            <label for="username" class="col-md-2 control-label">Username</label>
+        	<div class="col-md-4">
             	<input type="text" class="form-control" id="username" name="username" readonly></input>
         	</div>
-    	</div>
-
-      	<div class="form-group form-group-sm">
-            <label for="password" class="col-md-3 control-label">Password</label> 
-        	<div class="col-md-6">
-            <input type="text" class="form-control" id="password" name="password" readonly></input>
+        	<label for="fullname" class="col-md-2 control-label">Full Name</label>
+        	<div class="col-md-4">
+            <input type="text" class="form-control" id="fullname" name="fullname"></input>
         	</div>
-            <div class="ol-sm-2">
-            <button id="ch_pwd_btn" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#changePasswdModal">
-            Change Password
-            </button>
-            </div>
-
     	</div>
 
       	<div class="form-group form-group-sm">
-        	<label for="urole" class="col-md-3 control-label">User Role</label>
-        	<div class="col-md-9">
+            <label for="password" class="col-md-2 control-label">Password</label> 
+        	<div class="col-md-10">
+            <input type="text" class="form-control" id="password" name="password" readonly></input>
+            </div>
+    	</div>
+
+      	<div class="form-group form-group-sm">
+        	<label for="urole" class="col-md-2 control-label">User Role</label>
+        	<div class="col-md-10">
             <select class="form-control" name="urole" id="urole" required>
         {{ $roles := allowedroles }}
         {{range $role := $roles}}
@@ -498,39 +501,26 @@
     	</div>
 
       	<div class="form-group form-group-sm">
-        	<label for="fullname" class="col-md-3 control-label">Full Name</label>
-        	<div class="col-md-9">
-            <input type="text" class="form-control" id="fullname" name="fullname"></input>
-        	</div>
-    	</div>
-
-      	<div class="form-group form-group-sm">
-        	<label for="email" class="col-md-3 control-label">E-mail Address</label>
-        	<div class="col-md-9">
+        	<label for="email" class="col-md-2 control-label">E-mail Address</label>
+        	<div class="col-md-4">
             <input type="email" class="form-control" id="email" name="email"></input>
         	</div>
-    	</div>
-
-      	<div class="form-group form-group-sm">
-        	<label for="phone" class="col-md-3 control-label">Phone Number</label>
-        	<div class="col-md-9">
+        	<label for="phone" class="col-md-2 control-label">Phone Number</label>
+        	<div class="col-md-4">
             <input type="tel" class="form-control" id="phone" name="phone"></input>
         	</div>
     	</div>
 
       	<div class="form-group form-group-sm">
-        	<label for="disabled" class="col-md-3 control-label">Disabled</label>
-        	<div class="col-md-9">
+        	<label for="disabled" class="col-md-2 control-label">Disabled</label>
+        	<div class="col-md-4">
              <select class="form-control" id="disabled" name="disabled" required>
                  <option value="yes">Yes</option>
                  <option value="no">No</option>
              </select>
         	</div>
-    	</div>
-
-      	<div class="form-group form-group-sm">
-        	<label for="change" class="col-md-3 control-label">Must Change Password</label>
-        	<div class="col-md-9">
+        	<label for="change" class="col-md-2 control-label">Change Password</label>
+        	<div class="col-md-4">
             <select class="form-control" id="mustchange" name="mustchange" required>
                 <option value="yes">Yes</option>
                 <option value="no">No</option>
@@ -611,24 +601,24 @@
 
         <div class="row">
         <div class="form-group form-group-sm">
-            <label for="oldpassword" class="col-sm-3 control-label">Old Password</label>
-            <div class="col-sm-6">
+            <label for="oldpassword" class="col-sm-4 control-label">Old Password</label>
+            <div class="col-sm-8">
                 <input type="password" class="form-control" id="oldpassword" name="oldpassword"
                                        placeholder="enter old password" required autofocus></input>
             </div>
         </div>
  
         <div class="form-group form-group-sm">
-            <label for="newpassword" class="col-sm-3 control-label">New Password</label>
-            <div class="col-sm-6">
+            <label for="newpassword" class="col-sm-4 control-label">New Password</label>
+            <div class="col-sm-8">
                 <input type="password" class="form-control" id="newpassword" name="newpassword"
                                        placeholder="enter new password" required></input>
             </div>
         </div>
 
         <div class="form-group form-group-sm">
-            <label for="newpassword2" class="col-sm-3 control-label">Retype New Password</label>
-            <div class="col-sm-6">
+            <label for="newpassword2" class="col-sm-4 control-label">Retype New Password</label>
+            <div class="col-sm-8">
                 <input type="password" class="form-control" id="newpassword2" name="newpassword2"
                                        placeholder="retype new password" required></input>
             </div>
