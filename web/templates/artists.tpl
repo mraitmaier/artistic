@@ -83,6 +83,8 @@
                                        data-realname="{{$element.Artist.RealName}}"
                                        data-born="{{$element.Artist.Born}}"
                                        data-died="{{$element.Artist.Died}}"
+                                       data-birthplace="{{$element.Artist.Birthplace}}"
+                                       data-deathplace="{{$element.Artist.Deathplace}}"
                                        data-nationality="{{$element.Artist.Nationality}}"
                                        data-biography="{{$element.Artist.Biography}}"
                                        data-painter="{{$element.Artist.IsPainter}}"
@@ -106,6 +108,8 @@
                                        data-reallast="{{$element.Artist.RealName.Last}}"
                                        data-born="{{$element.Artist.Born}}"
                                        data-died="{{$element.Artist.Died}}"
+                                       data-birthplace="{{$element.Artist.Birthplace}}"
+                                       data-deathplace="{{$element.Artist.Deathplace}}"
                                        data-nationality="{{$element.Artist.Nationality}}"
                                        data-biography="{{$element.Artist.Biography}}"
                                        data-painter="{{$element.Artist.IsPainter}}"
@@ -129,6 +133,14 @@
                   {{end}}
                 </tbody>
                 </table>
+                <ul class="pagination pagination-sm" id="cases-pagination">
+                    <li><a href="#">&laquo;</a></li>
+                    <li><a href="#">1</a></li>
+                    <li><a href="#">2</a></li>
+                    <li><a href="#">3</a></li>
+                    <li><a href="#">4</a></li>
+                    <li><a href="#">&raquo;</a></li>
+                </ul>
 
     <!-- add modals -->
     {{template "view_artist_modal"}}
@@ -160,46 +172,40 @@
 
         var button = $(event.relatedTarget);     // Button that triggered the modal
         // Extract info from data-* requirement attribute
-        var id = button.data('id');  
-        var name = button.data('name');
- 		var real = button.data('realname');
- 		var born = button.data('born');
- 		var died = button.data('died');
- 		var nation = button.data('nationality');
- 		var bio = button.data('biography');
- 		var painter= button.data('painter');
+        //var id = button.data('id');  
+ 		var painter = button.data('painter');
  		var sculptor = button.data('sculptor');
  		var architect = button.data('architect');
  		var ceramic = button.data('ceramicist');
  		var print = button.data('printmaker');
-        var created = button.data('created');
-        var modified = button.data('modified');
+
         // Update the modal's content. We'll use jQuery here, but you could use a data 
         // binding library or other methods instead.
-        var modal = $(this)
-        modal.find('.modal-title').text(name);
+        var modal = $(this);
+        modal.find('.modal-title').text(button.data('name'));
         //modal.find('.modal-body #hexid').val(id);
-        //modal.find('.modal-body #namev').text(name);
-        modal.find('.modal-body #realnamev').text(real);
-        modal.find('.modal-body #diedv').text(died);
-        modal.find('.modal-body #bornv').text(born);
-        modal.find('.modal-body #nationalityv').text(nation);
-        modal.find('.modal-body #biographyv').text(bio);
-        modal.find('.modal-body #createdv').text(created);
-        modal.find('.modal-body #modifiedv').text(modified);
+        modal.find('.modal-body #realnamev').text(button.data('realname'));
+        modal.find('.modal-body #diedv').text(button.data('died'));
+        modal.find('.modal-body #bornv').text(button.data('born'));
+        modal.find('.modal-body #birthplacev').text(button.data('birthplace'));
+        modal.find('.modal-body #deathplacev').text(button.data('deathplace'));
+        modal.find('.modal-body #nationalityv').text(button.data('nationality'));
+        modal.find('.modal-body #biographyv').text(button.data('biography'));
+        modal.find('.modal-body #createdv').text(button.data('created'));
+        modal.find('.modal-body #modifiedv').text(button.data('modified'));
 
         var roles = ""
-        if (painter) {
-            roles += " Painter"
+        if (painter) { 
+            roles += " Painter" 
         } 
-        if (sculptor) {
+        if (sculptor) { 
             roles += " Sculptor"
         } 
-        if (print) {
-            roles += " Printmaker"
+        if (print) { 
+            roles += " Printmaker" 
         } 
-        if (architect) {
-            roles += " Architect"
+        if (architect) { 
+            roles += " Architect" 
         } 
         modal.find('.modal-body #rolesv').text(roles);
     })
@@ -208,57 +214,52 @@
 
         var button = $(event.relatedTarget); // Button that triggered the modal
         // Extract info from data-* requirement attribute
-        var id = button.data('id');  
+        //var id = button.data('id');  
         var first = button.data('first');
         var middle = button.data('middle');
         var last = button.data('last');
- 		var rfirst = button.data('realfirst');
- 		var rmiddle = button.data('realmiddle');
- 		var rlast = button.data('reallast');
- 		var born = button.data('born');
- 		var died = button.data('died');
- 		var nation = button.data('nationality');
- 		var bio = button.data('biography');
  		var painter= button.data('painter');
  		var sculptor = button.data('sculptor');
  		var architect = button.data('architect');
  		var ceramic = button.data('ceramicist');
  		var print = button.data('printmaker');
         var created = button.data('created');
-        var modified = button.data('modified');
+
         // Update the modal's content. We'll use jQuery here, but you could use a data binding library 
         // or other methods instead.
-        var modal = $(this)
-        modal.find('.modal-title').text('Modify "' + first + " " + last + '" Details');
-        modal.find('.modal-body #hexid').val(id);
+        var modal = $(this);
+        modal.find('.modal-title').text('Modify "' + first + ' ' + middle + ' ' + last + '" Details');
+        modal.find('.modal-body #hexid').val(button.data('id'));
         modal.find('.modal-body #firstm').val(first);
         modal.find('.modal-body #middlem').val(middle);
         modal.find('.modal-body #lastm').val(last);
-        modal.find('.modal-body #realfirstm').val(rfirst);
-        modal.find('.modal-body #realmiddlem').val(rmiddle);
-        modal.find('.modal-body #reallastm').val(rlast);
-        modal.find('.modal-body #diedm').val(died);
-        modal.find('.modal-body #bornm').val(born);
-        modal.find('.modal-body #nationalitym').val(nation);
-        modal.find('.modal-body #biographym').val(bio);
-        if (painter) {
-            modal.find('.modal-body #painterm').prop('checked', true);
+        modal.find('.modal-body #realfirstm').val(button.data('realfirst'));
+        modal.find('.modal-body #realmiddlem').val(button.data('realmiddle'));
+        modal.find('.modal-body #reallastm').val(button.data('reallast'));
+        modal.find('.modal-body #diedm').val(button.data('died'));
+        modal.find('.modal-body #bornm').val(button.data('born'));
+        modal.find('.modal-body #birthplacem').val(button.data('birthplace'));
+        modal.find('.modal-body #deathplacem').val(button.data('deathplace'));
+        modal.find('.modal-body #nationalitym').val(button.data('nationality'));
+        modal.find('.modal-body #biographym').val(button.data('biography'));
+        if (painter) { 
+            modal.find('.modal-body #painterm').prop('checked', true); 
         }
-        if (sculptor) {
-            modal.find('.modal-body #sculptorm').prop('checked', true);
+        if (sculptor) { 
+            modal.find('.modal-body #sculptorm').prop('checked', true); 
         }
-        if (architect) {
-            modal.find('.modal-body #architectm').prop('checked', true);
+        if (architect) { 
+            modal.find('.modal-body #architectm').prop('checked', true); 
         }
-        if (ceramic) {
-            modal.find('.modal-body #ceramicistm').prop('checked', true);
+        if (ceramic) { 
+            modal.find('.modal-body #ceramicistm').prop('checked', true); 
         }
-        if (print) {
-            modal.find('.modal-body #printmakerm').prop('checked', true);
+        if (print) { 
+            modal.find('.modal-body #printmakerm').prop('checked', true); 
         }
         modal.find('.modal-body #created').val(created);
         modal.find('.modal-body #createdm').text(created);
-        modal.find('.modal-body #modifiedm').text(modified);
+        modal.find('.modal-body #modifiedm').text(button.data('modified'));
     })
 
 // Handle the removals using modal pop-up 
@@ -267,6 +268,7 @@
         var button = $(event.relatedTarget);
         var id = button.data('id');
         var name = button.data('name');
+
         // Update the modal's content. We'll use jQuery here, but you could use a data binding library 
         // or other methods instead.
         var modal = $(this);
@@ -317,7 +319,7 @@
         <div class="col-sm-1 control-label"> <strong>Name</strong> </div>
         <label for="first" class="col-sm-1 control-label">First</label>
         <div class="col-sm-3">
-            <input type="text" class="form-control" id="first" name="first" placeholder="first name" required autofocus />
+            <input type="text" class="form-control" id="first" name="first" placeholder="first name" required />
         </div>
         <label for="middle" class="col-sm-1 control-label">Middle</label>
         <div class="col-sm-2">
@@ -348,11 +350,19 @@
     <div class="form-group form-group-sm">
         <label for="born" class="col-sm-2 control-label">Born</label>
         <div class="col-sm-4">
-            <input type="date" class="form-control" id="born" name="born" value="" />
+            <input type="date" class="form-control" id="born" name="born" />
         </div>
+        <div class="col-sm-6">
+            <input type="text" class="form-control" id="birthplace" name="birthplace" placeholder="Birthplace..." />
+        </div>
+    </div> <!-- form-group -->
+    <div class="form-group form-group-sm">
         <label for="died" class="col-sm-2 control-label">Died</label>
         <div class="col-sm-4">
             <input type="date" class="form-control" id="died" name="died" value="" />
+        </div>
+        <div class="col-sm-6">
+            <input type="text" class="form-control" id="deathplace" name="deathplace" placeholder="Place of death..." />
         </div>
     </div> <!-- form-group -->
 
@@ -435,23 +445,21 @@
         <div class="row">
              <table id="view-user-table" class="table table-hover small">
              <tbody>
-             <!--
-                 <tr> <td class="col-sm-3"></td> 
-                      <td id="rolesv" class="col-sm-9"></td> </tr>
-                -->
-                 <tr> <td class="col-sm-3"><b>Real Name<b/></td>
+                 <tr> <td class="col-sm-3"><strong>Real Name</strong></td>
                       <td class="col-sm-9"><span id="realnamev"></span></td> </tr>
-                 <tr> <td class="col-sm-3"><b>Born</b></td> 
-                      <td id="bornv" class="col-sm-9"></td> </tr>
-                 <tr> <td class="col-sm-3"><b>Died</b></td> 
-                      <td id="diedv" class="col-sm-9"></td> </tr>
+                 <tr> <td class="col-sm-3"><strong>Born</strong></td> 
+                      <td class="col-sm-9"><span id="bornv"></span>&emsp;
+                                           <span id="birthplacev"></span></td> </tr>
+                 <tr> <td class="col-sm-3"><strong>Died</strong></td> 
+                      <td class="col-sm-9"><span id="diedv"></span>&emsp;
+                                           <span id="deathplacev"></span></td> </tr>
                  <tr> <td class="col-sm-3"><strong>Nationality</strong></td> 
                       <td id="nationalityv" class="col-sm-9"></td> </tr>
                  <tr> <td class="col-sm-3"><strong>Biography</strong></td> 
                       <td id="biographyv" class="col-sm-9"></td> </tr>
-                 <tr> <td class="col-sm-3"><b>Created</b></td> 
+                 <tr> <td class="col-sm-3"><strong>Created</strong></td> 
                       <td id="createdv" class="col-sm-9"></td> </tr>
-                 <tr> <td class="col-sm-3"><b>Last Modified</b></td> 
+                 <tr> <td class="col-sm-3"><strong>Last Modified</strong></td> 
                       <td id="modifiedv" class="col-sm-9"></td> </tr>
              </tbody>
              </table>
@@ -474,7 +482,7 @@
         <div class="row">
             <h3 class="modal-title col-md-8" id="modifyArtistModalLabel">Empty Artist Details</h3>
              <button type="button" class="btn btn-primary btn-sm col-sm-2" 
-                     onclick="modifyArtist('modify_artist_form',$('#hexid').val());$('#modifyArtistModal').modal('hide');">
+                     onclick="modifyArtist('modify_artist_form', $('#hexid').val()); $('#modifyArtistModal').modal('hide');">
                      Modify
              </button>
             <button type="button" class="btn btn-default btn-sm col-md-2" data-dismiss="modal">Cancel</button>
@@ -526,9 +534,17 @@
                     <div class="col-sm-4">
                         <input type="date" class="form-control" id="bornm" name="born" />
                     </div>
+                    <div class="col-sm-6">
+                        <input type="text" class="form-control" id="birthplacem" name="birthplace" />
+                    </div>
+                </div> <!-- form-group -->
+                <div class="form-group form-group-sm">
                     <label for="died" class="col-sm-2 control-label">Died</label>
                     <div class="col-sm-4">
                         <input type="date" class="form-control" id="diedm" name="died" />
+                    </div>
+                    <div class="col-sm-6">
+                        <input type="text" class="form-control" id="deathplacem" name="deathplace" />
                     </div>
                 </div> <!-- form-group -->
 

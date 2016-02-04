@@ -121,6 +121,8 @@ func parseArtistFormValues(r *http.Request) *db.Artist {
 	rlast := strings.TrimSpace(r.FormValue("reallast"))
 	born := strings.TrimSpace(r.FormValue("born"))
 	died := strings.TrimSpace(r.FormValue("died"))
+	birth := strings.TrimSpace(r.FormValue("birthplace"))
+	death := strings.TrimSpace(r.FormValue("deathplace"))
 	nation := strings.TrimSpace(r.FormValue("nationality"))
 	painter := strings.TrimSpace(r.FormValue("painter"))
 	sculptor := strings.TrimSpace(r.FormValue("sculptor"))
@@ -134,6 +136,8 @@ func parseArtistFormValues(r *http.Request) *db.Artist {
 	a.Name = core.CreateName(first, middle, last)
 	a.RealName = core.CreateName(rfirst, rmiddle, rlast)
 	a.Born = born
+	a.Birthplace = birth
+	a.Deathplace = death
 	a.Died = died
 	a.Nationality = nation
 	a.Biography = bio

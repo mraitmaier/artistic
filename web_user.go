@@ -262,14 +262,14 @@ func pwdHandler(app *ArtisticApp) http.Handler {
 
 			case "POST":
 				// get the previous page information from form values for redirection
-				prev_page := strings.TrimSpace(r.FormValue("prev"))
+				prevPage := strings.TrimSpace(r.FormValue("prev"))
 				if uname, err := changeUserPassword(w, r, app); err != nil {
 					app.Log.Error(fmt.Sprintf("[%s] %s", user.Username, err.Error()))
 				} else {
 					app.Log.Info(fmt.Sprintf("[%s] Successfully changed password for user %q.", user.Username, uname))
 				}
 				// unconditionally reroute to previous page
-				http.Redirect(w, r, fmt.Sprintf("/%s", prev_page), http.StatusFound)
+				http.Redirect(w, r, fmt.Sprintf("/%s", prevPage), http.StatusFound)
 
 			default:
 				// otherwise just display main 'index' page
