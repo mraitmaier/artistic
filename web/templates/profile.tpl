@@ -258,24 +258,24 @@ Your
         <div class="row">
 
         <div class="form-group form-group-sm">
-            <label for="oldpassword" class="col-sm-3 control-label">Old Password</label>
-            <div class="col-sm-6">
+            <label for="oldpassword" class="col-sm-4 control-label">Old Password</label>
+            <div class="col-sm-8">
                 <input type="password" class="form-control" id="oldpassword" name="oldpassword"
                                        placeholder="enter old password" required autofocus></input>
             </div>
         </div>
  
         <div class="form-group form-group-sm">
-            <label for="newpassword" class="col-sm-3 control-label">New Password</label>
-            <div class="col-sm-6">
+            <label for="newpassword" class="col-sm-4 control-label">New Password</label>
+            <div class="col-sm-8">
                 <input type="password" class="form-control" id="newpassword" name="newpassword"
                                        placeholder="enter new password" required></input>
             </div>
         </div>
 
         <div class="form-group form-group-sm">
-            <label for="newpassword2" class="col-sm-3 control-label">Retype New Password</label>
-            <div class="col-sm-6">
+            <label for="newpassword2" class="col-sm-4 control-label">Retype New Password</label>
+            <div class="col-sm-8">
                 <input type="password" class="form-control" id="newpassword2" name="newpassword2"
                                        placeholder="retype new password" required></input>
             </div>

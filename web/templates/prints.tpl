@@ -1,4 +1,5 @@
 {{define "prints"}}
+{{$role := .User.Role}}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -30,12 +31,13 @@
 
             <div class="col-md-10" id="data-list">
                 <h1 id="data-list-header">Graphic Prints</h1>
-
+        {{if ne $role "guest"}}
                 <div id="new-print-btn">
                 <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addPrintModal">
                 <span class="glyphicon glyphicon-plus"></span> &nbsp; Add a New Graphic Print
                 </button>
         	    </div>
+        {{end}}
                 <br />
 
             {{if .Prints}}
@@ -101,6 +103,7 @@
                                  <span class="glyphicon glyphicon-eye-open"></span>
                             </a>
                        </span>            
+                       {{if ne $role "guest"}}
                        &nbsp;&nbsp;
                        <span data-toggle="tooltip" data-placement="up" title="Modify details"> 
                             <a data-toggle="modal" data-target="#modifyPrintModal"
@@ -137,7 +140,7 @@
                                 <span class="glyphicon glyphicon-remove"></span>
                             </a>
                        </span>       
-
+                       {{end}}
                     </td>
                   </tr>
                   {{end}}
@@ -146,8 +149,10 @@
 
     <!-- add modals -->
     {{template "view_print_modal"}}
+{{if ne $role "guest"}}
     {{template "modify_print_modal"}}
     {{template "remove_print_modal"}}
+{{end}}
     <!-- end of modals definition -->   
 
             {{else}}
@@ -157,9 +162,9 @@
             </div>
         </div> <!-- row -->
     </div> <!-- container fluid -->
-
+{{if ne $role "guest"}}
     {{template "add_print_modal"}}
-
+{{end}}
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <!--   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script> -->
     <script  src="/static/js/jquery.min.js"></script>
@@ -205,6 +210,7 @@
         modal.find('.modal-body #modifiedv').text(button.data('modified'));
     })
 
+{{if ne $role "guest"}}
     $('#modifyPrintModal').on('show.bs.modal', function (event) {
 
         var button = $(event.relatedTarget);     // Button that triggered the modal
@@ -271,7 +277,7 @@
         var url = '/print/' + id + '/put';
         postForm(form_id, url);
     }
-
+{{end}}
     </script>
 </body>
 </html>

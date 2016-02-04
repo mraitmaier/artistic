@@ -1,4 +1,5 @@
 {{define "techniques"}}
+{{$role := .User.Role}}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -36,12 +37,13 @@
 
         <div class="col-md-10" id="data-list">
             <h1 id="data-list-header">Techniques</h1>
-
+    {{if ne $role "guest"}}
             <div id="new-req-btn">
             <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addTechniqueModal">
                 <span class="glyphicon glyphicon-plus"></span> &nbsp; Create a New Technique
             </button>
         	</div>
+    {{end}}
             <br />
 
 
@@ -83,6 +85,7 @@
                                  <span class="glyphicon glyphicon-eye-open"></span>
                             </a>
                             </span>            
+                        {{if ne $role "guest"}}
                             &nbsp;&nbsp;
                             <span data-toggle="tooltip" data-placement="up" title="Modify details"> 
                             <a data-toggle="modal" data-target="#modifyTechniqueModal"
@@ -102,6 +105,7 @@
                                 <span class="glyphicon glyphicon-remove"></span>
                             </a>
                             </span>       
+                        {{end}}
                         </td>
                     </tr>
                     {{end}}
@@ -110,8 +114,10 @@
 
     <!-- add modals -->
     {{template "view_technique_modal" .Techniques}}
+{{if ne $role "guest"}}
     {{template "modify_technique_modal" .Techniques}}
     {{template "remove_technique_modal" .Techniques}}
+{{end}}
     <!-- end of modals definition -->                
 
     {{else}}
@@ -121,8 +127,9 @@
         </div>
      </div> <!-- row -->
     </div> <!-- container fluid -->
-
+{{if ne $role "guest"}}
     {{template "add_technique_modal"}}
+{{end}}
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
  <!--   <script 
         src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js">
@@ -156,6 +163,7 @@
         modal.find('.modal-body #modifiedv').text(modified);
     })
 
+{{if ne $role "guest"}}
     $('#modifyTechniqueModal').on('show.bs.modal', function (event) {
 
         var button = $(event.relatedTarget); // Button that triggered the modal
@@ -205,7 +213,7 @@
         var url = '/technique/' + id + '/put';
         postForm(form_id, url);
     }
-
+{{end}}
 	</script>
 
   </body>
@@ -241,7 +249,7 @@
                 <label for="description" class="col-sm-2 control-label">Description</label>
                 <div class="col-sm-offset-10">&nbsp;</div>
                 <div class="col-sm-12">
-                <textarea class="form-control" rows="5" id="description" name="description"></textarea>
+                <textarea class="form-control" rows="15" id="description" name="description"></textarea>
                 </div>
             </div>
       </form>
@@ -281,7 +289,7 @@
             <label for="descriptionv" class="col-sm-3 control-label">Description</label>
             <div class="col-sm-offset-9"></div>
             <div class="col-sm-12">
-                <textarea class="form-control" rows="5" id="descriptionv" name="descriptionv" readonly></textarea>
+                <textarea class="form-control" rows="15" id="descriptionv" name="descriptionv" readonly></textarea>
             </div>
         </div>
         <!--
@@ -342,7 +350,7 @@
             <label for="description" class="col-sm-3 control-label">Description</label>
             <div class="col-sm-offset-9"></div>
             <div class="col-sm-12">
-                <textarea class="form-control" rows="5" id="description" name="description"></textarea>
+                <textarea class="form-control" rows="15" id="description" name="description"></textarea>
             </div>
         </div>
    <div class="form-group form-group-sm small">

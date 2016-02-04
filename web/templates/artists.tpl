@@ -20,6 +20,7 @@
 </head>
 
 <body>
+    {{$role := .User.Role}}
     {{template "navbar" .User}}
     <div class="container-fluid">
         <div class="row">
@@ -31,11 +32,13 @@
             <div class="col-md-10" id="data-list">
                 <h1 id="data-list-header">{{get_artist_type .Type}}s</h1>
 
+        {{if ne $role "guest"}}
             <div id="new-artist-btn">
             <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addArtistModal">
                 <span class="glyphicon glyphicon-plus"></span> &nbsp; Add a New Artist
             </button>
         	</div>
+        {{end}}
             <br />
 
             {{if .Artists}}
@@ -94,6 +97,7 @@
                                  <span class="glyphicon glyphicon-eye-open"></span>
                             </a>
                        </span>            
+                            {{if ne $role "guest"}}
                        &nbsp;&nbsp;
                        <span data-toggle="tooltip" data-placement="up" title="Modify details"> 
                             <a data-toggle="modal" data-target="#modifyArtistModal"
@@ -127,7 +131,7 @@
                                 <span class="glyphicon glyphicon-remove"></span>
                             </a>
                        </span>       
-
+                            {{end}}
                     </td>
                   </tr>
                   {{end}}
@@ -144,8 +148,10 @@
 
     <!-- add modals -->
     {{template "view_artist_modal"}}
+{{if ne $role "guest"}}
     {{template "modify_artist_modal"}}
     {{template "remove_artist_modal"}}
+{{end}}
     <!-- end of modals definition -->   
 
             {{else}}
@@ -156,7 +162,9 @@
         </div> <!-- row -->
     </div> <!-- container fluid -->
 
+{{if ne $role "guest"}}
     {{template "add_artist_modal"}}
+{{end}}
 
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
@@ -210,6 +218,7 @@
         modal.find('.modal-body #rolesv').text(roles);
     })
 
+{{if ne $role "guest"}}
     $('#modifyArtistModal').on('show.bs.modal', function (event) {
 
         var button = $(event.relatedTarget); // Button that triggered the modal
@@ -289,7 +298,7 @@
         var url = '/artist/' + id + '/put';
         postForm(form_id, url);
     }
-
+{{end}}
     </script>
 </body>
 </html>

@@ -1,4 +1,5 @@
 {{define "users"}}
+{{$role := .User.Role}}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -33,7 +34,7 @@
             <div class="col-md-10" id="data-list">
                 <h1 id="data-list-header">Users</h1>
 
-        {{if eq .User.Role "admin"}}
+        {{if eq $role "admin"}}
                 <div id="new-user-btn">
                     <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addUserModal">
                         <span class="glyphicon glyphicon-plus"></span> &nbsp; Add a New User
@@ -66,7 +67,6 @@
 
                     <tbody>
                         {{ $uname := .User.Username }}
-                        {{ $role := .User.Role }}
                         {{range $index, $element := .Users}}
                             {{ $cnt := add $index 1 }}
                             {{if eq $element.Visible true}}
@@ -144,9 +144,11 @@
 
 		<!-- Add modals -->
     {{template "view_user_modal"}}
+{{if eq $role "admin"}}
     {{template "modify_user_modal"}}
     {{template "remove_user_modal"}}
     {{template "change_passwd_modal"}}
+{{end}}
     <!-- end of modals definition -->        
         {{else}}
             <p>ERROR! There are no users defined.</p>
@@ -156,7 +158,9 @@
         </div> <!-- row -->
     </div> <!-- container fluid -->
 
+{{if eq $role "admin"}}
    {{template "add_user_modal"}}
+{{end}}
 
     <script  src="/static/js/jquery.min.js"></script>
     <!-- Include all compiled plugins, or include individual files as needed -->
@@ -205,6 +209,7 @@
             modal.find('.modal-body #modified').text(modified);
     	});
 
+{{if eq $role "admin"}}
        $('#modifyUserModal').on('show.bs.modal', function (event) {
 
             var btn = $(event.relatedTarget); // button that triggerd event
@@ -291,7 +296,7 @@
             //   	alert("ID=" + id); //DEBUG
     		postForm(form_id, url);
 		}
-
+{{end}}
     	</script>
 </body>
 </html>

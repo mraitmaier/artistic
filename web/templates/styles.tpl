@@ -1,4 +1,5 @@
 {{define "styles"}}
+{{$role := .User.Role}}
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -35,12 +36,13 @@
 
         <div class="col-md-10" id="data-list">
             <h1 id="data-list-header">Styles</h1>
-
+        {{if ne $role "guest"}}
             <div id="new-req-btn">
             <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addStyleModal">
                 <span class="glyphicon glyphicon-plus"></span> &nbsp; Create a New Style
             </button>
         	</div>
+        {{end}}
             <br />
 
 		{{if .Styles}}
@@ -81,6 +83,7 @@
                                  <span class="glyphicon glyphicon-eye-open"></span>
                             </a>
                             </span>            
+                        {{if ne $role "guest"}}
                             &nbsp;&nbsp;
                             <span data-toggle="tooltip" data-placement="up" title="Modify details"> 
                             <a data-toggle="modal" data-target="#modifyStyleModal"
@@ -98,6 +101,7 @@
                                 <span class="glyphicon glyphicon-remove"></span>
                             </a>
                             </span>       
+                        {{end}}
 						</td>
 					</tr>
 					{{end}}
@@ -107,8 +111,10 @@
 
     <!-- add modals -->
     {{template "view_style_modal" .Styles}}
+{{if ne $role "guest"}}
     {{template "modify_style_modal" .Styles}}
     {{template "remove_style_modal" .Styles}}
+{{end}}
     <!-- end of modals definition -->          
 
 		{{else}}
@@ -119,7 +125,10 @@
      </div> <!-- row -->
     </div> <!-- container fluid -->
 
+{{if ne $role "guest"}}
    {{template "add_style_modal"}}
+{{end}}
+    <!-- end of modals definition -->          
 
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
  <!--   <script 
@@ -153,6 +162,7 @@
         modal.find('.modal-body #modifiedv').text(modified);
     })
 
+{{if ne $role "guest"}}
     $('#modifyStyleModal').on('show.bs.modal', function (event) {
 
         var button = $(event.relatedTarget); // Button that triggered the modal
@@ -174,7 +184,7 @@
         modal.find('.modal-body #modifiedd').text(modified);
     })
 
-// Handle the removals using modal pop-up 
+    // Handle the removals using modal pop-up 
    $('#removeStyleModal').on('show.bs.modal', function(event) {
     
         var button = $(event.relatedTarget);
@@ -200,7 +210,7 @@
         var url = '/style/' + id + '/put';
         postForm(form_id, url);
     }
-
+{{end}}
  	</script>
   </body>
 </html>
@@ -234,7 +244,7 @@
                 <label for="description" class="col-sm-2 control-label">Description</label>
                 <div class="col-sm-offset-10">&nbsp;</div>
                 <div class="col-sm-12">
-                <textarea class="form-control" rows="5" id="description" name="description"></textarea>
+                <textarea class="form-control" rows="15" id="description" name="description"></textarea>
                 </div>
             </div>
       </form>
@@ -274,7 +284,7 @@
 					<label for="descriptionv" class="col-sm-3 control-label">Description</label>
 					<div class="col-sm-offset-9"></div>
 					<div class="col-sm-12">
-						<textarea class="form-control" rows="5" id="descriptionv" name="descriptionv" readonly></textarea>
+						<textarea class="form-control" rows="15" id="descriptionv" name="descriptionv" readonly></textarea>
 					</div>
 				</div>
 				<div class="form-group form-group-sm small">
@@ -327,7 +337,7 @@
             <label for="description" class="col-sm-3 control-label">Description</label>
             <div class="col-sm-offset-9"></div>
             <div class="col-sm-12">
-                <textarea class="form-control" rows="5" id="description" name="description"></textarea>
+                <textarea class="form-control" rows="15" id="description" name="description"></textarea>
             </div>
         </div>
    <div class="form-group form-group-sm small">

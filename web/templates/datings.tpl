@@ -1,4 +1,5 @@
 {{define "datings"}}
+{{$role := .User.Role}}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -71,6 +72,7 @@
                                 <span class="glyphicon glyphicon-eye-open"></span>
                             </a>
                             </span>
+                        {{if ne $role "guest"}}
                             &nbsp;&nbsp;
                             <span data-toggle="tooltip" data-placement="up" title="Modify details">
                             <a href="" data-toggle="modal" data-target="#modifyDatingModal"
@@ -82,7 +84,7 @@
                                 <span class="glyphicon glyphicon-edit"></span>
                             </a>
                             </span>
-
+                        {{end}}
                         </td>
                     </tr>
                     {{end}}
@@ -93,7 +95,9 @@
 
     <!-- add modals -->
     {{template "view_dating_modal" .Datings}}
+{{if ne $role "guest"}}
     {{template "modify_dating_modal" .Datings}}
+{{end}}
     <!-- end of modals definition -->
 
                 {{else}}
@@ -113,7 +117,6 @@
     <script src="/static/js/artistic.js"></script>
     <script>
     // when page is ready...
-    $(document).ready( function() {
 
         $('#viewDatingModal').on('show.bs.modal', function (event) {
 
@@ -136,6 +139,7 @@
             modal.find('.modal-body #modifiedv').text(modified);
         });
 
+{{if ne $role "guest"}}
         $('#modifyDatingModal').on('show.bs.modal', function (event) {
 
             var btn = $(event.relatedTarget); // button that triggerd event
@@ -158,15 +162,13 @@
             modal.find('.modal-body #modifiedd').text(modified); //only display
         });
 
-    });
-
 	// This should post form (PUT method) to modify a dating
 	var modifyDating = function(form_id, id) {
     	var url = '/dating/' + id + '/put';
         //alert("ID=" + id); //DEBUG
     	postForm(form_id, url);
 	}
-
+{{end}}
     </script>
 
 </body>
