@@ -68,7 +68,7 @@
 				<tbody>
 					{{range $index, $element := .Styles}}
 					{{ $cnt := add $index 1 }}
-					<tr id="style-row-{{$cnt}}">
+					<tr class="art-single-row" id="style-row-{{$cnt}}">
 						<td>{{$cnt}}</td>
 						<td>{{printf "%s" $element.Name}}</td>
 						<td>{{printf "%s" $element.Description}}</td>
@@ -93,6 +93,7 @@
                                        data-name="{{$element.Style.Name}}"
                                        data-desc="{{$element.Style.Description}}">
                                 <span class="glyphicon glyphicon-edit"></span>
+                            </a>
                             &nbsp;&nbsp;
                             <span data-toggle="tooltip" data-placement="up" title="Remove"> 
                             <a data-toggle="modal" data-target="#removeStyleModal"
