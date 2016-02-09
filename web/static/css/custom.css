@@ -1,4 +1,7 @@
 
+table { table-layout: fixed; }
+td { overflow: hidden; white-space: nowrap; }
+
 #menu {
     background-color: #022a50;
     color: #fff;
