@@ -113,7 +113,7 @@ type User struct {
 func NewUser() *User {
 	return &User{
 		bson.NewObjectId(),
-		*utils.CreateUser("", "", "guest", "", "", "", true, checkRole),
+		*utils.CreateUser("", "", "guest", "", "", "", true, CheckRole),
 		NewTimestamp(),
 		NewTimestamp()}
 }
@@ -123,7 +123,7 @@ func NewUser() *User {
 func CreateUser(user, pwd, role string, create bool) *User {
 	return &User{
 		bson.NewObjectId(),
-		*utils.CreateUser(user, pwd, role, "Change Myname", "email@blah.org", "", create, checkRole),
+		*utils.CreateUser(user, pwd, role, "Change Myname", "email@blah.org", "", create, CheckRole),
 		NewTimestamp(),
 		NewTimestamp()}
 }
@@ -131,8 +131,8 @@ func CreateUser(user, pwd, role string, create bool) *User {
 // This is the the list of valid user roles.
 var AllRoles = []string{"admin", "user", "guest"}
 
-// The checkRole() is a helper function that checks if user roles is valid.
-func checkRole(val string) bool {
+// CheckRole() is a helper function that checks if user roles is valid.
+func CheckRole(val string) bool {
 
 	for _, v := range AllRoles {
 		if v == val {
@@ -280,5 +280,32 @@ type Building struct {
 }
 
 func NewBuilding() *Building {
-	return &Building{bson.NewObjectId(), *core.NewBuilding(), NewTimestamp(), NewTimestamp()}
+	return &Building{
+        Id: bson.NewObjectId(),
+        Building: *core.NewBuilding(),
+        Created: NewTimestamp(),
+        Modified: NewTimestamp()}
+}
+
+// Book type is a MongoDB wrapper for core Book type.
+type Book struct {
+
+    // ID represents the MongoDB Object ID
+    ID bson.ObjectId `bson:"_id"`
+
+    // Book is embedded core Book struct
+    core.Book
+
+    // Created and Modified represent ordinary database timestamps
+    Created, Modified Timestamp
+}
+
+// NewBook creates a new instance of Book.
+func NewBook() *Book {
+    t := NewTimestamp()
+    return &Book{
+        ID: bson.NewObjectId(),
+        Book: *core.NewBook(),
+        Created: t,
+        Modified: t }
 }
