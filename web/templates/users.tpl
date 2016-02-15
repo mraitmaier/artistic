@@ -23,7 +23,7 @@
 </head>
 
 <body>
-    {{template "navbar" .User}}
+    {{template "navbar" .}}
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-2" id="menu">
@@ -151,7 +151,7 @@
 {{end}}
     <!-- end of modals definition -->        
         {{else}}
-            <p>ERROR! There are no users defined.</p>
+            <p>No users found.</p>
         {{end}}
 
             </div>
@@ -600,7 +600,7 @@
     <p>Changing password for <strong><span id="name"></span></strong></p>
     <br />
 
-    <form class="form-horizontal" method="post" id="change_pwd_form"> 
+    <form class="form-horizontal" method="post" id="change_pwd_form" onsubmit="return validatrPasswordChange(this);"> 
             <input type="hidden" id="pwdid" name="pwdid"></input>
             <input type="hidden" name="prev" value="user"></input>
 

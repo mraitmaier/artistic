@@ -1,6 +1,6 @@
 
 table { table-layout: fixed; }
-td, th { overflow: hidden; white-space: nowrap; }
+.art-single-row td, th { overflow: hidden; white-space: nowrap; }
 
 #menu {
     background-color: #022a50;

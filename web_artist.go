@@ -25,7 +25,7 @@ func artistHandler(app *ArtisticApp, t db.ArtistType) http.Handler {
 			switch r.Method {
 
 			case "GET":
-				if err = artistHTTPGetHandler(w, r, app, user, t); err != nil {
+				if err = artistHTTPGetHandler("", w, r, app, user, t); err != nil {
 					app.Log.Error(fmt.Sprintf("[%s] Artist HTTP GET %s", user.Username, err.Error()))
 				}
 
@@ -158,9 +158,9 @@ func parseArtistFormValues(r *http.Request) *db.Artist {
 }
 
 // This is HTTP GET handler for artists
-func artistHTTPGetHandler(w http.ResponseWriter, r *http.Request, app *ArtisticApp, u *db.User, t db.ArtistType) error {
+func artistHTTPGetHandler(qry string, w http.ResponseWriter, r *http.Request, app *ArtisticApp, u *db.User, t db.ArtistType) error {
 
-	a, err := app.DataProv.GetAllArtists(t)
+	a, err := app.DataProv.GetArtists(t, qry)
 	if err != nil {
 		http.Redirect(w, r, "/err404", http.StatusFound)
 		return fmt.Errorf("Problem getting artists from DB: '%s'", err.Error())
@@ -170,8 +170,9 @@ func artistHTTPGetHandler(w http.ResponseWriter, r *http.Request, app *ArtisticA
 		Artists []*db.Artist
 		Num     int
 		Type    db.ArtistType
+		Ptype   string
 		User    *db.User
-	}{a, len(a), t, u}
+	}{a, len(a), t, t.String(), u}
 	app.Log.Info(fmt.Sprintf("[%s] Displaying '/artist' page", u.Username))
 	return renderPage("artists", web, app, w, r)
 }

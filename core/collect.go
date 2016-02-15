@@ -1,27 +1,27 @@
 package core
 
 type ArtCollection struct {
-    //
-    Name string
+	//
+	Name string
 
-    //
-    Description string
+	//
+	Description string
 
-    //
-    Owner string
+	//
+	Owner string
 
-    //
-    Location string
+	//
+	Location string
 }
 
 //
 func NewArtCollection() *ArtCollection {
-    return &ArtCollection{
-        Name: "",
-        Description: "",
-        Owner: "",
-        Location: "",
-    }
+	return &ArtCollection{
+		Name:        "",
+		Description: "",
+		Owner:       "",
+		Location:    "",
+	}
 }
 
 //

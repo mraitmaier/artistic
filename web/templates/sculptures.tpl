@@ -21,7 +21,7 @@
 </head>
 
 <body>
-    {{template "navbar" .User}}
+    {{template "navbar" .}}
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-2" id="menu">
@@ -157,7 +157,7 @@
     <!-- end of modals definition -->   
 
             {{else}}
-                <p>No sculptures were found.</p>
+                <p>No sculptures found.</p>
             {{end}}
 
             </div>

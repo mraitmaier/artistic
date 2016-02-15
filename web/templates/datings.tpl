@@ -24,7 +24,7 @@
 </head>
 
 <body>
-    {{template "navbar" .User}}
+    {{template "navbar" .}}
 
     <div class="container-fluid">
         <div class="row">
@@ -101,7 +101,7 @@
     <!-- end of modals definition -->
 
                 {{else}}
-                    <p>There are no datings defined yet.</p>
+                    <p>No datings found.</p>
                 {{end}}
            
             </div>

@@ -7,7 +7,6 @@ package main
 import (
 	"fmt"
 	"github.com/gorilla/mux"
-	//	"github.com/mraitmaier/artworkic/core"
 	"github.com/mraitmaier/artistic/db"
 	"net/http"
 	"strings"
@@ -25,7 +24,7 @@ func paintingHandler(app *ArtisticApp) http.Handler {
 			switch r.Method {
 
 			case "GET":
-				if err = paintingHTTPGetHandler(w, r, app, user); err != nil {
+				if err = paintingHTTPGetHandler("", w, r, app, user); err != nil {
 					app.Log.Error(fmt.Sprintf("[%s] Painting HTTP GET %s", user.Username, err.Error()))
 				}
 
@@ -139,9 +138,9 @@ func parsePaintingFormValues(r *http.Request) *db.Painting {
 }
 
 // This is HTTP GET handler for paintings
-func paintingHTTPGetHandler(w http.ResponseWriter, r *http.Request, app *ArtisticApp, u *db.User) error {
+func paintingHTTPGetHandler(qry string, w http.ResponseWriter, r *http.Request, app *ArtisticApp, u *db.User) error {
 
-	a, err := app.DataProv.GetAllPaintings()
+	a, err := app.DataProv.GetPaintings(qry)
 	if err != nil {
 		http.Redirect(w, r, "/err404", http.StatusFound)
 		return fmt.Errorf("Problem getting paintings from DB: '%s'", err.Error())
@@ -150,8 +149,9 @@ func paintingHTTPGetHandler(w http.ResponseWriter, r *http.Request, app *Artisti
 	var web = struct {
 		Paintings []*db.Painting
 		Num       int
+		Ptype     string
 		User      *db.User
-	}{a, len(a), u}
+	}{a, len(a), "painting", u}
 	app.Log.Info(fmt.Sprintf("[%s] Displaying '/painting' page", u.Username))
 	return renderPage("paintings", web, app, w, r)
 }
@@ -168,7 +168,7 @@ func sculptureHandler(app *ArtisticApp) http.Handler {
 			switch r.Method {
 
 			case "GET":
-				if err = sculptureHTTPGetHandler(w, r, app, user); err != nil {
+				if err = sculptureHTTPGetHandler("", w, r, app, user); err != nil {
 					app.Log.Error(fmt.Sprintf("[%s] Sculpture HTTP GET %s", user.Username, err.Error()))
 				}
 
@@ -282,9 +282,9 @@ func parseSculptureFormValues(r *http.Request) *db.Sculpture {
 }
 
 // This is HTTP GET handler for sculptures
-func sculptureHTTPGetHandler(w http.ResponseWriter, r *http.Request, app *ArtisticApp, u *db.User) error {
+func sculptureHTTPGetHandler(qry string, w http.ResponseWriter, r *http.Request, app *ArtisticApp, u *db.User) error {
 
-	s, err := app.DataProv.GetAllSculptures()
+	s, err := app.DataProv.GetSculptures(qry)
 	if err != nil {
 		http.Redirect(w, r, "/err404", http.StatusFound)
 		return fmt.Errorf("Problem getting culptures from DB: '%s'", err.Error())
@@ -293,8 +293,9 @@ func sculptureHTTPGetHandler(w http.ResponseWriter, r *http.Request, app *Artist
 	var web = struct {
 		Sculptures []*db.Sculpture
 		Num        int
+		Ptype      string
 		User       *db.User
-	}{s, len(s), u}
+	}{s, len(s), "sculpture", u}
 	app.Log.Info(fmt.Sprintf("[%s] Displaying '/sculpture' page", u.Username))
 	return renderPage("sculptures", web, app, w, r)
 }
@@ -311,7 +312,7 @@ func printHandler(app *ArtisticApp) http.Handler {
 			switch r.Method {
 
 			case "GET":
-				if err = printHTTPGetHandler(w, r, app, user); err != nil {
+				if err = printHTTPGetHandler("", w, r, app, user); err != nil {
 					app.Log.Error(fmt.Sprintf("[%s] Print HTTP GET %s", user.Username, err.Error()))
 				}
 
@@ -424,9 +425,9 @@ func parsePrintFormValues(r *http.Request) *db.Print {
 }
 
 // This is HTTP GET handler for graphic prints
-func printHTTPGetHandler(w http.ResponseWriter, r *http.Request, app *ArtisticApp, u *db.User) error {
+func printHTTPGetHandler(qry string, w http.ResponseWriter, r *http.Request, app *ArtisticApp, u *db.User) error {
 
-	p, err := app.DataProv.GetAllPrints()
+	p, err := app.DataProv.GetPrints(qry)
 	if err != nil {
 		http.Redirect(w, r, "/err404", http.StatusFound)
 		return fmt.Errorf("Problem getting graphic prints from DB: '%s'", err.Error())
@@ -435,8 +436,9 @@ func printHTTPGetHandler(w http.ResponseWriter, r *http.Request, app *ArtisticAp
 	var web = struct {
 		Prints []*db.Print
 		Num    int
+		Ptype  string
 		User   *db.User
-	}{p, len(p), u}
+	}{p, len(p), "print", u}
 	app.Log.Info(fmt.Sprintf("[%s] Displaying '/print' page", u.Username))
 	return renderPage("prints", web, app, w, r)
 }
@@ -453,7 +455,7 @@ func buildingHandler(app *ArtisticApp) http.Handler {
 			switch r.Method {
 
 			case "GET":
-				if err = buildingHTTPGetHandler(w, r, app, user); err != nil {
+				if err = buildingHTTPGetHandler("", w, r, app, user); err != nil {
 					app.Log.Error(fmt.Sprintf("[%s] Building HTTP GET %s", user.Username, err.Error()))
 				}
 
@@ -567,9 +569,9 @@ func parseBuildingFormValues(r *http.Request) *db.Building {
 }
 
 // This is HTTP GET handler for buildings
-func buildingHTTPGetHandler(w http.ResponseWriter, r *http.Request, app *ArtisticApp, u *db.User) error {
+func buildingHTTPGetHandler(qry string, w http.ResponseWriter, r *http.Request, app *ArtisticApp, u *db.User) error {
 
-	p, err := app.DataProv.GetAllBuildings()
+	p, err := app.DataProv.GetBuildings(qry)
 	if err != nil {
 		http.Redirect(w, r, "/err404", http.StatusFound)
 		return fmt.Errorf("Problem getting buildings from DB: '%s'", err.Error())
@@ -578,8 +580,9 @@ func buildingHTTPGetHandler(w http.ResponseWriter, r *http.Request, app *Artisti
 	var web = struct {
 		Buildings []*db.Building
 		Num       int
+		Ptype     string
 		User      *db.User
-	}{p, len(p), u}
+	}{p, len(p), "building", u}
 	app.Log.Info(fmt.Sprintf("[%s] Displaying '/building' page", u.Username))
 	return renderPage("buildings", web, app, w, r)
 }

@@ -1,4 +1,5 @@
 {{define "profile"}}
+{{$role := .User.Role }}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -23,7 +24,7 @@
 </head>
 
 <body>
-    {{template "navbar" .User}}
+    {{template "navbar" .}}
 
     <div class="container-fluid">
         <div class="row">
@@ -251,7 +252,7 @@ Your
 
     <div class="modal-body">
     <div class="container-fluid">
-    <form class="form-horizontal" method="post" onsubmit="validatePasswordChange();" id="change_pwd_form"> 
+    <form class="form-horizontal" method="post" onsubmit="validatePasswordChange(this);" id="change_pwd_form"> 
             <input type="hidden" id="hexid" name="hexid" value="{{.Id.Hex}}" />
             <input type="hidden" id="prev" name="prev" value="profile" />
 

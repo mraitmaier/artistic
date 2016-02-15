@@ -5,13 +5,12 @@ package main
 //
 
 import (
-	"github.com/mraitmaier/artistic/core"
-	"github.com/mraitmaier/artistic/db"
-	//"github.com/mraitmaier/artistic/utils"
 	"errors"
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
+	"github.com/mraitmaier/artistic/core"
+	"github.com/mraitmaier/artistic/db"
 	"html/template"
 	"net/http"
 	"os"
@@ -58,6 +57,7 @@ func registerHandlers(aa *ArtisticApp) {
 	r.Handle("/logout", logoutHandler(aa))
 	r.Handle("/index", indexHandler(aa))
 	r.Handle("/pwd/{id}", pwdHandler(aa))
+	r.Handle("/search", searchHandler(aa))
 	r.Handle("/user", userHandler(aa))
 	r.Handle("/user/{id}/{cmd}", userHandler(aa))
 	r.Handle("/log", logHandler(aa))
@@ -213,7 +213,7 @@ func renderPage(name string, web interface{}, aa *ArtisticApp, w http.ResponseWr
 
 	var err error
 	if err = aa.WebInfo.templates.ExecuteTemplate(w, name, web); err != nil {
-		http.Redirect(w, r, "/error", http.StatusFound)
+		http.Redirect(w, r, "/err404", http.StatusFound)
 	}
 	return err
 }
@@ -225,8 +225,13 @@ func err404Handler(aa *ArtisticApp) http.Handler {
 
 		if loggedin, user := userIsAuthenticated(aa, r); loggedin {
 
-			if err := renderPage("error404", user, aa, w, r); err != nil {
+			web := struct {
+				Ptype string
+				User  *db.User
+			}{"", user}
+			if err := renderPage("error404", web, aa, w, r); err != nil {
 				aa.Log.Error(fmt.Sprintf("[%s] Cannot render the 'error404' template: %q.", user.Username, err.Error()))
+				return
 			}
 			aa.Log.Info(fmt.Sprintf("[%s] Displaying the %q page.", user.Username, r.RequestURI))
 
@@ -246,12 +251,17 @@ func errorHandler(aa *ArtisticApp) http.Handler {
 		if loggedin, user := userIsAuthenticated(aa, r); loggedin {
 
 			// render the page
-			if err := aa.WebInfo.templates.ExecuteTemplate(w, "error", user); err != nil {
-				aa.Log.Error(fmt.Sprintf("[%s] Rendering the 'error' template.", user.Username))
-				http.Redirect(w, r, "/error404", http.StatusFound) // This is really worst-case scenario...
+			web := struct {
+				Ptype string
+				User  *db.User
+			}{"error", user}
+			if err := renderPage("error", web, aa, w, r); err != nil {
+				aa.Log.Error(fmt.Sprintf("[%s] Cannot render the 'error404' template: %q.", user.Username, err.Error()))
+				return
 			}
+			aa.Log.Info(fmt.Sprintf("[%s] Displaying the %q page.", user.Username, r.RequestURI))
 
-		} else {
+        } else {
 			redirectToLoginPage(w, r, aa)
 		}
 
@@ -264,13 +274,10 @@ func logoutHandler(aa *ArtisticApp) http.Handler {
 
 		if loggedin, user := userIsAuthenticated(aa, r); loggedin {
 
-			log := aa.Log
-
-			// render the page
 			if err := logout(aa, w, r); err != nil {
-				log.Error(err.Error())
+				aa.Log.Error(fmt.Sprintf("[%s] Logging out %q", user.Username, err.Error()))
 			} else {
-				log.Info(fmt.Sprintf("[%s] Logging out", user.Username))
+				aa.Log.Info(fmt.Sprintf("[%s] User logged out.", user.Username))
 			}
 		}
 		http.Redirect(w, r, "/login", http.StatusFound)
@@ -282,7 +289,13 @@ func licenseHandler(aa *ArtisticApp) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		if loggedin, user := userIsAuthenticated(aa, r); loggedin {
-			if err := renderPage("license", user, aa, w, r); err != nil {
+
+			web := struct {
+				Ptype string
+				User  *db.User
+			}{"license", user}
+
+			if err := renderPage("license", web, aa, w, r); err != nil {
 				aa.Log.Error(fmt.Sprintf("[%s] Cannot render the %q template: %q.", user.Username, "license", err.Error()))
 				return
 			}
@@ -290,7 +303,6 @@ func licenseHandler(aa *ArtisticApp) http.Handler {
 		} else {
 			redirectToLoginPage(w, r, aa)
 		}
-
 	}) // return handler closure
 }
 
@@ -300,7 +312,12 @@ func indexHandler(aa *ArtisticApp) http.Handler {
 
 		if loggedin, user := userIsAuthenticated(aa, r); loggedin {
 
-			if err := renderPage("index", user, aa, w, r); err != nil {
+			web := struct {
+				Ptype string
+				User  *db.User
+			}{"index", user}
+
+			if err := renderPage("index", web, aa, w, r); err != nil {
 				aa.Log.Error(fmt.Sprintf("[%s] Cannot render the 'index' template: %q.", user.Username, err.Error()))
 				return
 			}
@@ -309,6 +326,17 @@ func indexHandler(aa *ArtisticApp) http.Handler {
 			redirectToLoginPage(w, r, aa)
 		}
 	}) // return handler closure
+}
+
+// helper function that displays the /index (or /) page, this is done quite a lot...
+func displayIndexPage(w http.ResponseWriter, r *http.Request, app *ArtisticApp, u *db.User) error {
+
+	// create ad-hoc struct to be sent to page template
+	var web = struct {
+		Ptype string
+		User  *db.User
+	}{"", u}
+	return renderPage("index", web, app, w, r)
 }
 
 // login page handler - we must authenticate user
@@ -347,7 +375,7 @@ func loginHandler(aa *ArtisticApp) http.Handler {
 		case "GET":
 			err := aa.WebInfo.templates.ExecuteTemplate(w, "login", nil)
 			if err != nil {
-				log.Error("Rendering the 'login' template.")
+				log.Error(fmt.Sprintf("Error rendering the 'login' template: %q.", err.Error()))
 			}
 			aa.Log.Info(fmt.Sprintf("Displaying the %q page.", r.RequestURI))
 		}
@@ -382,9 +410,10 @@ func logHandler(aa *ArtisticApp) http.Handler {
 			// create ad-hoc struct to be sent to page template
 			var web = struct {
 				User     *db.User
+				Ptype    string
 				Contents []string // a list of log messages
 				PerPage  int      // how many log messages per page is displayed...
-			}{user, contents, 25}
+			}{user, "log", contents, 25}
 
 			if err = renderPage("log", &web, aa, w, r); err != nil {
 				aa.Log.Error(fmt.Sprintf("[%s] Cannot render the 'log' template: %q.", user.Username, err.Error()))
@@ -413,7 +442,7 @@ func datingHandler(app *ArtisticApp) http.Handler {
 			switch r.Method {
 
 			case "GET":
-				if err = datingHTTPGetHandler(w, r, app, user); err != nil {
+				if err = datingHTTPGetHandler("", w, r, app, user); err != nil {
 					app.Log.Error(fmt.Sprintf("[%s] Dating HTTP GET %s", user.Username, err.Error()))
 				}
 
@@ -493,9 +522,9 @@ func parseDatingFormValues(r *http.Request) *db.Dating {
 }
 
 // This is HTTP GET handler for datings.
-func datingHTTPGetHandler(w http.ResponseWriter, r *http.Request, app *ArtisticApp, u *db.User) error {
+func datingHTTPGetHandler(qry string, w http.ResponseWriter, r *http.Request, app *ArtisticApp, u *db.User) error {
 
-	datings, err := app.DataProv.GetAllDatings()
+	datings, err := app.DataProv.GetDatings(qry)
 	if err != nil {
 		http.Redirect(w, r, "/err404", http.StatusFound)
 		return fmt.Errorf("Problem getting datings from DB: '%s'", err.Error())
@@ -504,8 +533,9 @@ func datingHTTPGetHandler(w http.ResponseWriter, r *http.Request, app *ArtisticA
 	var web = struct {
 		Datings []*db.Dating
 		Num     int
+		Ptype   string
 		User    *db.User
-	}{datings, len(datings), u}
+	}{datings, len(datings), "dating", u}
 	app.Log.Info(fmt.Sprintf("[%s] Displaying '/dating' page", u.Username))
 	return renderPage("datings", web, app, w, r)
 }
@@ -522,7 +552,7 @@ func techniqueHandler(app *ArtisticApp) http.Handler {
 			switch r.Method {
 
 			case "GET":
-				if err = techniqueHTTPGetHandler(w, r, app, user); err != nil {
+				if err = techniqueHTTPGetHandler("", w, r, app, user); err != nil {
 					app.Log.Error(fmt.Sprintf("[%s] Technique HTTP GET %s", user.Username, err.Error()))
 				}
 
@@ -623,9 +653,9 @@ func parseTechniqueFormValues(r *http.Request) *db.Technique {
 }
 
 // This is HTTP GET handler for techniques
-func techniqueHTTPGetHandler(w http.ResponseWriter, r *http.Request, app *ArtisticApp, u *db.User) error {
+func techniqueHTTPGetHandler(qry string, w http.ResponseWriter, r *http.Request, app *ArtisticApp, u *db.User) error {
 
-	t, err := app.DataProv.GetAllTechniques()
+	t, err := app.DataProv.GetTechniques(qry)
 	if err != nil {
 		http.Redirect(w, r, "/err404", http.StatusFound)
 		return fmt.Errorf("Problem getting techniques from DB: '%s'", err.Error())
@@ -634,8 +664,9 @@ func techniqueHTTPGetHandler(w http.ResponseWriter, r *http.Request, app *Artist
 	var web = struct {
 		Techniques []*db.Technique
 		Num        int
+		Ptype      string
 		User       *db.User
-	}{t, len(t), u}
+	}{t, len(t), "technique", u}
 	app.Log.Info(fmt.Sprintf("[%s] Displaying '/technique' page", u.Username))
 	return renderPage("techniques", web, app, w, r)
 }
@@ -652,7 +683,7 @@ func styleHandler(app *ArtisticApp) http.Handler {
 			switch r.Method {
 
 			case "GET":
-				if err = styleHTTPGetHandler(w, r, app, user); err != nil {
+				if err = styleHTTPGetHandler("", w, r, app, user); err != nil {
 					app.Log.Error(fmt.Sprintf("[%s] Style HTTP GET %s", user.Username, err.Error()))
 				}
 
@@ -751,9 +782,9 @@ func parseStyleFormValues(r *http.Request) *db.Style {
 }
 
 // This is HTTP GET handler for styles
-func styleHTTPGetHandler(w http.ResponseWriter, r *http.Request, app *ArtisticApp, u *db.User) error {
+func styleHTTPGetHandler(qry string, w http.ResponseWriter, r *http.Request, app *ArtisticApp, u *db.User) error {
 
-	s, err := app.DataProv.GetAllStyles()
+	s, err := app.DataProv.GetStyles(qry) // empty query  retrieves all records
 	if err != nil {
 		http.Redirect(w, r, "/err404", http.StatusFound)
 		return fmt.Errorf("Problem getting styles from DB: '%s'", err.Error())
@@ -762,10 +793,95 @@ func styleHTTPGetHandler(w http.ResponseWriter, r *http.Request, app *ArtisticAp
 	var web = struct {
 		Styles []*db.Style
 		Num    int
+		Ptype  string
 		User   *db.User
-	}{s, len(s), u}
+	}{s, len(s), "style", u}
 	app.Log.Info(fmt.Sprintf("[%s] Displaying '/style' page", u.Username))
 	return renderPage("styles", web, app, w, r)
+}
+
+// This is handler that handler the "/search" URL. It accepts only POST requests.
+func searchHandler(app *ArtisticApp) http.Handler {
+
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// if user is autheticated, display the appropriate page
+		if loggedin, user := userIsAuthenticated(app, r); loggedin {
+
+			var err error
+
+			switch r.Method {
+
+			case "POST":
+				if err = searchHTTPPostHandler(w, r, app, user); err != nil {
+					app.Log.Error(fmt.Sprintf("[%s] Search HTTP POST %s", user.Username, err.Error()))
+				}
+
+			default:
+				// otherwise just display main 'index' page
+				if err := renderPage("index", nil, app, w, r); err != nil {
+					app.Log.Error(fmt.Sprintf("[%s] Index HTTP GET %s", user.Username, err.Error()))
+					return
+				}
+			}
+
+		} else {
+			// if user not authenticated
+			redirectToLoginPage(w, r, app)
+		}
+	})
+}
+
+// This is HTTP POST handler for searches.
+func searchHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *ArtisticApp, u *db.User) error {
+
+	qry := strings.TrimSpace(r.FormValue("search-string"))
+	ptype := strings.TrimSpace(r.FormValue("search-type"))
+
+	// if type is empty, we cannot do anything with it, just redirect to index page
+	if ptype == "" {
+		app.Log.Error(fmt.Sprintf("[%s] HTTP POST Search: unknown data type, redirecting to /index page", u.Username))
+		return displayIndexPage(w, r, app, u)
+	}
+	return resolveURL(ptype, qry, w, r, app, u)
+}
+
+// The helper function that resolves the proper search context and calls the appropriate GET handler.
+func resolveURL(ptype, qry string, w http.ResponseWriter, r *http.Request, app *ArtisticApp, u *db.User) error {
+
+	var err error
+
+	switch strings.ToLower(ptype) {
+	case "style":
+		err = styleHTTPGetHandler(qry, w, r, app, u)
+	case "technique":
+		err = techniqueHTTPGetHandler(qry, w, r, app, u)
+	case "dating":
+		err = datingHTTPGetHandler(qry, w, r, app, u)
+	case "artist":
+		err = artistHTTPGetHandler(qry, w, r, app, u, db.ArtistTypeArtist)
+	case "painter":
+		err = artistHTTPGetHandler(qry, w, r, app, u, db.ArtistTypePainter)
+	case "sculptor":
+		err = artistHTTPGetHandler(qry, w, r, app, u, db.ArtistTypeSculptor)
+	case "printmaker":
+		err = artistHTTPGetHandler(qry, w, r, app, u, db.ArtistTypePrintmaker)
+	case "architect":
+		err = artistHTTPGetHandler(qry, w, r, app, u, db.ArtistTypeArchitect)
+	case "painting":
+		err = paintingHTTPGetHandler(qry, w, r, app, u)
+	case "building":
+		err = buildingHTTPGetHandler(qry, w, r, app, u)
+	case "sculpture":
+		err = sculptureHTTPGetHandler(qry, w, r, app, u)
+	case "print":
+		err = printHTTPGetHandler(qry, w, r, app, u)
+	case "user":
+		err = userHTTPGetHandler(qry, w, r, app, u)
+	default:
+		// just render the /index page
+		return displayIndexPage(w, r, app, u)
+	}
+	return err
 }
 
 // aux function that gets the list of dating names

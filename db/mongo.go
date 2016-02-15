@@ -61,37 +61,6 @@ func NewMongoId() bson.ObjectId {
 
 ///////////////////////////// Users
 
-/*
-func CheckDefaultUser(m *MongoDbConn) error {
-
-	// acquire lock
-	dblock.Lock()
-	defer dblock.Unlock()
-
-	coll := m.Sess.DB(m.name).C("users")
-	if coll == nil {
-		return fmt.Errorf("Creating a default user: MongoDB descriptor empty.")
-	}
-
-	cnt, err := coll.Count()
-	if err != nil {
-		return fmt.Errorf("Creating a default user: Error counting collection.")
-	}
-
-	// create default user only if the collection is empty...
-	if cnt == 0 {
-
-		u := CreateUser(DefAppUsername, DefAppPasswd)
-        u.SetRole("admin")
-		err = coll.Insert(u)
-        u.Name = "Change MyName"
-        u.Email = "change_me@somewhere.org"
-        coll.In
-	}
-	return err
-}
-*/
-
 // CountUsers returns the number of users currently present in database.
 func (m *MongoDbConn) CountUsers() (int, error) {
 
@@ -106,85 +75,66 @@ func (m *MongoDbConn) CountUsers() (int, error) {
 	return coll.Count()
 }
 
-// Retrieves all users from database.
-func (m *MongoDbConn) GetAllUsers() ([]*User, error) {
+// Retrieves users from database.
+func (m *MongoDbConn) GetUsers(qry string) ([]*User, error) {
 
-	// acquire lock
 	dblock.Lock()
 	defer dblock.Unlock()
 
-	// get *mgo.Database instance
 	db := m.Sess.DB(m.name)
 	if db == nil {
 		return nil, errors.New("Mongo descriptor empty.")
 	}
 
-	// create channel
 	ch := make(chan []*User)
+	go func(ch chan []*User, qry string) {
 
-	// start a new goroutine to get users from DB
-	go func(ch chan []*User) {
-
-		// check channel
 		if ch == nil {
 			return
 		}
 
-		// prepare the empty slice for users
 		users := make([]*User, 0)
-
-		// get all users from DB
-		if err := db.C("users").Find(bson.D{}).All(&users); err != nil {
-			return
+		if qry == "" {
+			_ = db.C("users").Find(bson.D{}).All(&users) // if qry is empty, retrieve all...
+		} else {
+			//qry := m.decodeQuery(srch)
+			// XXX currently hard-coded, instead of decodeQuery()...
+			//qry := bson.M{ "$text": bson.M{ "$search": srch } }
+			_ = db.C("users").Find(bson.M{"$text": bson.M{"$search": qry}}).Sort("username").All(&users)
 		}
 
-		// write the users to the channel
 		ch <- users
+	}(ch, qry)
 
-	}(ch)
-
-	// read the answer from channel
 	users := <-ch
-
-	return users, nil // OK
+	return users, nil
 }
 
 // Get a single user from the DB: we need a username.
 func (m *MongoDbConn) GetUserByUsername(username string) (*User, error) {
 
-	// acquire lock
 	dblock.Lock()
 	defer dblock.Unlock()
 
-	// get *mgo.Database instance
 	db := m.Sess.DB(m.name)
 	if db == nil {
 		return nil, errors.New("MongoDB descriptor empty.")
 	}
 
-	// prepare channel
 	ch := make(chan *User)
-
-	// start goroutine to get a user
 	go func(username string, ch chan *User) {
 
-		//u := utils.CreateUser("", "") // create empty user
 		u := NewUser()
-
-		// get a user from DB
 		err := db.C("users").Find(bson.M{"username": username}).One(&u)
 		if err != nil {
 			return
 		}
-
-		// write a user to channel
 		ch <- u
+
 	}(username, ch)
 
-	// read user from channel
 	user := <-ch
-
-	return user, nil // all OK
+	return user, nil
 }
 
 /*
@@ -226,20 +176,16 @@ func (m * MongoDbConn) GetUser(id string) (*utils.User, error) {
 
 func (m *MongoDbConn) GetUser(id string) (*User, error) {
 
-	// acquire lock
 	dblock.Lock()
 	defer dblock.Unlock()
 
-	// get *mgo.Database instance
 	db := m.Sess.DB(m.name)
 	if db == nil {
 		return nil, errors.New("MongoDB descriptor empty.")
 	}
 
-	// create empty user
-	u := NewUser()
-
 	// get a user from DB
+	u := NewUser()
 	if err := db.C("users").Find(bson.M{"_id": MongoStringToId(id)}).One(&u); err != nil {
 		return nil, err
 	}
@@ -318,22 +264,28 @@ func (m *MongoDbConn) CountDatings() (int, error) {
 	return coll.Count()
 }
 
-// Retrieves all datings from database.
-func (m *MongoDbConn) GetAllDatings() ([]*Dating, error) {
+// Retrieves datings from database.
+func (m *MongoDbConn) GetDatings(srch string) ([]*Dating, error) {
 
-	// acquire lock
 	dblock.Lock()
 	defer dblock.Unlock()
 
-	// get *mgo.Database instance
 	db := m.Sess.DB(m.name)
 	if db == nil {
-		return nil, errors.New("Get all datings: MongoDB descriptor empty.")
+		return nil, errors.New("Getting datings: MongoDb descriptor empty.")
 	}
 
-	// get all users from DB
+	var err error
 	d := make([]*Dating, 0)
-	if err := db.C("datings").Find(bson.D{}).All(&d); err != nil {
+	if srch == "" {
+		err = db.C("datings").Find(bson.D{}).All(&d) // if qry is empty, retrieve all...
+	} else {
+		//qry := m.decodeQuery(srch)
+		// XXX currently hard-coded, instead of decodeQuery()...
+		//qry := bson.M{ "$text": bson.M{ "$search": srch } }
+		err = db.C("datings").Find(bson.M{"$text": bson.M{"$search": srch}}).All(&d)
+	}
+	if err != nil {
 		return nil, err
 	}
 	return d, nil
@@ -342,11 +294,9 @@ func (m *MongoDbConn) GetAllDatings() ([]*Dating, error) {
 // Retrieve a single Dating record by ID.
 func (m *MongoDbConn) GetDating(id string) (*Dating, error) {
 
-	// acquire lock
 	dblock.Lock()
 	defer dblock.Unlock()
 
-	// get *mgo.Database instance
 	db := m.Sess.DB(m.name)
 	if db == nil {
 		return nil, errors.New("Get a dating: MongoDb descriptor empty.")
@@ -413,24 +363,28 @@ func (m *MongoDbConn) InsertDatings(datings []*Dating) error {
 
 ///////////////////////////// Styles
 
-// Retrieves all styles from DB with given DB descriptor.
-func (m *MongoDbConn) GetAllStyles() ([]*Style, error) {
+// Retrieve a single Style record.
+func (m *MongoDbConn) GetStyles(srch string) ([]*Style, error) {
 
-	// acquire lock
 	dblock.Lock()
 	defer dblock.Unlock()
 
-	// get *mgo.Database instance
 	db := m.Sess.DB(m.name)
 	if db == nil {
-		return nil, errors.New("MongoDB descriptor empty.")
+		return nil, errors.New("Update a style: MongoDb descriptor empty.")
 	}
 
-	// prepare the empty slice for users
+	var err error
 	s := make([]*Style, 0)
-
-	// get all users from DB
-	if err := db.C("styles").Find(bson.D{}).All(&s); err != nil {
+	if srch == "" {
+		err = db.C("styles").Find(bson.D{}).All(&s)
+	} else {
+		//qry := m.decodeQuery(srch)
+		// XXX currently hard-coded, instead of decodeQuery()...
+		//qry := bson.M{ "$text": bson.M{ "$search": srch } }
+		err = db.C("styles").Find(bson.M{"$text": bson.M{"$search": srch}}).Sort("name").All(&s)
+	}
+	if err != nil {
 		return nil, err
 	}
 	return s, nil
@@ -439,11 +393,9 @@ func (m *MongoDbConn) GetAllStyles() ([]*Style, error) {
 // Retrieve a single Style record.
 func (m *MongoDbConn) GetStyle(id string) (*Style, error) {
 
-	// acquire lock
 	dblock.Lock()
 	defer dblock.Unlock()
 
-	// get *mgo.Database instance
 	db := m.Sess.DB(m.name)
 	if db == nil {
 		return nil, errors.New("Update a style: MongoDb descriptor empty.")
@@ -516,22 +468,25 @@ func (m *MongoDbConn) adminStyle(cmd DbCommand, s *Style) error {
 
 ///////////////////////////// Techniques
 
-// Retrieves all techniques from DB with given DB descriptor.
-func (m *MongoDbConn) GetAllTechniques() ([]*Technique, error) {
+// Retrieve a single Style record.
+func (m *MongoDbConn) GetTechniques(srch string) ([]*Technique, error) {
 
-	// acquire lock
 	dblock.Lock()
 	defer dblock.Unlock()
 
-	// get *mgo.Database instance
 	db := m.Sess.DB(m.name)
 	if db == nil {
-		return nil, errors.New("Getting techniques: MongoDB descriptor empty.")
+		return nil, errors.New("Update a technique: MongoDb descriptor empty.")
 	}
 
-	// get all users from DB
+	var err error
 	t := make([]*Technique, 0)
-	if err := db.C("techniques").Find(bson.D{}).All(&t); err != nil {
+	if srch == "" {
+		err = db.C("techniques").Find(bson.D{}).All(&t)
+	} else {
+		err = db.C("techniques").Find(bson.M{"$text": bson.M{"$search": srch}}).Sort("name").All(&t)
+	}
+	if err != nil {
 		return nil, err
 	}
 	return t, nil
@@ -612,108 +567,101 @@ func (m *MongoDbConn) adminTechnique(cmd DbCommand, t *Technique) error {
 }
 
 ///////////////////////////// Artists
-func (m *MongoDbConn) GetAllArtists(t ArtistType) ([]*Artist, error) {
+func (m *MongoDbConn) GetArtists(t ArtistType, srch string) ([]*Artist, error) {
 
-	// acquire DB lock
 	dblock.Lock()
 	defer dblock.Unlock()
 
-	// get *mgo.Database instance
 	db := m.Sess.DB(m.name)
 	if db == nil {
 		return nil, errors.New("Mongo descriptor empty.")
 	}
 
-	// create channel
 	ch := make(chan []*Artist)
-
-	// start a new goroutine to get users from DB
-	go func(ch chan []*Artist) {
+	go func(ch chan []*Artist, qry string) {
 
 		// check channel
 		if ch == nil {
 			return
 		}
 
-		// prepare the empty slice for users
 		artists := make([]*Artist, 0)
-		var err error
 
-		// get all artists from DB
 		switch t {
 
 		case ArtistTypeArtist: // get all case
-			if err = db.C("artists").Find(bson.M{}).All(&artists); err != nil {
-				return
+			if qry == "" {
+				_ = db.C("artists").Find(bson.D{}).All(&artists)
+			} else {
+				_ = db.C("artists").Find(bson.M{"$text": bson.M{"$search": qry}}).Sort("name").All(&artists)
 			}
 
 		case ArtistTypePainter:
-			if err = db.C("artists").Find(bson.M{"is_painter": true}).All(&artists); err != nil {
-				return
+			if qry == "" {
+				_ = db.C("artists").Find(bson.M{"is_painter": true}).Sort("name").All(&artists)
+			} else {
+				_ = db.C("artists").Find(
+					bson.M{"is_painter": true, "$text": bson.M{"$search": qry}}).Sort("name").All(&artists)
 			}
 
 		case ArtistTypeSculptor:
-			if err = db.C("artists").Find(bson.M{"is_sculptor": true}).All(&artists); err != nil {
-				return
+			if qry == "" {
+				_ = db.C("artists").Find(bson.M{"is_sculptor": true}).All(&artists)
+			} else {
+				_ = db.C("artists").Find(
+					bson.M{"is_sculptor": true, "$text": bson.M{"$search": qry}}).Sort("name").All(&artists)
 			}
 
 		case ArtistTypeArchitect:
-			if err = db.C("artists").Find(bson.M{"is_architect": true}).All(&artists); err != nil {
-				return
+			if qry == "" {
+				_ = db.C("artists").Find(bson.M{"is_architect": true}).All(&artists)
+			} else {
+				_ = db.C("artists").Find(
+					bson.M{"is_architect": true, "$text": bson.M{"$search": qry}}).Sort("name").All(&artists)
 			}
 
 		case ArtistTypePrintmaker:
-			if err = db.C("artists").Find(bson.M{"is_printmaker": true}).All(&artists); err != nil {
-				return
+			if qry == "" {
+				_ = db.C("artists").Find(bson.M{"is_printmaker": true}).All(&artists)
+			} else {
+				_ = db.C("artists").Find(
+					bson.M{"is_printmaker": true, "$text": bson.M{"$search": qry}}).Sort("name").All(&artists)
 			}
 		}
 
-		// write the users to the channel
 		ch <- artists
+	}(ch, srch)
 
-	}(ch)
-
-	// read the answer from channel
 	artists := <-ch
-
-	return artists, nil // OK
+	return artists, nil
 }
 
 // Get a single artist from the DB: we need an ID .
 func (m *MongoDbConn) GetArtist(id string) (*Artist, error) {
 
-	// acquire lock
 	dblock.Lock()
 	defer dblock.Unlock()
 
-	// get *mgo.Database instance
 	db := m.Sess.DB(m.name)
 	if db == nil {
 		return nil, errors.New("MongoDB descriptor empty.")
 	}
 
-	// prepare channel
-	ch := make(chan *Artist)
-
 	// start goroutine to get a user
+	ch := make(chan *Artist)
 	go func(id string, ch chan *Artist) {
 
-		u := NewArtist() // create empty user
-
-		// get a user from DB
+		u := NewArtist()
 		err := db.C("artists").Find(bson.M{"_id": MongoStringToId(id)}).One(&u)
 		if err != nil {
 			return
 		}
-
-		// write a user to channel
 		ch <- u
+
 	}(id, ch)
 
-	// read user from channel
 	user := <-ch
-
-	return user, nil // all OK
+	return user, nil 
 }
 
 // Update a single artist in DB.
@@ -774,82 +722,64 @@ func (m *MongoDbConn) adminArtist(cmd DbCommand, a *Artist) error {
 ////////////////////// Paintings
 
 // GetAllPaintings retrieves all paintings from DB with given DB descriptor.
-func (m *MongoDbConn) GetAllPaintings() ([]*Painting, error) {
+func (m *MongoDbConn) GetPaintings(srch string) ([]*Painting, error) {
 
-	// acquire lock
 	dblock.Lock()
 	defer dblock.Unlock()
 
-	// get *mgo.Database instance
 	db := m.Sess.DB(m.name)
 	if db == nil {
 		return nil, errors.New("Getting paintings: DB descriptor empty.")
 	}
 
-	// create channel
+	// start a new goroutine to get paintings from DB
 	ch := make(chan []*Painting)
-
-	// start a new goroutine to get users from DB
-	go func(ch chan []*Painting) {
+	go func(ch chan []*Painting, qry string) {
 
 		// check channel
 		if ch == nil {
 			return
 		}
 
-		// prepare the empty slice for users
-		p := make([]*Painting, 0)
-
 		// get all users from DB
-		if err := db.C("paintings").Find(bson.D{}).All(&p); err != nil {
-			return
+		p := make([]*Painting, 0)
+		if qry == "" {
+			_ = db.C("paintings").Find(bson.D{}).All(&p)
+		} else {
+			_ = db.C("paintings").Find(bson.M{"$text": bson.M{"$search": qry}}).Sort("work.title").All(&p)
 		}
-
-		// write the users to the channel
 		ch <- p
+	}(ch, srch)
 
-	}(ch)
-
-	// read the answer from channel
 	p := <-ch
-
 	return p, nil // OK
 }
 
 // GetPainting retrieves a single painting from the DB: we need an ID.
 func (m *MongoDbConn) GetPainting(id string) (*Painting, error) {
 
-	// acquire lock
 	dblock.Lock()
 	defer dblock.Unlock()
 
-	// get *mgo.Database instance
 	db := m.Sess.DB(m.name)
 	if db == nil {
 		return nil, errors.New("Getting single painting: MongoDB descriptor empty.")
 	}
 
-	// prepare channel
+	// start goroutine to get a painting
 	ch := make(chan *Painting)
-
-	// start goroutine to get a user
 	go func(id string, ch chan *Painting) {
 
 		p := NewPainting() // create empty user
-
-		// get a user from DB
 		err := db.C("paintings").Find(bson.M{"_id": MongoStringToId(id)}).One(&p)
 		if err != nil {
 			return
 		}
 
-		// write a user to channel
 		ch <- p
 	}(id, ch)
 
-	// read user from channel
 	p := <-ch
-
 	return p, nil // all OK
 }
 
@@ -909,83 +839,65 @@ func (m *MongoDbConn) adminPainting(cmd DbCommand, p *Painting) error {
 
 ////////////////////// sculpture
 
-// GetAllSculptures retrieves all paintings from DB with given DB descriptor.
-func (m *MongoDbConn) GetAllSculptures() ([]*Sculpture, error) {
+// GetSculptures retrieves all paintings from DB with given DB descriptor.
+func (m *MongoDbConn) GetSculptures(srch string) ([]*Sculpture, error) {
 
-	// acquire lock
 	dblock.Lock()
 	defer dblock.Unlock()
 
-	// get *mgo.Database instance
 	db := m.Sess.DB(m.name)
 	if db == nil {
 		return nil, errors.New("Getting paintings: DB descriptor empty.")
 	}
 
-	// create channel
-	ch := make(chan []*Sculpture)
-
 	// start a new goroutine to get sculptures from DB
-	go func(ch chan []*Sculpture) {
+	ch := make(chan []*Sculpture)
+	go func(ch chan []*Sculpture, qry string) {
 
-		// check channel
 		if ch == nil {
 			return
 		}
 
-		// prepare the empty slice for users
 		p := make([]*Sculpture, 0)
-
-		// get all users from DB
-		if err := db.C("sculptures").Find(bson.D{}).All(&p); err != nil {
-			return
+		if qry == "" {
+			_ = db.C("sculptures").Find(bson.D{}).All(&p)
+		} else {
+			_ = db.C("sculptures").Find(bson.M{"$text": bson.M{"$search": qry}}).Sort("work.title").All(&p)
 		}
-
-		// write the users to the channel
 		ch <- p
 
-	}(ch)
+	}(ch, srch)
 
-	// read the answer from channel
 	p := <-ch
-
 	return p, nil // OK
 }
 
 // GetSculpture retrieves a single sculpture from the DB: we need an ID.
 func (m *MongoDbConn) GetSculpture(id string) (*Sculpture, error) {
 
-	// acquire lock
 	dblock.Lock()
 	defer dblock.Unlock()
 
-	// get *mgo.Database instance
 	db := m.Sess.DB(m.name)
 	if db == nil {
 		return nil, errors.New("Getting single painting: MongoDB descriptor empty.")
 	}
 
-	// prepare channel
-	ch := make(chan *Sculpture)
-
 	// start goroutine to get a user
+	ch := make(chan *Sculpture)
 	go func(id string, ch chan *Sculpture) {
 
 		p := NewSculpture() // create empty user
 
-		// get a user from DB
 		err := db.C("sculptures").Find(bson.M{"_id": MongoStringToId(id)}).One(&p)
 		if err != nil {
 			return
 		}
 
-		// write a user to channel
 		ch <- p
 	}(id, ch)
 
-	// read user from channel
 	p := <-ch
-
 	return p, nil // all OK
 }
 
@@ -1046,82 +958,65 @@ func (m *MongoDbConn) adminSculpture(cmd DbCommand, p *Sculpture) error {
 ////////////////////// Graphic prints
 
 // GetAllPrints retrieves all prints from DB with given DB descriptor.
-func (m *MongoDbConn) GetAllPrints() ([]*Print, error) {
+func (m *MongoDbConn) GetPrints(srch string) ([]*Print, error) {
 
-	// acquire lock
 	dblock.Lock()
 	defer dblock.Unlock()
 
-	// get *mgo.Database instance
 	db := m.Sess.DB(m.name)
 	if db == nil {
 		return nil, errors.New("Getting graphic prints: DB descriptor empty.")
 	}
 
-	// create channel
-	ch := make(chan []*Print)
-
 	// start a new goroutine to get prints from DB
-	go func(ch chan []*Print) {
+	ch := make(chan []*Print)
+	go func(ch chan []*Print, qry string) {
 
 		// check channel
 		if ch == nil {
 			return
 		}
 
-		// prepare the empty slice for users
 		p := make([]*Print, 0)
-
-		// get all users from DB
-		if err := db.C("prints").Find(bson.D{}).All(&p); err != nil {
-			return
+		if qry == "" {
+			_ = db.C("prints").Find(bson.D{}).All(&p)
+		} else {
+			_ = db.C("prints").Find(bson.M{"$text": bson.M{"$search": qry}}).Sort("work.title").All(&p)
 		}
-
-		// write the users to the channel
 		ch <- p
 
-	}(ch)
+	}(ch, srch)
 
-	// read the answer from channel
 	p := <-ch
-
 	return p, nil // OK
 }
 
 // GetPrint retrieves a single print from the DB: we need an ID.
 func (m *MongoDbConn) GetPrint(id string) (*Print, error) {
 
-	// acquire lock
 	dblock.Lock()
 	defer dblock.Unlock()
 
-	// get *mgo.Database instance
 	db := m.Sess.DB(m.name)
 	if db == nil {
 		return nil, errors.New("Getting single graphic print: MongoDB descriptor empty.")
 	}
 
-	// prepare channel
-	ch := make(chan *Print)
-
 	// start goroutine to get a user
+	ch := make(chan *Print)
 	go func(id string, ch chan *Print) {
 
 		p := NewPrint() // create empty print
 
-		// get a user from DB
 		err := db.C("prints").Find(bson.M{"_id": MongoStringToId(id)}).One(&p)
 		if err != nil {
 			return
 		}
 
-		// write a user to channel
 		ch <- p
 	}(id, ch)
 
-	// read user from channel
 	p := <-ch
-
 	return p, nil // all OK
 }
 
@@ -1182,65 +1077,52 @@ func (m *MongoDbConn) adminPrint(cmd DbCommand, p *Print) error {
 ////////////////////// Buildings
 
 // GetAllBuildings retrieves all buildings from DB with given DB descriptor.
-func (m *MongoDbConn) GetAllBuildings() ([]*Building, error) {
+func (m *MongoDbConn) GetBuildings(srch string) ([]*Building, error) {
 
-	// acquire lock
 	dblock.Lock()
 	defer dblock.Unlock()
 
-	// get *mgo.Database instance
 	db := m.Sess.DB(m.name)
 	if db == nil {
 		return nil, errors.New("Getting buildings: DB descriptor empty.")
 	}
 
-	// create channel
-	ch := make(chan []*Building)
-
 	// start a new goroutine to get buildings from DB
-	go func(ch chan []*Building) {
+	ch := make(chan []*Building)
+	go func(ch chan []*Building, qry string) {
 
 		// check channel
 		if ch == nil {
 			return
 		}
 
-		// prepare the empty slice for users
 		p := make([]*Building, 0)
-
-		// get all users from DB
-		if err := db.C("buildings").Find(bson.D{}).All(&p); err != nil {
-			return
+		if qry == "" {
+			_ = db.C("buildings").Find(bson.D{}).All(&p) // get all
+		} else {
+			_ = db.C("buildings").Find(bson.M{"$text": bson.M{"$search": qry}}).Sort("work.title").All(&p)
 		}
-
-		// write the users to the channel
 		ch <- p
 
-	}(ch)
+	}(ch, srch)
 
-	// read the answer from channel
 	p := <-ch
-
 	return p, nil // OK
 }
 
 // GetBuilding retrieves a single buiding from the DB: we need an ID.
 func (m *MongoDbConn) GetBuilding(id string) (*Building, error) {
 
-	// acquire lock
 	dblock.Lock()
 	defer dblock.Unlock()
 
-	// get *mgo.Database instance
 	db := m.Sess.DB(m.name)
 	if db == nil {
 		return nil, errors.New("Getting a single building: MongoDB descriptor empty.")
 	}
 
-	// prepare channel
-	ch := make(chan *Building)
-
 	// start goroutine to get a building
+	ch := make(chan *Building)
 	go func(id string, ch chan *Building) {
 
 		p := NewBuilding()
@@ -1251,13 +1133,11 @@ func (m *MongoDbConn) GetBuilding(id string) (*Building, error) {
 			return
 		}
 
-		// write a user to channel
 		ch <- p
 	}(id, ch)
 
 	// read user from channel
 	p := <-ch
-
 	return p, nil // all OK
 }
 
@@ -1394,4 +1274,10 @@ func (m *MongoDbConn) GetTechniqueNames() ([]string, error) {
 		techs = append(techs, val.Technique.Name)
 	}
 	return techs, nil
+}
+
+// The decodeQuery method is a helper function that takes a search string (as input by user in web browser) and
+// returns a MongoDB (JSON-formatted) query string that is to be used directly to retrieve data.
+func (m *MongoDbConn) decodeQuery(srch string) string {
+	return ""
 }

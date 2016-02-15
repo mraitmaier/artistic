@@ -24,7 +24,7 @@
   </head>
 
   <body>
-    {{template "navbar" .User}}
+    {{template "navbar" .}}
 
     <div class="container-fluid">
 
@@ -121,7 +121,7 @@
     <!-- end of modals definition -->                
 
     {{else}}
-    <p>There are no techniques defined yet.</p>
+    <p>No techniques found.</p>
     {{end}}
 
         </div>

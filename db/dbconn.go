@@ -16,14 +16,20 @@ var dblock sync.Mutex
 type DbType int
 
 const (
-	UnknownDB DbType = iota
+
+	// UnknownDB represent unknown database server
+	UnknownDB DbType = 1 << iota
+
+	// MongoDB represents the MongoDB server environment
 	MongoDB
 )
 
 const (
-	//
+
+	// DefAppUsername contains the default application username
 	DefAppUsername = "admin"
-	//
+
+	// DefAppPasswd contains the default application password
 	DefAppPasswd = "admin123!"
 )
 
@@ -46,15 +52,54 @@ func NewDbId(dbtype DbType) DbIdentifier {
 }
 */
 
-// Interface that defines the database connection.
+// DbConnector represents the open-close database interface (database connection).
 type DbConnector interface {
 	Connect(url string, timeout time.Duration) error
 	Close()
 }
 
+// Counter represents the count-items database interface.
+type Counter interface {
+	Count() (int, error)
+}
+
+// Inserter represents the insert database interface
+type Inserter interface {
+	Insert() error
+}
+
+// Updater represents the update database interface.
+type Updater interface {
+	Update() error
+}
+
+// Remover represents the remove database interface. Several items can be removed at once.
+type Remover interface {
+	Remove() error
+}
+
+// Getter represents the get DB interface.
+type Getter interface {
+	All() ([]interface{}, error)
+	One() (interface{}, error)
+}
+
+// UserGetter add an additional behavior to Getter interface: users are usually retrieved by username, not by ID.
+type UserGetter interface {
+	Getter
+	ByUsername(uname string) (interface{}, error)
+}
+
+// IDHandler represents the interface that operates the database IDs
+type IDHandler interface {
+	NewID() string
+	StringToID(string) interface{}
+	IDToString(interface{}) string
+}
+
 // Interface that defines the data provider
 type DataProvider interface {
-	GetAllUsers() ([]*User, error)
+	GetUsers(string) ([]*User, error)
 	GetUser(string) (*User, error)
 	GetUserByUsername(string) (*User, error)
 	InsertUser(*User) error
@@ -62,49 +107,49 @@ type DataProvider interface {
 	DeleteUser(*User) error
 	CountUsers() (int, error)
 
-	GetAllArtists(ArtistType) ([]*Artist, error)
+	GetArtists(ArtistType, string) ([]*Artist, error)
 	GetArtist(string) (*Artist, error)
 	InsertArtist(*Artist) error
 	UpdateArtist(*Artist) error
 	DeleteArtist(*Artist) error
 
-	GetAllTechniques() ([]*Technique, error)
+	GetTechniques(string) ([]*Technique, error)
 	GetTechnique(string) (*Technique, error)
 	InsertTechnique(*Technique) error
 	UpdateTechnique(*Technique) error
 	DeleteTechnique(*Technique) error
 
-	GetAllStyles() ([]*Style, error)
+	GetStyles(string) ([]*Style, error)
 	GetStyle(string) (*Style, error)
 	InsertStyle(*Style) error
 	UpdateStyle(*Style) error
 	DeleteStyle(*Style) error
 
-	GetAllDatings() ([]*Dating, error)
+	GetDatings(string) ([]*Dating, error)
 	GetDating(string) (*Dating, error)
 	UpdateDating(*Dating) error
 	CountDatings() (int, error)
 	InsertDatings([]*Dating) error
 
-	GetAllPaintings() ([]*Painting, error)
+	GetPaintings(string) ([]*Painting, error)
 	GetPainting(string) (*Painting, error)
 	InsertPainting(*Painting) error
 	UpdatePainting(*Painting) error
 	DeletePainting(*Painting) error
 
-	GetAllSculptures() ([]*Sculpture, error)
+	GetSculptures(string) ([]*Sculpture, error)
 	GetSculpture(string) (*Sculpture, error)
 	InsertSculpture(*Sculpture) error
 	UpdateSculpture(*Sculpture) error
 	DeleteSculpture(*Sculpture) error
 
-	GetAllPrints() ([]*Print, error)
+	GetPrints(string) ([]*Print, error)
 	GetPrint(string) (*Print, error)
 	InsertPrint(*Print) error
 	UpdatePrint(*Print) error
 	DeletePrint(*Print) error
 
-	GetAllBuildings() ([]*Building, error)
+	GetBuildings(string) ([]*Building, error)
 	GetBuilding(string) (*Building, error)
 	InsertBuilding(*Building) error
 	UpdateBuilding(*Building) error

@@ -281,31 +281,31 @@ type Building struct {
 
 func NewBuilding() *Building {
 	return &Building{
-        Id: bson.NewObjectId(),
-        Building: *core.NewBuilding(),
-        Created: NewTimestamp(),
-        Modified: NewTimestamp()}
+		Id:       bson.NewObjectId(),
+		Building: *core.NewBuilding(),
+		Created:  NewTimestamp(),
+		Modified: NewTimestamp()}
 }
 
 // Book type is a MongoDB wrapper for core Book type.
 type Book struct {
 
-    // ID represents the MongoDB Object ID
-    ID bson.ObjectId `bson:"_id"`
+	// ID represents the MongoDB Object ID
+	ID bson.ObjectId `bson:"_id"`
 
-    // Book is embedded core Book struct
-    core.Book
+	// Book is embedded core Book struct
+	core.Book
 
-    // Created and Modified represent ordinary database timestamps
-    Created, Modified Timestamp
+	// Created and Modified represent ordinary database timestamps
+	Created, Modified Timestamp
 }
 
 // NewBook creates a new instance of Book.
 func NewBook() *Book {
-    t := NewTimestamp()
-    return &Book{
-        ID: bson.NewObjectId(),
-        Book: *core.NewBook(),
-        Created: t,
-        Modified: t }
+	t := NewTimestamp()
+	return &Book{
+		ID:       bson.NewObjectId(),
+		Book:     *core.NewBook(),
+		Created:  t,
+		Modified: t}
 }

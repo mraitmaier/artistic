@@ -31,7 +31,7 @@
   </head>
 
   <body>
-    {{template "navbar" .User}}
+    {{template "navbar" .}}
 
     <div class="container-fluid">
 

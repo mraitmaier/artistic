@@ -70,22 +70,6 @@ func profileHandler(app *ArtisticApp) http.Handler {
 				// unconditionally reroute to main style page
 				http.Redirect(w, r, "/profile", http.StatusFound)
 
-			case "DELETE":
-				msg := fmt.Sprintf("[%s] Profile HTTP DELETE request received. Redirecting to main 'profile' page.", user.Username)
-				app.Log.Info(msg)
-				// unconditionally reroute to main profile page
-				// Use HTTP 303 (see other) to force GET to redirect as DELETE request is normally
-				// followed by another DELETE
-				http.Redirect(w, r, "/profile", http.StatusSeeOther)
-
-			case "PUT":
-				msg := fmt.Sprintf("[%s] Profile HTTP PUT request received. Redirecting to main 'profile' page.", user.Username)
-				app.Log.Info(msg)
-				// unconditionally reroute to main profile page
-				// Use HTTP 303 (see other) to force GET to redirect as PUT request is normally followed by
-				// another PUT
-				http.Redirect(w, r, "/profile", http.StatusSeeOther)
-
 			default:
 				// otherwise just display main 'index' page
 				if err := renderPage("index", nil, app, w, r); err != nil {
@@ -122,17 +106,11 @@ func profileHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *Artisti
 // This is HTTP GET handler for user profile
 func profileHTTPGetHandler(w http.ResponseWriter, r *http.Request, app *ArtisticApp, u *db.User) error {
 
-	s, err := app.DataProv.GetAllUsers()
-	if err != nil {
-		http.Redirect(w, r, "/err404", http.StatusFound)
-		return fmt.Errorf("Problem getting users from DB: '%s'", err.Error())
-	}
 	// create ad-hoc struct to be sent to page template
 	var web = struct {
-		Users []*db.User
-		Num   int
+		Ptype string
 		User  *db.User
-	}{s, len(s), u}
+	}{"profile", u}
 	app.Log.Info(fmt.Sprintf("[%s] Displaying '/profile' page", u.Username))
 	return renderPage("profile", web, app, w, r)
 }
@@ -149,7 +127,7 @@ func userHandler(app *ArtisticApp) http.Handler {
 			switch r.Method {
 
 			case "GET":
-				if err = userHTTPGetHandler(w, r, app, user); err != nil {
+				if err = userHTTPGetHandler("", w, r, app, user); err != nil {
 					app.Log.Error(fmt.Sprintf("[%s] User HTTP GET %s", user.Username, err.Error()))
 				}
 
@@ -234,9 +212,9 @@ func userHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *ArtisticAp
 }
 
 // This is HTTP GET handler for users
-func userHTTPGetHandler(w http.ResponseWriter, r *http.Request, app *ArtisticApp, u *db.User) error {
+func userHTTPGetHandler(qry string, w http.ResponseWriter, r *http.Request, app *ArtisticApp, u *db.User) error {
 
-	s, err := app.DataProv.GetAllUsers()
+	s, err := app.DataProv.GetUsers(qry)
 	if err != nil {
 		http.Redirect(w, r, "/err404", http.StatusFound)
 		return fmt.Errorf("Problem getting users from DB: '%s'", err.Error())
@@ -245,8 +223,9 @@ func userHTTPGetHandler(w http.ResponseWriter, r *http.Request, app *ArtisticApp
 	var web = struct {
 		Users []*db.User
 		Num   int
+		Ptype string
 		User  *db.User
-	}{s, len(s), u}
+	}{s, len(s), "user", u}
 	app.Log.Info(fmt.Sprintf("[%s] Displaying '/user' page", u.Username))
 	return renderPage("users", web, app, w, r)
 }

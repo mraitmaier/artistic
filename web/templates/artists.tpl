@@ -1,4 +1,5 @@
 {{define "artists"}}
+{{$role := .User.Role}}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,8 +21,7 @@
 </head>
 
 <body>
-    {{$role := .User.Role}}
-    {{template "navbar" .User}}
+    {{template "navbar" .}}
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-2" id="menu">
@@ -155,7 +155,7 @@
     <!-- end of modals definition -->   
 
             {{else}}
-                <p>No artists were found.</p>
+                <p>No artists found.</p>
             {{end}}
 
             </div>

@@ -1,7 +1,6 @@
 package core
 
 import (
-	//    "fmt"
 	"encoding/json"
 )
 
@@ -34,10 +33,6 @@ func (p *Painting) DisplayNotes() string { return p.Work.DisplayNotes() }
 func (p *Painting) DisplayExhibitions() string {
 	return p.Work.DisplayExhibitions()
 }
-
-//func (p *Painting) Created() string {
-//    return p.Work.Created()
-//}
 
 // serialize a list of paintings into JSON
 func paintingsToJson(items []Painting) (data string, err error) {

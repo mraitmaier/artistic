@@ -9,10 +9,6 @@ import (
 type Artwork interface {
 	Json() (string, error)
 	Display() string
-	//   Created() string
-	// Create() error
-	// Update() error
-	// Delete() error
 }
 
 type Work struct {
