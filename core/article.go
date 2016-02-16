@@ -39,6 +39,9 @@ type Article struct {
 
 	//
 	Notes string
+
+    //
+    Keywords string
 }
 
 // NewArticle creates a new instance of Article.
@@ -55,6 +58,7 @@ func NewArticle() *Article {
 		Link:        "",
 		Notes:       "",
 		Contents:    "",
+        Keywords:    "",
 	}
 }
 
