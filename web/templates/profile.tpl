@@ -39,7 +39,7 @@
             <p>
             <div class="btn-group">
             <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modProfileModal"
-								  	data-id="{{.User.Id.Hex}}"
+								  	data-id="{{.User.ID.Hex}}"
 									data-username="{{.User.Username}}"
 									data-password="{{.User.Password}}"
 									data-role="{{.User.Role}}"
@@ -53,7 +53,7 @@
                 <span class="glyphicon glyphicon-edit"></span> &nbsp; Modify Profile
             </button>
             <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#changePwdModal"
-								  	data-id="{{.User.Id.Hex}}"
+								  	data-id="{{.User.ID.Hex}}"
 									data-username="{{.User.Username}}"
 									data-created="{{.User.Created}}"
 									data-modified="{{.User.Modified}}">
@@ -253,7 +253,7 @@ Your
     <div class="modal-body">
     <div class="container-fluid">
     <form class="form-horizontal" method="post" onsubmit="validatePasswordChange(this);" id="change_pwd_form"> 
-            <input type="hidden" id="hexid" name="hexid" value="{{.Id.Hex}}" />
+            <input type="hidden" id="hexid" name="hexid" value="{{.ID.Hex}}" />
             <input type="hidden" id="prev" name="prev" value="profile" />
 
         <div class="row">

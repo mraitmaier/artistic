@@ -89,7 +89,7 @@ func paintingHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *Artist
 			return fmt.Errorf("Modify painting: ID is empty")
 		}
 		if s := parsePaintingFormValues(r); s != nil {
-			s.Id = db.MongoStringToId(id)
+			s.ID = db.MongoStringToId(id)
 			err = app.DataProv.UpdatePainting(s)
 			app.Log.Info(fmt.Sprintf("[%s] Updating painting '%s'", u.Username, s.Title))
 		}
@@ -99,7 +99,7 @@ func paintingHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *Artist
 			return fmt.Errorf("Delete painting: ID is empty")
 		}
 		s := db.NewPainting()
-		s.Id = db.MongoStringToId(id)
+		s.ID = db.MongoStringToId(id)
 		err = app.DataProv.DeletePainting(s)
 		app.Log.Info(fmt.Sprintf("[%s] Removing painting '%s'", u.Username, s.Title))
 
@@ -233,7 +233,7 @@ func sculptureHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *Artis
 			return fmt.Errorf("Modify sculpture: ID is empty")
 		}
 		if s := parseSculptureFormValues(r); s != nil {
-			s.Id = db.MongoStringToId(id)
+			s.ID = db.MongoStringToId(id)
 			err = app.DataProv.UpdateSculpture(s)
 			app.Log.Info(fmt.Sprintf("[%s] Updating sculpture '%s'", u.Username, s.Title))
 		}
@@ -243,7 +243,7 @@ func sculptureHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *Artis
 			return fmt.Errorf("Delete sculpture: ID is empty")
 		}
 		s := db.NewSculpture()
-		s.Id = db.MongoStringToId(id)
+		s.ID = db.MongoStringToId(id)
 		err = app.DataProv.DeleteSculpture(s)
 		app.Log.Info(fmt.Sprintf("[%s] Removing sculpture '%s'", u.Username, s.Title))
 
@@ -376,7 +376,7 @@ func printHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *ArtisticA
 			return fmt.Errorf("Modify graphic print: ID is empty")
 		}
 		if s := parsePrintFormValues(r); s != nil {
-			s.Id = db.MongoStringToId(id)
+			s.ID = db.MongoStringToId(id)
 			err = app.DataProv.UpdatePrint(s)
 			app.Log.Info(fmt.Sprintf("[%s] Updating graphic print '%s'", u.Username, s.Title))
 		}
@@ -386,7 +386,7 @@ func printHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *ArtisticA
 			return fmt.Errorf("Delete graphic print: ID is empty")
 		}
 		s := db.NewPrint()
-		s.Id = db.MongoStringToId(id)
+		s.ID = db.MongoStringToId(id)
 		err = app.DataProv.DeletePrint(s)
 		app.Log.Info(fmt.Sprintf("[%s] Removing graphic print '%s'", u.Username, s.Title))
 
@@ -520,7 +520,7 @@ func buildingHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *Artist
 			return fmt.Errorf("Modify building: ID is empty")
 		}
 		if s := parseBuildingFormValues(r); s != nil {
-			s.Id = db.MongoStringToId(id)
+			s.ID = db.MongoStringToId(id)
 			err = app.DataProv.UpdateBuilding(s)
 			app.Log.Info(fmt.Sprintf("[%s] Updating building '%s'", u.Username, s.Title))
 		}
@@ -530,7 +530,7 @@ func buildingHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *Artist
 			return fmt.Errorf("Delete building: ID is empty")
 		}
 		s := db.NewBuilding()
-		s.Id = db.MongoStringToId(id)
+		s.ID = db.MongoStringToId(id)
 		err = app.DataProv.DeleteBuilding(s)
 		app.Log.Info(fmt.Sprintf("[%s] Removing building '%s'", u.Username, s.Title))
 

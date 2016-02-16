@@ -75,7 +75,7 @@
 						<td class="text-right">
   							<span data-toggle="tooltip" data-placement="up" title="View details">
                             <a data-toggle="modal" data-target="#viewStyleModal"
-                                       data-id="{{$element.Id.Hex}}"
+                                       data-id="{{$element.ID.Hex}}"
                                        data-created="{{$element.Created}}"
                                        data-modified="{{$element.Modified}}"
                                        data-name="{{$element.Style.Name}}"
@@ -87,7 +87,7 @@
                             &nbsp;&nbsp;
                             <span data-toggle="tooltip" data-placement="up" title="Modify details"> 
                             <a data-toggle="modal" data-target="#modifyStyleModal"
-                                       data-id="{{$element.Id.Hex}}"  
+                                       data-id="{{$element.ID.Hex}}"  
                                        data-created="{{$element.Created}}" 
                                        data-modified="{{$element.Modified}}" 
                                        data-name="{{$element.Style.Name}}"
@@ -97,7 +97,7 @@
                             &nbsp;&nbsp;
                             <span data-toggle="tooltip" data-placement="up" title="Remove"> 
                             <a data-toggle="modal" data-target="#removeStyleModal"
-                                       data-id="{{$element.Id.Hex}}"  
+                                       data-id="{{$element.ID.Hex}}"  
                                        data-name="{{$element.Style.Name}}">
                                 <span class="glyphicon glyphicon-remove"></span>
                             </a>

@@ -1,6 +1,5 @@
-//
-//
 package db
+//
 
 import (
 	// "fmt"
@@ -23,7 +22,7 @@ func (t Timestamp) String() string { return string(t) }
 type Dating struct {
 
 	// database ID
-	Id bson.ObjectId `bson:"_id"`
+	ID bson.ObjectId `bson:"_id"`
 	//  embed the instance of the DB Identifier interface, this is generalized DB ID
 	//Id DbIdentifier `bson:"_id"` // XXX: need more knowledge about that...
 
@@ -47,7 +46,7 @@ func NewDating(d *core.Dating) *Dating {
 type Technique struct {
 
 	// database ID
-	Id bson.ObjectId `bson:"_id"`
+	ID bson.ObjectId `bson:"_id"`
 	//  embed the instance of the DB Identifier interface, this is generalized DB ID
 	//Id DbIdentifier
 
@@ -73,7 +72,7 @@ func CreateTechnique(name, descr string) *Technique {
 type Style struct {
 
 	// database ID
-	Id bson.ObjectId `bson:"_id"`
+	ID bson.ObjectId `bson:"_id"`
 	//  embed the instance of the DB Identifier interface, this is generalized DB ID
 	//Id DbIdentifier `bson:"_id,inline"`
 
@@ -95,7 +94,7 @@ func NewStyle() *Style {
 type User struct {
 
 	// database ID
-	Id bson.ObjectId `bson:"_id"`
+	ID bson.ObjectId `bson:"_id"`
 	//  embed the instance of the DB Identifier interface, this is generalized DB ID
 	//Id DbIdentifier `bson:"_id,inline"`
 
@@ -185,7 +184,7 @@ func (t ArtistType) String() string {
 type Artist struct {
 
 	// database ID
-	Id bson.ObjectId `bson:"_id"`
+	ID bson.ObjectId `bson:"_id"`
 
 	// original core Artist struct is embedded
 	core.Artist `bson:",inline"`
@@ -205,7 +204,7 @@ func NewArtist() *Artist {
 type Painting struct {
 
 	// database ID
-	Id bson.ObjectId `bson:"_id"`
+	ID bson.ObjectId `bson:"_id"`
 
 	// original core Artwork interface is embedded
 	core.Painting `bson:",inline"`
@@ -225,7 +224,7 @@ func NewPainting() *Painting {
 type Sculpture struct {
 
 	// database ID
-	Id bson.ObjectId `bson:"_id"`
+	ID bson.ObjectId `bson:"_id"`
 
 	// original core Artwork interface is embedded
 	core.Sculpture `bson:",inline"`
@@ -245,7 +244,7 @@ func NewSculpture() *Sculpture {
 type Print struct {
 
 	// database ID
-	Id bson.ObjectId `bson:"_id"`
+	ID bson.ObjectId `bson:"_id"`
 
 	// original core Artwork interface is embedded
 	core.Print `bson:",inline"`
@@ -267,7 +266,7 @@ func NewPrint() *Print {
 type Building struct {
 
 	// database ID
-	Id bson.ObjectId `bson:"_id"`
+	ID bson.ObjectId `bson:"_id"`
 
 	// original core Artwork interface is embedded
 	core.Building `bson:",inline"`
@@ -281,7 +280,7 @@ type Building struct {
 
 func NewBuilding() *Building {
 	return &Building{
-		Id:       bson.NewObjectId(),
+		ID:       bson.NewObjectId(),
 		Building: *core.NewBuilding(),
 		Created:  NewTimestamp(),
 		Modified: NewTimestamp()}

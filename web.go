@@ -498,7 +498,7 @@ func datingHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *Artistic
 			return fmt.Errorf("Modify dating: ID is empty")
 		}
 		if d := parseDatingFormValues(r); d != nil {
-			d.Id = db.MongoStringToId(id)
+			d.ID = db.MongoStringToId(id)
 			err = app.DataProv.UpdateDating(d)
 			app.Log.Info(fmt.Sprintf("[%s] Updating Dating '%s'", u.Username, d.Dating))
 		}
@@ -618,7 +618,7 @@ func techniqueHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *Artis
 			return fmt.Errorf("Modify technique: ID is empty")
 		}
 		if d := parseTechniqueFormValues(r); d != nil {
-			d.Id = db.MongoStringToId(id)
+			d.ID = db.MongoStringToId(id)
 			err = app.DataProv.UpdateTechnique(d)
 			app.Log.Info(fmt.Sprintf("[%s] Updating Technique '%s'", u.Username, d.Name))
 		}
@@ -628,7 +628,7 @@ func techniqueHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *Artis
 			return fmt.Errorf("Delete technique: ID is empty")
 		}
 		t := db.NewTechnique()
-		t.Id = db.MongoStringToId(id)
+		t.ID = db.MongoStringToId(id)
 		err = app.DataProv.DeleteTechnique(t)
 		app.Log.Info(fmt.Sprintf("[%s] Removing Technique '%s'", u.Username, t.Name))
 
@@ -747,7 +747,7 @@ func styleHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *ArtisticA
 			return fmt.Errorf("Modify style: ID is empty")
 		}
 		if s := parseStyleFormValues(r); s != nil {
-			s.Id = db.MongoStringToId(id)
+			s.ID = db.MongoStringToId(id)
 			err = app.DataProv.UpdateStyle(s)
 			app.Log.Info(fmt.Sprintf("[%s] Updating Style '%s'", u.Username, s.Name))
 		}
@@ -757,7 +757,7 @@ func styleHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *ArtisticA
 			return fmt.Errorf("Delete style: ID is empty")
 		}
 		s := db.NewStyle()
-		s.Id = db.MongoStringToId(id)
+		s.ID = db.MongoStringToId(id)
 		err = app.DataProv.DeleteStyle(s)
 		app.Log.Info(fmt.Sprintf("[%s] Removing style '%s'", u.Username, s.Name))
 

@@ -79,7 +79,7 @@
 				    <td>
   						<span data-toggle="tooltip" data-placement="up" title="View details">
                             <a data-toggle="modal" data-target="#viewArtistModal"
-                                       data-id="{{$element.Id.Hex}}"
+                                       data-id="{{$element.ID.Hex}}"
                                        data-created="{{$element.Created}}"
                                        data-modified="{{$element.Modified}}"
                                        data-name="{{$element.Artist.Name}}"
@@ -101,7 +101,7 @@
                        &nbsp;&nbsp;
                        <span data-toggle="tooltip" data-placement="up" title="Modify details"> 
                             <a data-toggle="modal" data-target="#modifyArtistModal"
-                                       data-id="{{$element.Id.Hex}}"  
+                                       data-id="{{$element.ID.Hex}}"  
                                        data-created="{{$element.Created}}" 
                                        data-modified="{{$element.Modified}}" 
                                        data-first="{{$element.Artist.Name.First}}"
@@ -126,7 +126,7 @@
                        &nbsp;&nbsp;
                        <span data-toggle="tooltip" data-placement="up" title="Remove"> 
                             <a data-toggle="modal" data-target="#removeArtistModal"
-                                       data-id="{{$element.Id.Hex}}"  
+                                       data-id="{{$element.ID.Hex}}"  
                                        data-name="{{$element.Artist.Name}}">
                                 <span class="glyphicon glyphicon-remove"></span>
                             </a>

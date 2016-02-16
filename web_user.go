@@ -95,7 +95,7 @@ func profileHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *Artisti
 		return fmt.Errorf("Modify profile: ID is empty")
 	}
 	if s := parseUserFormValues(r, false); s != nil {
-		s.Id = db.MongoStringToId(id)
+		s.ID = db.MongoStringToId(id)
 		err = app.DataProv.UpdateUser(s)
 		app.Log.Info(fmt.Sprintf("[%s] Updating Profile '%s'", s.Username, s.Fullname))
 	}
@@ -191,7 +191,7 @@ func userHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *ArtisticAp
 			return fmt.Errorf("Modify user: ID is empty")
 		}
 		if s := parseUserFormValues(r, false); s != nil {
-			s.Id = db.MongoStringToId(id)
+			s.ID = db.MongoStringToId(id)
 			err = app.DataProv.UpdateUser(s)
 			app.Log.Info(fmt.Sprintf("[%s] Updating User '%s (%s)'", u.Username, s.Fullname, s.Username))
 		}
@@ -201,7 +201,7 @@ func userHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *ArtisticAp
 			return fmt.Errorf("Delete user: ID is empty")
 		}
 		s := db.NewUser()
-		s.Id = db.MongoStringToId(id)
+		s.ID = db.MongoStringToId(id)
 		err = app.DataProv.DeleteUser(s)
 		app.Log.Info(fmt.Sprintf("[%s] Removing user '%s (%s)'", u.Username, s.Fullname, s.Username))
 

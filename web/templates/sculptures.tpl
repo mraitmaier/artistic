@@ -78,7 +78,7 @@
 				    <td>
   						<span data-toggle="tooltip" data-placement="up" title="View details">
                             <a data-toggle="modal" data-target="#viewSculptureModal"
-                                       data-id="{{$element.Id.Hex}}"
+                                       data-id="{{$element.ID.Hex}}"
                                        data-created="{{$element.Created}}"
                                        data-modified="{{$element.Modified}}"
                                        data-title="{{$element.Work.Title}}"
@@ -108,7 +108,7 @@
                        &nbsp;&nbsp;
                        <span data-toggle="tooltip" data-placement="up" title="Modify details"> 
                             <a data-toggle="modal" data-target="#modifySculptureModal"
-                                       data-id="{{$element.Id.Hex}}"
+                                       data-id="{{$element.ID.Hex}}"
                                        data-created="{{$element.Created}}"
                                        data-modified="{{$element.Modified}}"
                                        data-title="{{$element.Work.Title}}"
@@ -136,7 +136,7 @@
                        &nbsp;&nbsp;
                        <span data-toggle="tooltip" data-placement="up" title="Remove"> 
                             <a data-toggle="modal" data-target="#removeSculptureModal"
-                                       data-id="{{$element.Id.Hex}}"  
+                                       data-id="{{$element.ID.Hex}}"  
                                        data-title="{{$element.Work.Title}}">
                                 <span class="glyphicon glyphicon-remove"></span>
                             </a>

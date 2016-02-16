@@ -89,7 +89,7 @@ func artistHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *Artistic
 			return fmt.Errorf("Modify artist: ID is empty")
 		}
 		if s := parseArtistFormValues(r); s != nil {
-			s.Id = db.MongoStringToId(id)
+			s.ID = db.MongoStringToId(id)
 			err = app.DataProv.UpdateArtist(s)
 			app.Log.Info(fmt.Sprintf("[%s] Updating Artist '%s'", u.Username, s.Name))
 		}
@@ -99,7 +99,7 @@ func artistHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *Artistic
 			return fmt.Errorf("Delete artist: ID is empty")
 		}
 		s := db.NewArtist()
-		s.Id = db.MongoStringToId(id)
+		s.ID = db.MongoStringToId(id)
 		err = app.DataProv.DeleteArtist(s)
 		app.Log.Info(fmt.Sprintf("[%s] Removing artist '%s'", u.Username, s.Name))
 

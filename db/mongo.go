@@ -1,7 +1,7 @@
+package db
 //
 // mongo.go -
 //
-package db
 
 import (
 	"errors"
@@ -201,8 +201,8 @@ func (m *MongoDbConn) UpdateUser(u *User) error {
 // Create a new user in DB.
 func (m *MongoDbConn) InsertUser(u *User) error {
 	// check the ID of the item to be inserted into DB
-	if u.Id == "" {
-		u.Id = NewMongoId()
+	if u.ID == "" {
+		u.ID = NewMongoId()
 	}
 	return m.adminUser(DBCmdInsert, u)
 }
@@ -233,14 +233,14 @@ func (m *MongoDbConn) adminUser(cmd DbCommand, u *User) error {
 
 	case DBCmdUpdate:
 		u.Modified = NewTimestamp()
-		err = coll.UpdateId(u.Id, u)
+		err = coll.UpdateId(u.ID, u)
 
 	case DBCmdInsert:
 		u.Created = NewTimestamp()
 		err = coll.Insert(u)
 
 	case DBCmdDelete:
-		err = coll.RemoveId(u.Id)
+		err = coll.RemoveId(u.ID)
 
 	default:
 		err = fmt.Errorf("Handling users: Unknown command.")
@@ -329,7 +329,7 @@ func (m *MongoDbConn) UpdateDating(d *Dating) error {
 
 	// update the dating in DB
 	d.Modified = NewTimestamp() // Update modified timestamp before commiting
-	if err := db.C("datings").Update(bson.M{"_id": d.Id}, d); err != nil {
+	if err := db.C("datings").Update(bson.M{"_id": d.ID}, d); err != nil {
 		return err
 	}
 
@@ -418,8 +418,8 @@ func (m *MongoDbConn) UpdateStyle(s *Style) error {
 // Create a new style in DB.
 func (m *MongoDbConn) InsertStyle(s *Style) error {
 	// check the ID of the item to be inserted into DB
-	if s.Id == "" {
-		s.Id = NewMongoId()
+	if s.ID == "" {
+		s.ID = NewMongoId()
 	}
 	return m.adminStyle(DBCmdInsert, s)
 }
@@ -450,14 +450,14 @@ func (m *MongoDbConn) adminStyle(cmd DbCommand, s *Style) error {
 
 	case DBCmdUpdate:
 		s.Modified = NewTimestamp()
-		err = coll.UpdateId(s.Id, s)
+		err = coll.UpdateId(s.ID, s)
 
 	case DBCmdInsert:
 		s.Created = NewTimestamp()
 		err = coll.Insert(s)
 
 	case DBCmdDelete:
-		err = coll.RemoveId(s.Id)
+		err = coll.RemoveId(s.ID)
 
 	default:
 		err = fmt.Errorf("Handling styles: Unknown command.")
@@ -520,8 +520,8 @@ func (m *MongoDbConn) UpdateTechnique(t *Technique) error {
 // Create a new technique in DB.
 func (m *MongoDbConn) InsertTechnique(t *Technique) error {
 	// check the ID of the item to be inserted into DB
-	if t.Id == "" {
-		t.Id = NewMongoId()
+	if t.ID == "" {
+		t.ID = NewMongoId()
 	}
 	return m.adminTechnique(DBCmdInsert, t)
 }
@@ -551,14 +551,14 @@ func (m *MongoDbConn) adminTechnique(cmd DbCommand, t *Technique) error {
 
 	case DBCmdUpdate:
 		t.Modified = NewTimestamp() // update modified timestamp first...
-		err = coll.UpdateId(t.Id, t)
+		err = coll.UpdateId(t.ID, t)
 
 	case DBCmdInsert:
 		t.Created = NewTimestamp() // create new timestamp first...
 		err = coll.Insert(t)
 
 	case DBCmdDelete:
-		err = coll.RemoveId(t.Id)
+		err = coll.RemoveId(t.ID)
 
 	default:
 		err = fmt.Errorf("Handling techniques: Unknown DB command.")
@@ -673,8 +673,8 @@ func (m *MongoDbConn) UpdateArtist(a *Artist) error {
 func (m *MongoDbConn) InsertArtist(a *Artist) error {
 
 	// check the ID of the item to be inserted into DB
-	if a.Id == "" {
-		a.Id = NewMongoId()
+	if a.ID == "" {
+		a.ID = NewMongoId()
 	}
 	return m.adminArtist(DBCmdInsert, a)
 }
@@ -704,14 +704,14 @@ func (m *MongoDbConn) adminArtist(cmd DbCommand, a *Artist) error {
 
 	case DBCmdUpdate:
 		a.Modified = NewTimestamp()
-		err = coll.UpdateId(a.Id, a)
+		err = coll.UpdateId(a.ID, a)
 
 	case DBCmdInsert:
 		a.Created = NewTimestamp()
 		err = coll.Insert(a)
 
 	case DBCmdDelete:
-		err = coll.RemoveId(a.Id)
+		err = coll.RemoveId(a.ID)
 
 	default:
 		err = fmt.Errorf("Handling artists: Unknown DB command.")
@@ -791,8 +791,8 @@ func (m *MongoDbConn) UpdatePainting(p *Painting) error {
 // InsertPainting creates a new painting in DB.
 func (m *MongoDbConn) InsertPainting(p *Painting) error {
 	// check the ID of the item to be inserted into DB
-	if p.Id == "" {
-		p.Id = NewMongoId()
+	if p.ID == "" {
+		p.ID = NewMongoId()
 	}
 	return m.adminPainting(DBCmdInsert, p)
 }
@@ -822,14 +822,14 @@ func (m *MongoDbConn) adminPainting(cmd DbCommand, p *Painting) error {
 
 	case DBCmdUpdate:
 		p.Modified = NewTimestamp() // update modified timestamp first...
-		err = coll.UpdateId(p.Id, p)
+		err = coll.UpdateId(p.ID, p)
 
 	case DBCmdInsert:
 		p.Created = NewTimestamp() // create new timestamp first...
 		err = coll.Insert(p)
 
 	case DBCmdDelete:
-		err = coll.RemoveId(p.Id)
+		err = coll.RemoveId(p.ID)
 
 	default:
 		err = fmt.Errorf("Handling paintings: Unknown DB command.")
@@ -909,8 +909,8 @@ func (m *MongoDbConn) UpdateSculpture(p *Sculpture) error {
 // InsertSculpture creates a new painting in DB.
 func (m *MongoDbConn) InsertSculpture(p *Sculpture) error {
 	// check the ID of the item to be inserted into DB
-	if p.Id == "" {
-		p.Id = NewMongoId()
+	if p.ID == "" {
+		p.ID = NewMongoId()
 	}
 	return m.adminSculpture(DBCmdInsert, p)
 }
@@ -940,14 +940,14 @@ func (m *MongoDbConn) adminSculpture(cmd DbCommand, p *Sculpture) error {
 
 	case DBCmdUpdate:
 		p.Modified = NewTimestamp() // update modified timestamp first...
-		err = coll.UpdateId(p.Id, p)
+		err = coll.UpdateId(p.ID, p)
 
 	case DBCmdInsert:
 		p.Created = NewTimestamp() // create new timestamp first...
 		err = coll.Insert(p)
 
 	case DBCmdDelete:
-		err = coll.RemoveId(p.Id)
+		err = coll.RemoveId(p.ID)
 
 	default:
 		err = fmt.Errorf("Handling sculptures: Unknown DB command.")
@@ -1028,8 +1028,8 @@ func (m *MongoDbConn) UpdatePrint(p *Print) error {
 // Insertprint creates a new print in DB.
 func (m *MongoDbConn) InsertPrint(p *Print) error {
 	// check the ID of the item to be inserted into DB
-	if p.Id == "" {
-		p.Id = NewMongoId()
+	if p.ID == "" {
+		p.ID = NewMongoId()
 	}
 	return m.adminPrint(DBCmdInsert, p)
 }
@@ -1059,14 +1059,14 @@ func (m *MongoDbConn) adminPrint(cmd DbCommand, p *Print) error {
 
 	case DBCmdUpdate:
 		p.Modified = NewTimestamp() // update modified timestamp first...
-		err = coll.UpdateId(p.Id, p)
+		err = coll.UpdateId(p.ID, p)
 
 	case DBCmdInsert:
 		p.Created = NewTimestamp() // create new timestamp first...
 		err = coll.Insert(p)
 
 	case DBCmdDelete:
-		err = coll.RemoveId(p.Id)
+		err = coll.RemoveId(p.ID)
 
 	default:
 		err = fmt.Errorf("Handling a graphic print: Unknown DB command.")
@@ -1149,8 +1149,8 @@ func (m *MongoDbConn) UpdateBuilding(b *Building) error {
 // InsertBuilding creates a new building in DB.
 func (m *MongoDbConn) InsertBuilding(b *Building) error {
 	// check the ID of the item to be inserted into DB
-	if b.Id == "" {
-		b.Id = NewMongoId()
+	if b.ID == "" {
+		b.ID = NewMongoId()
 	}
 	return m.adminBuilding(DBCmdInsert, b)
 }
@@ -1180,14 +1180,14 @@ func (m *MongoDbConn) adminBuilding(cmd DbCommand, p *Building) error {
 
 	case DBCmdUpdate:
 		p.Modified = NewTimestamp() // update modified timestamp first...
-		err = coll.UpdateId(p.Id, p)
+		err = coll.UpdateId(p.ID, p)
 
 	case DBCmdInsert:
 		p.Created = NewTimestamp() // create new timestamp first...
 		err = coll.Insert(p)
 
 	case DBCmdDelete:
-		err = coll.RemoveId(p.Id)
+		err = coll.RemoveId(p.ID)
 
 	default:
 		err = fmt.Errorf("Handling a building: Unknown DB command.")

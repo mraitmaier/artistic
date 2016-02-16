@@ -82,7 +82,7 @@
                             <td>
 								<span data-toggle="tooltip" data-placement="up" title="View details">
                             	<a data-toggle="modal" data-target="#viewUserModal"
-                                       data-id="{{$element.Id.Hex}}"
+                                       data-id="{{$element.ID.Hex}}"
                                        data-created="{{$element.Created}}"
                                        data-modified="{{$element.Modified}}"
                                        data-username="{{$element.User.Username}}"
@@ -100,7 +100,7 @@
                                 {{if and (ne $element.User.Username $uname) (eq $role "admin") }}
                             	<span data-toggle="tooltip" data-placement="up" title="Modify Details"> 
                             	<a data-toggle="modal" data-target="#modifyUserModal"
-                                       data-id="{{$element.Id.Hex}}"  
+                                       data-id="{{$element.ID.Hex}}"  
                                        data-created="{{$element.Created}}" 
                                        data-modified="{{$element.Modified}}" 
                                        data-username="{{$element.User.Username}}"
@@ -117,7 +117,7 @@
                             	&nbsp;&nbsp;
                             	<span data-toggle="tooltip" data-placement="up" title="Remove"> 
                             	<a data-toggle="modal" data-target="#removeUserModal"
-                                       data-id="{{$element.Id.Hex}}"  
+                                       data-id="{{$element.ID.Hex}}"  
                                        data-username="{{$element.User.Username}}"  
                                        data-fullname="{{$element.User.Fullname}}">
                                 <span class="glyphicon glyphicon-remove"></span>
@@ -128,7 +128,7 @@
                                 {{if eq $role "admin"}}
                             	<span data-toggle="tooltip" data-placement="up" title="Change Password"> 
                             	<a data-toggle="modal" data-target="#changePasswdModal"
-                                       data-id="{{$element.Id.Hex}}"  
+                                       data-id="{{$element.ID.Hex}}"  
                                        data-username="{{$element.User.Username}}"  
                                        data-fullname="{{$element.User.Fullname}}">
                                 <span class="glyphicon glyphicon-random"></span>

@@ -64,7 +64,7 @@
                         <td class="text-right">
                             <span data-toggle="tooltip" data-placement="up" title="View details">
                             <a href="" data-toggle="modal" data-target="#viewDatingModal"
-                                        data-id="{{$element.Id.Hex}}"
+                                        data-id="{{$element.ID.Hex}}"
                                         data-created="{{$element.Created}}"
                                         data-modified="{{$element.Modified}}"
                                         data-dating="{{$element.Dating.Dating}}"
@@ -76,7 +76,7 @@
                             &nbsp;&nbsp;
                             <span data-toggle="tooltip" data-placement="up" title="Modify details">
                             <a href="" data-toggle="modal" data-target="#modifyDatingModal"
-                                        data-id="{{$element.Id.Hex}}"
+                                        data-id="{{$element.ID.Hex}}"
                                         data-created="{{$element.Created}}"
                                         data-modified="{{$element.Modified}}"
                                         data-dating="{{$element.Dating.Dating}}"
@@ -201,7 +201,7 @@
             <td class="text-right">
                 <span data-toggle="tooltip" data-placement="up" title="View details">
                 <a href="" data-toggle="modal" data-target="#viewDatingModal"
-                            data-id="{{$element.Id.Hex}}"
+                            data-id="{{$element.ID.Hex}}"
                             data-created="{{$element.Created}}"
                             data-modified="{{$element.Modified}}"
                             data-dating="{{$element.Dating}}"
@@ -212,7 +212,7 @@
                 &nbsp;&nbsp;
                 <span data-toggle="tooltip" data-placement="up" title="Modify details">
                 <a href="" data-toggle="modal" data-target="#modifyDatingModal"
-                            data-id="{{$element.Id.Hex}}"
+                            data-id="{{$element.ID.Hex}}"
                             data-created="{{$element.Created}}"
                             data-modified="{{$element.Modified}}"
                             data-dating="{{$element.Dating}}"
