@@ -155,6 +155,18 @@ type DataProvider interface {
 	UpdateBuilding(*Building) error
 	DeleteBuilding(*Building) error
 
+	GetBooks(string) ([]*Book, error)
+	GetBook(string) (*Book, error)
+	InsertBook(*Book) error
+	UpdateBook(*Book) error
+	DeleteBook(*Book) error
+
+	GetArticles(string) ([]*Article, error)
+	GetArticle(string) (*Article, error)
+	InsertArticle(*Article) error
+	UpdateArticle(*Article) error
+	DeleteArticle(*Article) error
+
 	// helper methods
 	GetDatingNames() ([]string, error)
 	GetStyleNames() ([]string, error)

@@ -1114,6 +1114,218 @@ func (m *MongoDbConn) adminBuilding(cmd DbCommand, p *Building) error {
 	return err
 }
 
+////////////////////// Books
+
+// GetBooks retrieves all books from DB with given DB descriptor.
+func (m *MongoDbConn) GetBooks(srch string) ([]*Book, error) {
+
+	dblock.Lock()
+	defer dblock.Unlock()
+
+	db := m.Sess.DB(m.name)
+	if db == nil {
+		return nil, errors.New("Getting books: DB descriptor empty.")
+	}
+
+	// start a new goroutine to get books from DB
+	ch := make(chan []*Book)
+	go func(ch chan []*Book, qry string) {
+
+		// check channel
+		if ch == nil {
+			return
+		}
+
+		b := make([]*Book, 0)
+		if qry == "" {
+			_ = db.C("books").Find(bson.D{}).All(&b) // get all
+		} else {
+			_ = db.C("books").Find(bson.M{"$text": bson.M{"$search": qry}}).Sort("title").All(&b)
+		}
+		ch <- b
+
+	}(ch, srch)
+
+	b := <-ch
+	return b, nil
+}
+
+// GetBook retrieves a single buiding from the DB: we need an ID.
+func (m *MongoDbConn) GetBook(id string) (*Book, error) {
+
+	dblock.Lock()
+	defer dblock.Unlock()
+
+	db := m.Sess.DB(m.name)
+	if db == nil {
+		return nil, errors.New("Getting a single book: MongoDB descriptor empty.")
+	}
+
+	ch := make(chan *Book)
+	go func(id string, ch chan *Book) {
+
+		b := NewBook()
+		err := db.C("books").Find(bson.M{"_id": MongoStringToId(id)}).One(&b)
+		if err != nil {
+			return
+		}
+		ch <- b
+
+	}(id, ch)
+
+	b := <-ch
+	return b, nil
+}
+
+// UpdateBook modifies a single in DB.
+func (m *MongoDbConn) UpdateBook(b *Book) error { return m.adminBook(DBCmdUpdate, b) }
+
+// InsertBook creates a new book in DB.
+func (m *MongoDbConn) InsertBook(b *Book) error { return m.adminBook(DBCmdInsert, b) }
+
+// DeleteBook removes a single book from DB.
+func (m *MongoDbConn) DeleteBook(b *Book) error { return m.adminBook(DBCmdDelete, b) }
+
+// Aux method that administers the building records in DB
+func (m *MongoDbConn) adminBook(cmd DbCommand, p *Book) error {
+
+	dblock.Lock()
+	defer dblock.Unlock()
+
+	coll := m.Sess.DB(m.name).C("books")
+	if coll == nil {
+		return fmt.Errorf("Handling a book: MongoDB descriptor empty")
+	}
+
+	if p == nil {
+		return fmt.Errorf("Handling a book: cannot create empty book")
+	}
+
+	var err error
+	switch cmd {
+
+	case DBCmdUpdate:
+		p.Modified = NewTimestamp() // update modified timestamp first...
+		err = coll.UpdateId(p.ID, p)
+
+	case DBCmdInsert:
+		p.Created = NewTimestamp() // create new timestamp first...
+		err = coll.Insert(p)
+
+	case DBCmdDelete:
+		err = coll.RemoveId(p.ID)
+
+	default:
+		err = fmt.Errorf("Handling a book: Unknown DB command.")
+	}
+	return err
+}
+
+////////////////////// Articles
+
+// GetArticles retrieves articles from DB with given DB descriptor.
+func (m *MongoDbConn) GetArticles(srch string) ([]*Article, error) {
+
+	dblock.Lock()
+	defer dblock.Unlock()
+
+	db := m.Sess.DB(m.name)
+	if db == nil {
+		return nil, errors.New("Getting articles: DB descriptor empty.")
+	}
+
+	ch := make(chan []*Article)
+	go func(ch chan []*Article, qry string) {
+
+		if ch == nil {
+			return
+		}
+
+		a := make([]*Article, 0)
+		if qry == "" {
+			_ = db.C("articles").Find(bson.D{}).All(&a) // get all
+		} else {
+			_ = db.C("articles").Find(bson.M{"$text": bson.M{"$search": qry}}).Sort("title").All(&a)
+		}
+		ch <- a
+
+	}(ch, srch)
+
+	a := <-ch
+	return a, nil
+}
+
+// GetArticle retrieves a single item from the DB: we need an ID.
+func (m *MongoDbConn) GetArticle(id string) (*Article, error) {
+
+	dblock.Lock()
+	defer dblock.Unlock()
+
+	db := m.Sess.DB(m.name)
+	if db == nil {
+		return nil, errors.New("Getting a single article: MongoDB descriptor empty.")
+	}
+
+	ch := make(chan *Article)
+	go func(id string, ch chan *Article) {
+
+		a := NewArticle()
+		err := db.C("articles").Find(bson.M{"_id": MongoStringToId(id)}).One(&a)
+		if err != nil {
+			return
+		}
+		ch <- a
+
+	}(id, ch)
+
+	a := <-ch
+	return a, nil
+}
+
+// UpdateArticle modifies a single article in DB.
+func (m *MongoDbConn) UpdateArticle(b *Article) error { return m.adminArticle(DBCmdUpdate, b) }
+
+// InsertArticle creates a new article in DB.
+func (m *MongoDbConn) InsertArticle(b *Article) error { return m.adminArticle(DBCmdInsert, b) }
+
+// DeleteArticle removes a single book from DB.
+func (m *MongoDbConn) DeleteArticle(b *Article) error { return m.adminArticle(DBCmdDelete, b) }
+
+// Aux method that administers the article records in DB
+func (m *MongoDbConn) adminArticle(cmd DbCommand, p *Article) error {
+
+	dblock.Lock()
+	defer dblock.Unlock()
+
+	coll := m.Sess.DB(m.name).C("articles")
+	if coll == nil {
+		return fmt.Errorf("Handling an article: MongoDB descriptor empty")
+	}
+
+	if p == nil {
+		return fmt.Errorf("Handling an article: cannot create empty article")
+	}
+
+	var err error
+	switch cmd {
+
+	case DBCmdUpdate:
+		p.Modified = NewTimestamp() // update modified timestamp first...
+		err = coll.UpdateId(p.ID, p)
+
+	case DBCmdInsert:
+		p.Created = NewTimestamp() // create new timestamp first...
+		err = coll.Insert(p)
+
+	case DBCmdDelete:
+		err = coll.RemoveId(p.ID)
+
+	default:
+		err = fmt.Errorf("Handling an article: Unknown DB command.")
+	}
+	return err
+}
+
 //// Additional methods
 
 //
