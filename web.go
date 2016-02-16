@@ -86,6 +86,10 @@ func registerHandlers(aa *ArtisticApp) {
 	r.Handle("/print/{id}/{cmd}", printHandler(aa))
 	r.Handle("/building", buildingHandler(aa))
 	r.Handle("/building/{id}/{cmd}", buildingHandler(aa))
+	r.Handle("/book", bookHandler(aa))
+	r.Handle("/book/{id}/{cmd}", bookHandler(aa))
+	r.Handle("/article", articleHandler(aa))
+	r.Handle("/article/{id}/{cmd}", articleHandler(aa))
 	r.HandleFunc("/favicon.ico", faviconHandler)
 	r.NotFoundHandler = err404Handler(aa)
 
@@ -261,7 +265,7 @@ func errorHandler(aa *ArtisticApp) http.Handler {
 			}
 			aa.Log.Info(fmt.Sprintf("[%s] Displaying the %q page.", user.Username, r.RequestURI))
 
-        } else {
+		} else {
 			redirectToLoginPage(w, r, aa)
 		}
 
@@ -877,6 +881,10 @@ func resolveURL(ptype, qry string, w http.ResponseWriter, r *http.Request, app *
 		err = printHTTPGetHandler(qry, w, r, app, u)
 	case "user":
 		err = userHTTPGetHandler(qry, w, r, app, u)
+	case "book":
+		err = bookHTTPGetHandler(qry, w, r, app, u)
+	case "article":
+		err = articleHTTPGetHandler(qry, w, r, app, u)
 	default:
 		// just render the /index page
 		return displayIndexPage(w, r, app, u)

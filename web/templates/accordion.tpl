@@ -45,6 +45,8 @@
     </div>
     <div class="panel-collapse collapse" id="other-collapse" role="tabpanel" aria-labelledby="other-menu-header">
         <div class="panel-body small">
+            <p><a href="/book">Books</a></p>
+            <p><a href="/article">Articles</a></p>
             <p><a href="/dating">Datings</a></p>
             <p><a href="/technique">Techniques</a></p>
             <p><a href="/style">Styles</a></p>

@@ -28,11 +28,11 @@ type Article struct {
 	//
 	Location string
 
-	//
-	ISSN string
+    //
+    Publisher string
 
 	//
-	Contents string
+	ISSN string
 
 	// Link is a link to the article online (if possible)
 	Link string
@@ -54,10 +54,10 @@ func NewArticle() *Article {
 		Issue:       "",
 		Year:        "",
 		Location:    "",
+        Publisher:   "",
 		ISSN:        "",
 		Link:        "",
 		Notes:       "",
-		Contents:    "",
         Keywords:    "",
 	}
 }

@@ -1,4 +1,5 @@
 package db
+
 //
 
 import (
@@ -327,7 +328,7 @@ func NewArticle() *Article {
 	t := NewTimestamp()
 	return &Article{
 		ID:       bson.NewObjectId(),
-		Article:     *core.NewArticle(),
+		Article:  *core.NewArticle(),
 		Created:  t,
 		Modified: t}
 }

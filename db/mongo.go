@@ -1,4 +1,5 @@
 package db
+
 //
 // mongo.go -
 //
@@ -631,7 +632,7 @@ func (m *MongoDbConn) GetArtist(id string) (*Artist, error) {
 	}(id, ch)
 
 	user := <-ch
-	return user, nil 
+	return user, nil
 }
 
 // Update a single artist in DB.
@@ -1116,7 +1117,7 @@ func (m *MongoDbConn) adminBuilding(cmd DbCommand, p *Building) error {
 
 ////////////////////// Books
 
-// GetBooks retrieves all books from DB with given DB descriptor.
+// GetBooks retrieves books from DB: either all or filtered (defined by search query).
 func (m *MongoDbConn) GetBooks(srch string) ([]*Book, error) {
 
 	dblock.Lock()
@@ -1127,11 +1128,9 @@ func (m *MongoDbConn) GetBooks(srch string) ([]*Book, error) {
 		return nil, errors.New("Getting books: DB descriptor empty.")
 	}
 
-	// start a new goroutine to get books from DB
 	ch := make(chan []*Book)
 	go func(ch chan []*Book, qry string) {
 
-		// check channel
 		if ch == nil {
 			return
 		}
@@ -1150,7 +1149,7 @@ func (m *MongoDbConn) GetBooks(srch string) ([]*Book, error) {
 	return b, nil
 }
 
-// GetBook retrieves a single buiding from the DB: we need an ID.
+// GetBook retrieves a single book from the DB.
 func (m *MongoDbConn) GetBook(id string) (*Book, error) {
 
 	dblock.Lock()
@@ -1177,7 +1176,7 @@ func (m *MongoDbConn) GetBook(id string) (*Book, error) {
 	return b, nil
 }
 
-// UpdateBook modifies a single in DB.
+// UpdateBook modifies a single book in DB.
 func (m *MongoDbConn) UpdateBook(b *Book) error { return m.adminBook(DBCmdUpdate, b) }
 
 // InsertBook creates a new book in DB.
@@ -1186,7 +1185,7 @@ func (m *MongoDbConn) InsertBook(b *Book) error { return m.adminBook(DBCmdInsert
 // DeleteBook removes a single book from DB.
 func (m *MongoDbConn) DeleteBook(b *Book) error { return m.adminBook(DBCmdDelete, b) }
 
-// Aux method that administers the building records in DB
+// Aux method that administers the book records in DB
 func (m *MongoDbConn) adminBook(cmd DbCommand, p *Book) error {
 
 	dblock.Lock()
@@ -1288,7 +1287,7 @@ func (m *MongoDbConn) UpdateArticle(b *Article) error { return m.adminArticle(DB
 // InsertArticle creates a new article in DB.
 func (m *MongoDbConn) InsertArticle(b *Article) error { return m.adminArticle(DBCmdInsert, b) }
 
-// DeleteArticle removes a single book from DB.
+// DeleteArticle removes a single article from DB.
 func (m *MongoDbConn) DeleteArticle(b *Article) error { return m.adminArticle(DBCmdDelete, b) }
 
 // Aux method that administers the article records in DB

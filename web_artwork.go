@@ -586,3 +586,240 @@ func buildingHTTPGetHandler(qry string, w http.ResponseWriter, r *http.Request, 
 	app.Log.Info(fmt.Sprintf("[%s] Displaying '/building' page", u.Username))
 	return renderPage("buildings", web, app, w, r)
 }
+
+// This is handler that handler the "/book" URL.
+func bookHandler(app *ArtisticApp) http.Handler {
+
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// if user is autheticated, display the appropriate page
+		if loggedin, user := userIsAuthenticated(app, r); loggedin {
+
+			var err error
+
+			switch r.Method {
+
+			case "GET":
+				if err = bookHTTPGetHandler("", w, r, app, user); err != nil {
+					app.Log.Error(fmt.Sprintf("[%s] Book HTTP GET %s", user.Username, err.Error()))
+				}
+
+			case "POST":
+				if err = bookHTTPPostHandler(w, r, app, user); err != nil {
+					app.Log.Error(fmt.Sprintf("[%s] Book HTTP POST %s", user.Username, err.Error()))
+				}
+				// unconditionally reroute to main book page
+				http.Redirect(w, r, "/book", http.StatusFound)
+
+			default:
+				// otherwise just display main 'index' page
+				if err := renderPage("index", nil, app, w, r); err != nil {
+					app.Log.Error(fmt.Sprintf("[%s] Index HTTP GET %s", user.Username, err.Error()))
+					return
+				}
+			}
+
+		} else {
+			// if user not authenticated
+			redirectToLoginPage(w, r, app)
+		}
+	})
+}
+
+// This is HTTP POST handler for books.
+func bookHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *ArtisticApp, u *db.User) error {
+
+	id := mux.Vars(r)["id"]
+	cmd := mux.Vars(r)["cmd"]
+
+	var err error
+	switch strings.ToLower(cmd) {
+
+	case "":
+		// insert new book , when 'cmd' is empty...
+		if b := parseBookFormValues(r); b != nil {
+			err = app.DataProv.InsertBook(b)
+		} else {
+			app.Log.Info(fmt.Sprintf("[%s] Creating new book '%s'", u.Username, b.Title))
+		}
+
+	case "put":
+		if id == "" {
+			return fmt.Errorf("Modify book: ID is empty")
+		}
+		if b := parseBookFormValues(r); b != nil {
+			b.ID = db.MongoStringToId(id)
+			err = app.DataProv.UpdateBook(b)
+			app.Log.Info(fmt.Sprintf("[%s] Updating book '%s'", u.Username, b.Title))
+		}
+
+	case "delete":
+		if id == "" {
+			return fmt.Errorf("Delete book: ID is empty")
+		}
+		b := db.NewBook()
+		b.ID = db.MongoStringToId(id)
+		err = app.DataProv.DeleteBook(b)
+		app.Log.Info(fmt.Sprintf("[%s] Removing book '%s'", u.Username, b.Title))
+
+	default:
+		err = fmt.Errorf("Illegal POST request for book")
+	}
+	return err
+}
+
+// Helper function that parses the '/book' POST request values and creates a new instance of Book
+func parseBookFormValues(r *http.Request) *db.Book {
+
+	// get POST form values and create a struct
+	b := db.NewBook()
+	b.Title = strings.TrimSpace(r.FormValue("title"))
+	b.Authors = strings.TrimSpace(r.FormValue("authors"))
+	b.Edition = strings.TrimSpace(r.FormValue("edition"))
+	b.Publisher = strings.TrimSpace(r.FormValue("publisher"))
+	b.Year = strings.TrimSpace(r.FormValue("year"))
+	b.Location = strings.TrimSpace(r.FormValue("location"))
+	b.ISBN = strings.TrimSpace(r.FormValue("isbn"))
+	b.Keywords = strings.TrimSpace(r.FormValue("keywords"))
+	b.Created = db.Timestamp(strings.TrimSpace(r.FormValue("created")))
+	//b.Notes = strings.TrimSpace(r.FormValue("notes"))
+	//b.Picture = strings.TrimSpace(r.FormValue("picture"))
+	return b
+}
+
+// This is HTTP GET handler for books
+func bookHTTPGetHandler(qry string, w http.ResponseWriter, r *http.Request, app *ArtisticApp, u *db.User) error {
+
+	p, err := app.DataProv.GetBooks(qry)
+	if err != nil {
+		http.Redirect(w, r, "/err404", http.StatusFound)
+		return fmt.Errorf("Problem getting books from DB: '%s'", err.Error())
+	}
+	// create ad-hoc struct to be sent to page template
+	var web = struct {
+		Books []*db.Book
+		Num   int
+		Ptype string
+		User  *db.User
+	}{p, len(p), "book", u}
+	app.Log.Info(fmt.Sprintf("[%s] Displaying '/book' page", u.Username))
+	return renderPage("books", web, app, w, r)
+}
+
+// This is handler that handler the "/article" URL.
+func articleHandler(app *ArtisticApp) http.Handler {
+
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// if user is autheticated, display the appropriate page
+		if loggedin, user := userIsAuthenticated(app, r); loggedin {
+
+			var err error
+
+			switch r.Method {
+
+			case "GET":
+				if err = articleHTTPGetHandler("", w, r, app, user); err != nil {
+					app.Log.Error(fmt.Sprintf("[%s] Article HTTP GET %s", user.Username, err.Error()))
+				}
+
+			case "POST":
+				if err = articleHTTPPostHandler(w, r, app, user); err != nil {
+					app.Log.Error(fmt.Sprintf("[%s] Article HTTP POST %s", user.Username, err.Error()))
+				}
+				http.Redirect(w, r, "/article", http.StatusFound)
+
+			default:
+				// otherwise just display main 'index' page
+				if err := renderPage("index", nil, app, w, r); err != nil {
+					app.Log.Error(fmt.Sprintf("[%s] Index HTTP GET %s", user.Username, err.Error()))
+					return
+				}
+			}
+
+		} else {
+			// if user not authenticated
+			redirectToLoginPage(w, r, app)
+		}
+	})
+}
+
+// This is HTTP POST handler for articles.
+func articleHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *ArtisticApp, u *db.User) error {
+
+	id := mux.Vars(r)["id"]
+	cmd := mux.Vars(r)["cmd"]
+
+	var err error
+	switch strings.ToLower(cmd) {
+
+	case "":
+		// insert new article, when 'cmd' is empty...
+		if a := parseArticleFormValues(r); a != nil {
+			err = app.DataProv.InsertArticle(a)
+		} else {
+			app.Log.Info(fmt.Sprintf("[%s] Creating new article '%s'", u.Username, a.Title))
+		}
+
+	case "put":
+		if id == "" {
+			return fmt.Errorf("Modify article: ID is empty")
+		}
+		if a := parseArticleFormValues(r); a != nil {
+			a.ID = db.MongoStringToId(id)
+			err = app.DataProv.UpdateArticle(a)
+			app.Log.Info(fmt.Sprintf("[%s] Updating article '%s'", u.Username, a.Title))
+		}
+
+	case "delete":
+		if id == "" {
+			return fmt.Errorf("Delete article: ID is empty")
+		}
+		a := db.NewArticle()
+		a.ID = db.MongoStringToId(id)
+		err = app.DataProv.DeleteArticle(a)
+		app.Log.Info(fmt.Sprintf("[%s] Removing article '%s'", u.Username, a.Title))
+
+	default:
+		err = fmt.Errorf("Illegal POST request for article")
+	}
+	return err
+}
+
+// Helper function that parses the '/article' POST request values and creates a new instance of Article
+func parseArticleFormValues(r *http.Request) *db.Article {
+
+	// get POST form values and create a struct
+	a := db.NewArticle()
+	a.Title = strings.TrimSpace(r.FormValue("title"))
+	a.Authors = strings.TrimSpace(r.FormValue("authors"))
+	a.Publication = strings.TrimSpace(r.FormValue("publication"))
+	a.Volume = strings.TrimSpace(r.FormValue("volume"))
+	a.Issue = strings.TrimSpace(r.FormValue("issue"))
+	a.Year = strings.TrimSpace(r.FormValue("year"))
+	a.Publisher = strings.TrimSpace(r.FormValue("publisher"))
+	a.Location = strings.TrimSpace(r.FormValue("location"))
+	a.ISSN = strings.TrimSpace(r.FormValue("issn"))
+	a.Keywords = strings.TrimSpace(r.FormValue("keywords"))
+	a.Created = db.Timestamp(strings.TrimSpace(r.FormValue("created")))
+	//a.Notes = strings.TrimSpace(r.FormValue("notes"))
+	a.Link = strings.TrimSpace(r.FormValue("link"))
+	return a
+}
+
+// This is HTTP GET handler for articles
+func articleHTTPGetHandler(qry string, w http.ResponseWriter, r *http.Request, app *ArtisticApp, u *db.User) error {
+
+	p, err := app.DataProv.GetArticles(qry)
+	if err != nil {
+		http.Redirect(w, r, "/err404", http.StatusFound)
+		return fmt.Errorf("Problem getting articles from DB: '%s'", err.Error())
+	}
+	// create ad-hoc struct to be sent to page template
+	var web = struct {
+		Articles []*db.Article
+		Num      int
+		Ptype    string
+		User     *db.User
+	}{p, len(p), "article", u}
+	app.Log.Info(fmt.Sprintf("[%s] Displaying '/article' page", u.Username))
+	return renderPage("articles", web, app, w, r)
+}
