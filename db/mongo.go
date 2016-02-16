@@ -194,23 +194,13 @@ func (m *MongoDbConn) GetUser(id string) (*User, error) {
 }
 
 // Update a single user in DB.
-func (m *MongoDbConn) UpdateUser(u *User) error {
-	return m.adminUser(DBCmdUpdate, u)
-}
+func (m *MongoDbConn) UpdateUser(u *User) error { return m.adminUser(DBCmdUpdate, u) }
 
 // Create a new user in DB.
-func (m *MongoDbConn) InsertUser(u *User) error {
-	// check the ID of the item to be inserted into DB
-	if u.ID == "" {
-		u.ID = NewMongoId()
-	}
-	return m.adminUser(DBCmdInsert, u)
-}
+func (m *MongoDbConn) InsertUser(u *User) error { return m.adminUser(DBCmdInsert, u) }
 
 // Delete a single user in DB.
-func (m *MongoDbConn) DeleteUser(u *User) error {
-	return m.adminUser(DBCmdDelete, u)
-}
+func (m *MongoDbConn) DeleteUser(u *User) error { return m.adminUser(DBCmdDelete, u) }
 
 // Aux method that administers the user records in DB
 func (m *MongoDbConn) adminUser(cmd DbCommand, u *User) error {
@@ -411,23 +401,13 @@ func (m *MongoDbConn) GetStyle(id string) (*Style, error) {
 }
 
 // Update a single style in DB.
-func (m *MongoDbConn) UpdateStyle(s *Style) error {
-	return m.adminStyle(DBCmdUpdate, s)
-}
+func (m *MongoDbConn) UpdateStyle(s *Style) error { return m.adminStyle(DBCmdUpdate, s) }
 
 // Create a new style in DB.
-func (m *MongoDbConn) InsertStyle(s *Style) error {
-	// check the ID of the item to be inserted into DB
-	if s.ID == "" {
-		s.ID = NewMongoId()
-	}
-	return m.adminStyle(DBCmdInsert, s)
-}
+func (m *MongoDbConn) InsertStyle(s *Style) error { return m.adminStyle(DBCmdInsert, s) }
 
 // Delete a single style in DB
-func (m *MongoDbConn) DeleteStyle(s *Style) error {
-	return m.adminStyle(DBCmdDelete, s)
-}
+func (m *MongoDbConn) DeleteStyle(s *Style) error { return m.adminStyle(DBCmdDelete, s) }
 
 // Aux method that administers the style records in DB
 func (m *MongoDbConn) adminStyle(cmd DbCommand, s *Style) error {
@@ -513,23 +493,13 @@ func (m *MongoDbConn) GetTechnique(id string) (*Technique, error) {
 }
 
 // Update a single technique in DB.
-func (m *MongoDbConn) UpdateTechnique(t *Technique) error {
-	return m.adminTechnique(DBCmdUpdate, t)
-}
+func (m *MongoDbConn) UpdateTechnique(t *Technique) error { return m.adminTechnique(DBCmdUpdate, t) }
 
 // Create a new technique in DB.
-func (m *MongoDbConn) InsertTechnique(t *Technique) error {
-	// check the ID of the item to be inserted into DB
-	if t.ID == "" {
-		t.ID = NewMongoId()
-	}
-	return m.adminTechnique(DBCmdInsert, t)
-}
+func (m *MongoDbConn) InsertTechnique(t *Technique) error { return m.adminTechnique(DBCmdInsert, t) }
 
 // Delete a new technique in DB.
-func (m *MongoDbConn) DeleteTechnique(t *Technique) error {
-	return m.adminTechnique(DBCmdDelete, t)
-}
+func (m *MongoDbConn) DeleteTechnique(t *Technique) error { return m.adminTechnique(DBCmdDelete, t) }
 
 // Aux method that administers the technique records in DB
 func (m *MongoDbConn) adminTechnique(cmd DbCommand, t *Technique) error {
@@ -665,24 +635,13 @@ func (m *MongoDbConn) GetArtist(id string) (*Artist, error) {
 }
 
 // Update a single artist in DB.
-func (m *MongoDbConn) UpdateArtist(a *Artist) error {
-	return m.adminArtist(DBCmdUpdate, a)
-}
+func (m *MongoDbConn) UpdateArtist(a *Artist) error { return m.adminArtist(DBCmdUpdate, a) }
 
 // Create a new artist in DB.
-func (m *MongoDbConn) InsertArtist(a *Artist) error {
-
-	// check the ID of the item to be inserted into DB
-	if a.ID == "" {
-		a.ID = NewMongoId()
-	}
-	return m.adminArtist(DBCmdInsert, a)
-}
+func (m *MongoDbConn) InsertArtist(a *Artist) error { return m.adminArtist(DBCmdInsert, a) }
 
 // Delete a new artist in DB.
-func (m *MongoDbConn) DeleteArtist(a *Artist) error {
-	return m.adminArtist(DBCmdDelete, a)
-}
+func (m *MongoDbConn) DeleteArtist(a *Artist) error { return m.adminArtist(DBCmdDelete, a) }
 
 // Aux method that administers the artist records in DB
 func (m *MongoDbConn) adminArtist(cmd DbCommand, a *Artist) error {
@@ -784,23 +743,13 @@ func (m *MongoDbConn) GetPainting(id string) (*Painting, error) {
 }
 
 // UpdatePainting modifies a single painting in DB.
-func (m *MongoDbConn) UpdatePainting(p *Painting) error {
-	return m.adminPainting(DBCmdUpdate, p)
-}
+func (m *MongoDbConn) UpdatePainting(p *Painting) error { return m.adminPainting(DBCmdUpdate, p) }
 
 // InsertPainting creates a new painting in DB.
-func (m *MongoDbConn) InsertPainting(p *Painting) error {
-	// check the ID of the item to be inserted into DB
-	if p.ID == "" {
-		p.ID = NewMongoId()
-	}
-	return m.adminPainting(DBCmdInsert, p)
-}
+func (m *MongoDbConn) InsertPainting(p *Painting) error { return m.adminPainting(DBCmdInsert, p) }
 
 // DeletePainting removes a single painting from DB.
-func (m *MongoDbConn) DeletePainting(p *Painting) error {
-	return m.adminPainting(DBCmdDelete, p)
-}
+func (m *MongoDbConn) DeletePainting(p *Painting) error { return m.adminPainting(DBCmdDelete, p) }
 
 // Aux method that administers the painting records in DB
 func (m *MongoDbConn) adminPainting(cmd DbCommand, p *Painting) error {
@@ -902,23 +851,13 @@ func (m *MongoDbConn) GetSculpture(id string) (*Sculpture, error) {
 }
 
 // UpdateSculpture modifies a single sculpture in DB.
-func (m *MongoDbConn) UpdateSculpture(p *Sculpture) error {
-	return m.adminSculpture(DBCmdUpdate, p)
-}
+func (m *MongoDbConn) UpdateSculpture(p *Sculpture) error { return m.adminSculpture(DBCmdUpdate, p) }
 
 // InsertSculpture creates a new painting in DB.
-func (m *MongoDbConn) InsertSculpture(p *Sculpture) error {
-	// check the ID of the item to be inserted into DB
-	if p.ID == "" {
-		p.ID = NewMongoId()
-	}
-	return m.adminSculpture(DBCmdInsert, p)
-}
+func (m *MongoDbConn) InsertSculpture(p *Sculpture) error { return m.adminSculpture(DBCmdInsert, p) }
 
 // DeleteSculpture removes a single sculpture from DB.
-func (m *MongoDbConn) DeleteSculpture(p *Sculpture) error {
-	return m.adminSculpture(DBCmdDelete, p)
-}
+func (m *MongoDbConn) DeleteSculpture(p *Sculpture) error { return m.adminSculpture(DBCmdDelete, p) }
 
 // Aux method that administers the painting records in DB
 func (m *MongoDbConn) adminSculpture(cmd DbCommand, p *Sculpture) error {
@@ -1021,23 +960,13 @@ func (m *MongoDbConn) GetPrint(id string) (*Print, error) {
 }
 
 // UpdatePrint modifies a single print in DB.
-func (m *MongoDbConn) UpdatePrint(p *Print) error {
-	return m.adminPrint(DBCmdUpdate, p)
-}
+func (m *MongoDbConn) UpdatePrint(p *Print) error { return m.adminPrint(DBCmdUpdate, p) }
 
 // Insertprint creates a new print in DB.
-func (m *MongoDbConn) InsertPrint(p *Print) error {
-	// check the ID of the item to be inserted into DB
-	if p.ID == "" {
-		p.ID = NewMongoId()
-	}
-	return m.adminPrint(DBCmdInsert, p)
-}
+func (m *MongoDbConn) InsertPrint(p *Print) error { return m.adminPrint(DBCmdInsert, p) }
 
 // DeletePrint removes a single graphic print from DB.
-func (m *MongoDbConn) DeletePrint(p *Print) error {
-	return m.adminPrint(DBCmdDelete, p)
-}
+func (m *MongoDbConn) DeletePrint(p *Print) error { return m.adminPrint(DBCmdDelete, p) }
 
 // Aux method that administers the graphic print records in DB
 func (m *MongoDbConn) adminPrint(cmd DbCommand, p *Print) error {
@@ -1142,23 +1071,13 @@ func (m *MongoDbConn) GetBuilding(id string) (*Building, error) {
 }
 
 // UpdateBuilding modifies a single in DB.
-func (m *MongoDbConn) UpdateBuilding(b *Building) error {
-	return m.adminBuilding(DBCmdUpdate, b)
-}
+func (m *MongoDbConn) UpdateBuilding(b *Building) error { return m.adminBuilding(DBCmdUpdate, b) }
 
 // InsertBuilding creates a new building in DB.
-func (m *MongoDbConn) InsertBuilding(b *Building) error {
-	// check the ID of the item to be inserted into DB
-	if b.ID == "" {
-		b.ID = NewMongoId()
-	}
-	return m.adminBuilding(DBCmdInsert, b)
-}
+func (m *MongoDbConn) InsertBuilding(b *Building) error { return m.adminBuilding(DBCmdInsert, b) }
 
 // DeleteBuilding removes a single building from DB.
-func (m *MongoDbConn) DeleteBuilding(b *Building) error {
-	return m.adminBuilding(DBCmdDelete, b)
-}
+func (m *MongoDbConn) DeleteBuilding(b *Building) error { return m.adminBuilding(DBCmdDelete, b) }
 
 // Aux method that administers the building records in DB
 func (m *MongoDbConn) adminBuilding(cmd DbCommand, p *Building) error {

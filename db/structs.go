@@ -308,3 +308,26 @@ func NewBook() *Book {
 		Created:  t,
 		Modified: t}
 }
+
+// Article type is a MongoDB wrapper for core Article type.
+type Article struct {
+
+	// ID represents the MongoDB Object ID
+	ID bson.ObjectId `bson:"_id"`
+
+	// Article is embedded core Artcile struct
+	core.Article
+
+	// Created and Modified represent ordinary database timestamps
+	Created, Modified Timestamp
+}
+
+// NewArticle creates a new instance of Article.
+func NewArticle() *Article {
+	t := NewTimestamp()
+	return &Article{
+		ID:       bson.NewObjectId(),
+		Article:     *core.NewArticle(),
+		Created:  t,
+		Modified: t}
+}
