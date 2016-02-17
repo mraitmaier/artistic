@@ -113,16 +113,8 @@
 {{if ne $role "guest"}}
     {{template "add_technique_modal"}}
 {{end}}
-<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
- <!--   <script 
-        src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js">
-    </script> -->
-    <script  src="/static/js/jquery.min.js"></script>
 
-<!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="/static/js/bootstrap.min.js"></script>
-    <script src="/static/js/artistic.js"></script>
-
+{{template "insert-js"}}
     <script>
 
     $('#viewTechniqueModal').on('show.bs.modal', function (event) {

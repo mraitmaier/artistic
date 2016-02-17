@@ -145,11 +145,7 @@
    {{template "add_user_modal"}}
 {{end}}
 
-    <script  src="/static/js/jquery.min.js"></script>
-    <!-- Include all compiled plugins, or include individual files as needed -->
-    <script src="/static/js/bootstrap.min.js"></script>
-    <!-- custom JS code -->
-    <script src="/static/js/artistic.js"></script>
+{{template "insert-js"}}
 	<script>
 
         $('#viewUserModal').on('show.bs.modal', function (event) {

@@ -73,16 +73,8 @@
     {{template "modify_profile_modal" .User}}
     <!-- end of modals definition -->
 
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script> -->
-    <script  src="/static/js/jquery.min.js"></script>
-
-    <!-- Include all compiled plugins, or include individual files as needed -->
-    <script src="/static/js/bootstrap.min.js"></script>
-
-    <!-- custom JS code -->
-    <script src="/static/js/artistic.js"></script>
-    <script>
+{{template "insert-js"}}
+<script>
 
        $('#modProfileModal').on('show.bs.modal', function (event) {
 
@@ -139,7 +131,7 @@
     		postForm(form_id, url);
 		}
 
-    </script>
+</script>
 </body>
 </html>
 {{end}}
