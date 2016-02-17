@@ -20,7 +20,8 @@
         <div id="new-{{tolower .}}-btn">
             <button type="button" class="btn btn-primary btn-sm" 
                     data-toggle="modal" data-target="#add{{.}}Modal">
-                <span class="glyphicon glyphicon-plus"></span> &nbsp; Add a New {{.}}
+                <span class="glyphicon glyphicon-plus"></span> &nbsp; Add a New 
+                {{if eq . "Print"}} Graphic {{.}} {{else}} {{.}} {{end}}
             </button>
         </div>
 {{end}}
@@ -172,7 +173,8 @@
     <div class="modal-header">
     <div class="container-fluid">
         <div class="row">
-            <h3 class="modal-title col-sm-8" id="remove{{.}}ModalLabel">Remove {{.}}</h3>
+            <h3 class="modal-title col-sm-8" id="remove{{.}}ModalLabel">
+            Remove {{if eq . "Print"}} Graphic {{.}} {{else}} {{.}} {{end}}</h3>
             <button type="button" class="btn btn-primary btn-sm col-sm-2" id="removebtn"> Remove </button>
             <button type="button" class="btn btn-default btn-sm col-sm-2" data-dismiss="modal"> Cancel </button>
         </div> <!-- row -->
@@ -180,7 +182,8 @@
     </div> <!-- modal-header -->
 
     <div class="modal-body">
-    <p> Would you really like to remove the {{tolower .}} '<span id="removename"></span>'?</p>
+    <p> Would you really like to remove the {{if eq . "Print"}} graphic {{tolower .}} ' {{else}} {{tolower .}} '{{end}}
+            <span id="removename"></span>'?</p>
     <form method="post" id="remove_{{tolower .}}_form">
         <input type="hidden" name="id" id="id" />
     </form>
