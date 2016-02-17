@@ -1,6 +1,6 @@
 {{define "buildings"}}
 {{$role := .User.Role}}
-{{$name := "Building"}}
+{{$name := totitle .Ptype}}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -116,7 +116,7 @@
     {{template "view_building_modal"}}
 {{if ne $role "guest"}}
     {{template "modify_building_modal"}}
-    {{template "remove_building_modal"}}
+    {{template "remove_building_modal" $name}}
 {{end}}
     <!-- end of modals definition -->   
 
@@ -492,5 +492,5 @@
 {{end}}
 
 {{define "remove_building_modal"}}
-{{template "remove-modal" "Building"}}
+{{template "remove-modal" .}}
 {{end}}

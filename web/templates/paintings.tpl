@@ -1,6 +1,6 @@
 {{define "paintings"}}
 {{$role := .User.Role}}
-{{$name := "Painting"}}
+{{$name := totitle .Ptype}}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -134,7 +134,7 @@
     {{template "view_painting_modal"}}
 {{if ne $role "guest"}}    
     {{template "modify_painting_modal"}}
-    {{template "remove_painting_modal"}}
+    {{template "remove_painting_modal" $name}}
 {{end}}
     <!-- end of modals definition -->   
 
@@ -647,5 +647,5 @@
 {{end}}
 
 {{define "remove_painting_modal"}}
-{{template "remove-modal" "Painting"}}
+{{template "remove-modal" .}}
 {{end}}

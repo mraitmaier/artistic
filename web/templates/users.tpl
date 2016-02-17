@@ -1,6 +1,6 @@
 {{define "users"}}
 {{$role := .User.Role}}
-{{$name := "User"}}
+{{$name := totitle .Ptype}}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -126,7 +126,7 @@
     {{template "view_user_modal"}}
 {{if eq $role "admin"}}
     {{template "modify_user_modal"}}
-    {{template "remove_user_modal"}}
+    {{template "remove_user_modal" $name}}
     {{template "change_passwd_modal"}}
 {{end}}
     <!-- end of modals definition -->        
@@ -527,7 +527,7 @@
 {{end}}
 
 {{define "remove_user_modal"}}
-{{template "remove-modal" "User"}}
+{{template "remove-modal" .}}
 {{end}}
 
 {{define "change_passwd_modal"}}

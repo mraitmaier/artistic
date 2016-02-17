@@ -1,6 +1,6 @@
 {{define "books"}}
 {{$role := .User.Role}}
-{{$name := "Book"}}
+{{$name := totitle .Ptype}}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -112,7 +112,7 @@
     {{template "view_book_modal"}}
 {{if ne $role "guest"}}
     {{template "modify_book_modal"}}
-    {{template "remove_book_modal"}}
+    {{template "remove_book_modal" $name}}
 {{end}}
     <!-- end of modals definition -->   
 
@@ -445,5 +445,5 @@
 {{end}}
 
 {{define "remove_book_modal"}}
-{{template "remove-modal" "Book"}}
+{{template "remove-modal" .}}
 {{end}}

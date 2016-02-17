@@ -1,6 +1,6 @@
 {{define "techniques"}}
 {{$role := .User.Role}}
-{{$name := "Technique"}}
+{{$name := totitle .Ptype}}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -93,10 +93,10 @@
             </table>
 
     <!-- add modals -->
-    {{template "view_technique_modal" .Techniques}}
+    {{template "view_technique_modal"}}
 {{if ne $role "guest"}}
-    {{template "modify_technique_modal" .Techniques}}
-    {{template "remove_technique_modal" .Techniques}}
+    {{template "modify_technique_modal"}}
+    {{template "remove_technique_modal" .}}
 {{end}}
     <!-- end of modals definition -->                
 

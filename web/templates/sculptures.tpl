@@ -1,6 +1,6 @@
 {{define "sculptures"}}
 {{$role := .User.Role}}
-{{$name := "Sculpture"}}
+{{$name := totitle .Ptype}}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -134,7 +134,7 @@
     {{template "view_sculpture_modal"}}
 {{if ne $role "guest"}}
     {{template "modify_sculpture_modal"}}
-    {{template "remove_sculpture_modal"}}
+    {{template "remove_sculpture_modal" $name}}
 {{end}}
     <!-- end of modals definition -->   
 
@@ -647,5 +647,5 @@
 {{end}}
 
 {{define "remove_sculpture_modal"}}
-{{template "remove-modal" "Sculpture"}}
+{{template "remove-modal" .}}
 {{end}}

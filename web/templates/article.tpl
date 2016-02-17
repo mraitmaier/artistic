@@ -1,6 +1,6 @@
 {{define "articles"}}
 {{$role := .User.Role}}
-{{$name := "Article"}}
+{{$name := totitle .Ptype}}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -40,7 +40,7 @@
                 <tfoot>
                     <tr class="bg-primary">
                     <td colspan="6"> 
-                        <strong> {{.Num}} {{if eq .Num 1}} article {{else}} articles {{end}} found. </strong> 
+                        <strong> {{.Num}} {{if eq .Num 1}} {{.Ptype}} {{else}} {{.Ptype}}s {{end}} found. </strong> 
                     </td>
                     </tr>
                 </tfoot>
@@ -115,12 +115,12 @@
     {{template "view_article_modal"}}
 {{if ne $role "guest"}}
     {{template "modify_article_modal"}}
-    {{template "remove_article_modal"}}
+    {{template "remove_article_modal" $name}}
 {{end}}
     <!-- end of modals definition -->   
 
             {{else}}
-                <p>No articles found.</p>
+                <p>No {{.Ptype}}s found.</p>
             {{end}}
 
             </div>
@@ -503,5 +503,5 @@
 {{end}}
 
 {{define "remove_article_modal"}}
-{{template "remove-modal" "Article"}}
+{{template "remove-modal" .}}
 {{end}}
