@@ -602,28 +602,5 @@
 {{end}}
 
 {{define "remove_artist_modal"}}
-<div class="modal fade" id="removeArtistModal" tabindex="-1" role="dialog" aria-labelledby="removeArtistModalLabel">
-<div class="modal-dialog">
-<div class="modal-content">
-
-    <div class="modal-header">
-    <div class="container-fluid">
-        <div class="row">
-            <h3 class="modal-title col-sm-8" id="removeArtistModalLabel">Remove Artist</h3>
-            <button type="button" class="btn btn-primary btn-sm col-sm-2" id="removebtn"> Remove </button>
-            <button type="button" class="btn btn-default btn-sm col-sm-2" data-dismiss="modal"> Cancel </button>
-        </div> <!-- row -->
-    </div> <!-- container-fluid -->
-    </div> <!-- modal-header -->
-
-    <div class="modal-body">
-    <p> Would you really like to remove the artist '<span id="removename"></span>'?</p>
-    <form method="post" id="remove_artist_form">
-        <input type="hidden" name="id" id="id" />
-        <input type="hidden" name="name" id="name" />
-    </form>
-    </div>
-</div>
-</div>
-</div>
+{{template "remove-modal" "Artist"}}
 {{end}}

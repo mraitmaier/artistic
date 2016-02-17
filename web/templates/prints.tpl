@@ -641,6 +641,8 @@
 {{end}}
 
 {{define "remove_print_modal"}}
+{{template "remove-modal" "Print"}}
+{{/*
 <div class="modal fade" id="removePrintModal" tabindex="-1" role="dialog" aria-labelledby="removePrintModalLabel">
 <div class="modal-dialog">
 <div class="modal-content">
@@ -665,4 +667,5 @@
 </div>
 </div>
 </div>
+*/}}
 {{end}}
