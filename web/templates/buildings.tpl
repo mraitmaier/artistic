@@ -347,7 +347,7 @@
         <div class="container-fluid" id="view-building-table-div">
 
         <div class="row">
-             <table id="view-user-table" class="table table-hover small">
+             <table id="view-building-table" class="table table-hover small">
              <tbody>
                  <tr> <td class="col-sm-3"><strong>Architect(s)<strong/></td>
                       <td class="col-sm-9"><span id="artist"></span></td> </tr>

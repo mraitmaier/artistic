@@ -442,7 +442,7 @@
         </div>   
         -->
         <div class="row">
-             <table id="view-user-table" class="table table-hover small">
+             <table id="view-sculpture-table" class="table table-hover small">
              <tbody>
                  <tr> <td class="col-sm-3"><strong>Artist<strong/></td>
                       <td class="col-sm-9" colspan="3"><span id="artist"></span></td> </tr>

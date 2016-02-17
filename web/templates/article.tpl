@@ -349,7 +349,7 @@
         <div class="container-fluid" id="view-article-table-div">
 
         <div class="row">
-             <table id="view-user-table" class="table table-hover small">
+             <table id="view-article-table" class="table table-hover small">
              <tbody>
                  <tr> <td class="col-sm-3"><strong>Author(s)<strong/></td>
                       <td class="col-sm-9"><span id="authors"></span></td> </tr>

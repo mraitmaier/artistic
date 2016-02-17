@@ -428,7 +428,7 @@
         </div> <!-- row -->
 
         <div class="row">
-             <table id="view-user-table" class="table table-hover small">
+             <table id="view-artist-table" class="table table-hover small">
              <tbody>
                  <tr> <td class="col-sm-3"><strong>Real Name</strong></td>
                       <td class="col-sm-9"><span id="realnamev"></span></td> </tr>
