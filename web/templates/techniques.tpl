@@ -1,5 +1,6 @@
 {{define "techniques"}}
 {{$role := .User.Role}}
+{{$name := "Technique"}}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,13 +20,9 @@
         </div>
 
         <div class="col-md-10" id="data-list">
-            <h1 id="data-list-header">Techniques</h1>
+            <h1 id="data-list-header">{{$name}}s</h1>
     {{if ne $role "guest"}}
-            <div id="new-req-btn">
-            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addTechniqueModal">
-                <span class="glyphicon glyphicon-plus"></span> &nbsp; Create a New Technique
-            </button>
-        	</div>
+    {{template "add-button" $name}}
     {{end}}
             <br />
 

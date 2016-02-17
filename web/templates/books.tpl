@@ -1,5 +1,6 @@
 {{define "books"}}
 {{$role := .User.Role}}
+{{$name := "Book"}}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,14 +17,10 @@
             </div>
 
             <div class="col-md-10" id="data-list">
-                <h1 id="data-list-header">Books</h1>
+                <h1 id="data-list-header">{{$name}}s</h1>
 
     {{if ne $role "guest"}}
-                <div id="new-book-btn">
-                <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addBookModal">
-                <span class="glyphicon glyphicon-plus"></span> &nbsp; Add a New Book
-                </button>
-        	    </div>
+    {{template "add-button" $name}}
     {{end}}
                 <br />
 

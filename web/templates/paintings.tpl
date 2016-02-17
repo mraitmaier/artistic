@@ -1,5 +1,6 @@
 {{define "paintings"}}
 {{$role := .User.Role}}
+{{$name := "Painting"}}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,13 +16,9 @@
             </div>
 
             <div class="col-md-10" id="data-list">
-                <h1 id="data-list-header">Paintings</h1>
+                <h1 id="data-list-header">{{$name}}s</h1>
         {{if ne $role "guest"}}
-            <div id="new-painting-btn">
-            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addPaintingModal">
-                <span class="glyphicon glyphicon-plus"></span> &nbsp; Add a New Painting
-            </button>
-        	</div>
+        {{template "add-button" $name}}
         {{end}}
             <br />
 

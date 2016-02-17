@@ -17,9 +17,9 @@
 {{end}}
 
 {{define "add-button"}}
-        <div id="new-book-btn">
+        <div id="new-{{tolower .}}-btn">
             <button type="button" class="btn btn-primary btn-sm" 
-                    data-toggle="modal" data-target="{{printf "#add%sModal"  .}}">
+                    data-toggle="modal" data-target="#add{{.}}Modal">
                 <span class="glyphicon glyphicon-plus"></span> &nbsp; Add a New {{.}}
             </button>
         </div>

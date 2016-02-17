@@ -1,5 +1,6 @@
 {{define "sculptures"}}
 {{$role := .User.Role}}
+{{$name := "Sculpture"}}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,13 +16,9 @@
             </div>
 
             <div class="col-md-10" id="data-list">
-                <h1 id="data-list-header">Sculptures</h1>
+                <h1 id="data-list-header">{{$name}}s</h1>
     {{if ne $role "guest"}}
-                <div id="new-sculpture-btn">
-                <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addSculptureModal">
-                <span class="glyphicon glyphicon-plus"></span> &nbsp; Add a New Sculpture
-                </button>
-        	    </div>
+    {{template "add-button" $name}}
     {{end}}
                 <br />
 

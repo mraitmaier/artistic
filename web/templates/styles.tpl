@@ -1,5 +1,6 @@
 {{define "styles"}}
 {{$role := .User.Role}}
+{{$name := "Style"}}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -18,13 +19,9 @@
         </div>
 
         <div class="col-md-10" id="data-list">
-            <h1 id="data-list-header">Styles</h1>
+            <h1 id="data-list-header">{{$name}}s</h1>
         {{if ne $role "guest"}}
-            <div id="new-req-btn">
-            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addStyleModal">
-                <span class="glyphicon glyphicon-plus"></span> &nbsp; Create a New Style
-            </button>
-        	</div>
+        {{template "add-button" $name}}
         {{end}}
             <br />
 

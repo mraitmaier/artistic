@@ -1,5 +1,6 @@
 {{define "artists"}}
 {{$role := .User.Role}}
+{{$name := "Artist"}}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,11 +20,7 @@
                 <h1 id="data-list-header">{{get_artist_type .Type}}s</h1>
 
         {{if ne $role "guest"}}
-            <div id="new-artist-btn">
-            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addArtistModal">
-                <span class="glyphicon glyphicon-plus"></span> &nbsp; Add a New Artist
-            </button>
-        	</div>
+        {{template "add-button" $name}}
         {{end}}
             <br />
 

@@ -1,5 +1,6 @@
 {{define "prints"}}
 {{$role := .User.Role}}
+{{$name := "Print"}}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,13 +16,9 @@
             </div>
 
             <div class="col-md-10" id="data-list">
-                <h1 id="data-list-header">Graphic Prints</h1>
+                <h1 id="data-list-header">Graphic {{$name}}s</h1>
         {{if ne $role "guest"}}
-                <div id="new-print-btn">
-                <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addPrintModal">
-                <span class="glyphicon glyphicon-plus"></span> &nbsp; Add a New Graphic Print
-                </button>
-        	    </div>
+        {{template "add-button" $name}}
         {{end}}
                 <br />
 
