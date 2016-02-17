@@ -1,6 +1,6 @@
 {{define "artists"}}
 {{$role := .User.Role}}
-{{$name := "Artist"}}
+{{$name := get_artist_type .Type}}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -17,10 +17,10 @@
             </div>
 
             <div class="col-md-10" id="data-list">
-                <h1 id="data-list-header">{{get_artist_type .Type}}s</h1>
+                <h1 id="data-list-header">{{$name}}s</h1>
 
         {{if ne $role "guest"}}
-        {{template "add-button" $name}}
+        {{template "add-button" "Artist"}} <!-- XXX leave it alone! -->
         {{end}}
             <br />
 
@@ -43,7 +43,7 @@
                     <tr class="bg-primary">
                     <td colspan="7"> 
                         <strong>
-                        {{.Num}} {{if eq .Num 1}} {{get_artist_type .Type}} {{else}} {{get_artist_type .Type}}s {{end}} found.
+                        {{.Num}} {{if eq .Num 1}} {{tolower $name}} {{else}} {{tolower $name}}s {{end}} found.
                         </strong> 
                     </td>
                     </tr>
@@ -146,11 +146,10 @@
     </div> <!-- container fluid -->
 
 {{if ne $role "guest"}}
-    {{template "add_artist_modal"}}
+{{template "add_artist_modal"}}
 {{end}}
 
 {{template "insert-js"}}
-
     <script>
 
     $('#viewArtistModal').on('show.bs.modal', function (event) {
