@@ -118,20 +118,20 @@
 
         var button = $(event.relatedTarget);     // Button that triggered the modal
         // Extract info from data-* requirement attribute
-        var id = button.data('id');  
+//        var id = button.data('id');  
         var name = button.data('name');
- 		var desc = button.data('desc');
-        var created = button.data('created');
-        var modified = button.data('modified');
+// 		var desc = button.data('desc');
+ //       var created = button.data('created');
+  //      var modified = button.data('modified');
         // Update the modal's content. We'll use jQuery here, but you could use a data 
         // binding library or other methods instead.
         var modal = $(this)
         modal.find('.modal-title').text('The "' + name + '" Style Details');
-        modal.find('.modal-body #hexid').val(id);
+        modal.find('.modal-body #hexid').val(button.data('id'));
         modal.find('.modal-body #namev').val(name);
-        modal.find('.modal-body #descriptionv').val(desc);
-        modal.find('.modal-body #createdv').text(created);
-        modal.find('.modal-body #modifiedv').text(modified);
+        modal.find('.modal-body #descriptionv').val(button.data('desc'));
+        modal.find('.modal-body #createdv').text(button.data('created'));
+        modal.find('.modal-body #modifiedv').text(button.data('modified'));
     })
 
 {{if ne $role "guest"}}
@@ -139,21 +139,21 @@
 
         var button = $(event.relatedTarget); // Button that triggered the modal
         // Extract info from data-* requirement attribute
-        var id = button.data('id');  
+        //var id = button.data('id');  
         var name = button.data('name');
-		var desc = button.data('desc');
+		//var desc = button.data('desc');
         var created = button.data('created');
-        var modified = button.data('modified');
+        //var modified = button.data('modified');
         // Update the modal's content. We'll use jQuery here, but you could use a data binding library 
         // or other methods instead.
         var modal = $(this)
         modal.find('.modal-title').text('Modify "' + name + '" Style Details');
-        modal.find('.modal-body #hexid').val(id);
+        modal.find('.modal-body #hexid').val(button.data('id'));
         modal.find('.modal-body #name').val(name);
-        modal.find('.modal-body #description').val(desc);
+        modal.find('.modal-body #description').val(button.data('desc'));
         modal.find('.modal-body #created').val(created);
         modal.find('.modal-body #createdm').text(created);
-        modal.find('.modal-body #modifiedm').text(modified);
+        modal.find('.modal-body #modifiedm').text(button.data('modified'));
     })
 
     // Handle the removals using modal pop-up 

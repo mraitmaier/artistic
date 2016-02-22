@@ -226,7 +226,7 @@ Your
 
     <div class="modal-body">
     <div class="container-fluid">
-    <form class="form-horizontal" method="post" onsubmit="validatePasswordChange(this);" id="change_pwd_form"> 
+    <form class="form-horizontal" method="post" onsubmit="return validatePasswordChange(this);" id="change_pwd_form"> 
             <input type="hidden" id="hexid" name="hexid" value="{{.ID.Hex}}" />
             <input type="hidden" id="prev" name="prev" value="profile" />
 

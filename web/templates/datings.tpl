@@ -97,18 +97,12 @@
         $('#viewDatingModal').on('show.bs.modal', function (event) {
 
             var btn = $(event.relatedTarget); // button that triggerd event
-
             // extract info from data-dating attribute
             //var hexid = btn.data('id');
             var dating = btn.data('dating');
-            //var description = btn.data('desc');
-            //var created = btn.data('created');
-            //var modified = btn.data('modified');
-
             // Update the modal's content.
             var modal = $(this);
             modal.find('.modal-title').text('The "' + dating + '" Dating Details');
-            //modal.find('.modal-body #hexid').val(hexid);
             modal.find('.modal-body #datingv').val(dating);
             modal.find('.modal-body #descriptionv').val(btn.data('desc'));
             modal.find('.modal-body #createdv').text(btn.data('created'));
@@ -119,14 +113,10 @@
         $('#modifyDatingModal').on('show.bs.modal', function (event) {
 
             var btn = $(event.relatedTarget); // button that triggerd event
-
             // extract info from data-dating attribute
-           // var hexid = btn.data('id');
+            // var hexid = btn.data('id');
             var dating = btn.data('dating');
-            //var description = btn.data('desc');
             var created = btn.data('created');
-            //var modified = btn.data('modified');
-
             // Update the modal's content.
             var modal = $(this);
             modal.find('.modal-title').text('Modify Dating "' + dating + '"');

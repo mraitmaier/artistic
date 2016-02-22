@@ -167,7 +167,6 @@
         // binding library or other methods instead.
         var modal = $(this);
         modal.find('.modal-title').text(button.data('name'));
-        //modal.find('.modal-body #hexid').val(id);
         modal.find('.modal-body #realnamev').text(button.data('realname'));
         modal.find('.modal-body #diedv').text(button.data('died'));
         modal.find('.modal-body #bornv').text(button.data('born'));
@@ -544,7 +543,7 @@
                     <label for="biography" class="col-sm-2 control-label"> Biography </label>
                 </div> <!-- form-group -->
                 <div class="form-group form-group-sm">
-                    <textarea class="col-sm-10 form-control" id="biographym" name="biography" rows="6"></textarea>
+                    <textarea class="col-sm-10 form-control" id="biographym" name="biography" rows="10"></textarea>
                 </div> <!-- form-group -->
 
                 <div class="form-group form-group-sm form-inline">
