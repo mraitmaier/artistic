@@ -582,15 +582,15 @@
 -->
 
     <!-- TODO -->
-        <div class="form-group form-group-sm small">
-            <input type="hidden" id="created" name="created"></input>
-            <div class="col-sm-2 text-right"><strong>Created:</strong></div>
-            <div id="createdm" name="createdm" class="col-sm-4 text-left">Error</div>
-            <div class="col-sm-2 text-right"><strong>Modified:</strong></div>
-            <div id="modifiedm" name="modifiedm" class="col-sm-4 text-left">Error</div>
-        </div>
 
-       </fieldset>
+                <div class="form-group form-group-sm small">
+                   <input type="hidden" id="created" name="created"></input>
+                   <div class="col-sm-2 text-right"><strong>Created</strong></div>
+                   <div id="createdm" name="createdm" class="col-sm-4 text-left">Error</div>
+                   <div class="col-sm-2 text-right"><strong>Modified</strong></div>
+                   <div id="modifiedm" name="modifiedm" class="col-sm-4 text-left">Error</div>
+               </div>
+            </fieldset>
         </form>
         </div> <!-- row -->
     </div> <!-- container-fluid -->

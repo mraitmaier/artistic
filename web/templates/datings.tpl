@@ -101,18 +101,18 @@
             // extract info from data-dating attribute
             //var hexid = btn.data('id');
             var dating = btn.data('dating');
-            var description = btn.data('desc');
-            var created = btn.data('created');
-            var modified = btn.data('modified');
+            //var description = btn.data('desc');
+            //var created = btn.data('created');
+            //var modified = btn.data('modified');
 
             // Update the modal's content.
             var modal = $(this);
             modal.find('.modal-title').text('The "' + dating + '" Dating Details');
             //modal.find('.modal-body #hexid').val(hexid);
             modal.find('.modal-body #datingv').val(dating);
-            modal.find('.modal-body #descriptionv').val(description);
-            modal.find('.modal-body #createdv').text(created);
-            modal.find('.modal-body #modifiedv').text(modified);
+            modal.find('.modal-body #descriptionv').val(btn.data('desc'));
+            modal.find('.modal-body #createdv').text(btn.data('created'));
+            modal.find('.modal-body #modifiedv').text(btn.data('modified'));
         });
 
 {{if ne $role "guest"}}
@@ -121,21 +121,21 @@
             var btn = $(event.relatedTarget); // button that triggerd event
 
             // extract info from data-dating attribute
-            var hexid = btn.data('id');
+           // var hexid = btn.data('id');
             var dating = btn.data('dating');
-            var description = btn.data('desc');
+            //var description = btn.data('desc');
             var created = btn.data('created');
-            var modified = btn.data('modified');
+            //var modified = btn.data('modified');
 
             // Update the modal's content.
             var modal = $(this);
             modal.find('.modal-title').text('Modify Dating "' + dating + '"');
-            modal.find('.modal-body #hexid').val(hexid);
+            modal.find('.modal-body #hexid').val(btn.data('hexid'));
             modal.find('.modal-body #dating').val(dating);
-            modal.find('.modal-body #description').val(description);
+            modal.find('.modal-body #description').val(btn.data('desc'));
             modal.find('.modal-body #created').val(created);   // hidden val
-            modal.find('.modal-body #createdd').text(created); // only display
-            modal.find('.modal-body #modifiedd').text(modified); //only display
+            modal.find('.modal-body #createdm').text(created); // only display
+            modal.find('.modal-body #modifiedm').text(btn.data('modified')); //only display
         });
 
 	// This should post form (PUT method) to modify a dating
@@ -302,17 +302,10 @@
                 <textarea class="form-control" rows="5" id="description" name="description"></textarea>
             </div>
         </div>
-   		<div class="form-group form-group-sm small">
-            <input type="hidden" id="created" name="created" />
-            <div class="col-sm-2 text-right"><strong>Created:</strong></div>
-            <div id="createdd" name="createdd" class="col-sm-4 text-left">Error</div>
-            <div class="col-sm-2 text-right"><strong>Modified:</strong></div>
-            <div id="modifiedd" name="modifiedd" class="col-sm-4 text-left">Error</div>
-        </div>
-
+        {{template "created-modified-modify"}}
+   	    </form>
         </div> <!-- row -->
     </div> <!-- container-fluid -->
-    </form>
     </div> <!-- modal-body -->
 
 </div>

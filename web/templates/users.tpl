@@ -510,9 +510,9 @@
     	</div>
    		<div class="form-group form-group-sm small">
             <input type="hidden" id="created" name="created" />
-            <div class="col-sm-2 text-right"><strong>Created:</strong></div>
+            <div class="col-sm-2 text-right"><strong>Created</strong></div>
             <div id="createdd" name="createdd" class="col-sm-4 text-left">Error</div>
-            <div class="col-sm-2 text-right"><strong>Modified:</strong></div>
+            <div class="col-sm-2 text-right"><strong>Modified</strong></div>
             <div id="modifiedd" name="modifiedd" class="col-sm-4 text-left">Error</div>
         </div>
 

@@ -193,4 +193,12 @@
 </div>
 {{end}}
 
-
+{{define "created-modified-modify"}}
+            <div class="form-group form-group-sm small">
+                <input type="hidden" id="created" name="created"></input>
+                <div class="col-sm-3 text-right"><strong>Created</strong></div>
+                <div id="createdm" name="createdm" class="col-sm-3 text-left">Error</div>
+                <div class="col-sm-3 text-right"><strong>Last Modified</strong></div>
+                <div id="modifiedm" name="modifiedm" class="col-sm-3 text-left">Error</div>
+            </div>
+{{end}}

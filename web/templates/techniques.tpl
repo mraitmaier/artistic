@@ -154,8 +154,8 @@
         modal.find('.modal-body #name').val(name);
         modal.find('.modal-body #description').val(desc);
         modal.find('.modal-body #created').val(created);
-        modal.find('.modal-body #createdd').text(created);
-        modal.find('.modal-body #modifiedd').text(modified);
+        modal.find('.modal-body #createdm').text(created);
+        modal.find('.modal-body #modifiedm').text(modified);
     })
 
 	// Handle the removals using modal pop-up 
@@ -325,17 +325,10 @@
                 <textarea class="form-control" rows="15" id="description" name="description"></textarea>
             </div>
         </div>
-   <div class="form-group form-group-sm small">
-            <input type="hidden" id="created" name="created" />
-            <div class="col-sm-2 text-right"><strong>Created:</strong></div>
-            <div id="createdd" name="createdd" class="col-sm-4 text-left">Error</div>
-            <div class="col-sm-2 text-right"><strong>Modified:</strong></div>
-            <div id="modifiedd" name="modifiedd" class="col-sm-4 text-left">Error</div>
-        </div>
-
+        {{template "created-modified-modify"}}
+        </form>
         </div> <!-- row -->
     </div> <!-- container-fluid -->
-    </form>
     </div> <!-- modal-body -->
 
 </div>
