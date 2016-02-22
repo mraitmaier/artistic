@@ -34,8 +34,8 @@ type Book struct {
 	//
 	Notes string
 
-    //
-    Keywords string
+	//
+	Keywords string
 }
 
 // NewBook creates a new instance of Book.
@@ -50,7 +50,7 @@ func NewBook() *Book {
 		ISBN:      "",
 		Front:     "",
 		Notes:     "",
-        Keywords:  "",
+		Keywords:  "",
 	}
 }
 

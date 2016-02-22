@@ -28,8 +28,8 @@ type Article struct {
 	//
 	Location string
 
-    //
-    Publisher string
+	//
+	Publisher string
 
 	//
 	ISSN string
@@ -40,8 +40,8 @@ type Article struct {
 	//
 	Notes string
 
-    //
-    Keywords string
+	//
+	Keywords string
 }
 
 // NewArticle creates a new instance of Article.
@@ -54,11 +54,11 @@ func NewArticle() *Article {
 		Issue:       "",
 		Year:        "",
 		Location:    "",
-        Publisher:   "",
+		Publisher:   "",
 		ISSN:        "",
 		Link:        "",
 		Notes:       "",
-        Keywords:    "",
+		Keywords:    "",
 	}
 }
 

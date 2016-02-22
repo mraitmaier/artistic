@@ -224,7 +224,8 @@ func userHTTPGetHandler(qry string, w http.ResponseWriter, r *http.Request, app 
 		Users []*db.User
 		Num   int
 		Ptype string
-		User  *db.User
+		//Msg  WebMessage
+		User *db.User
 	}{s, len(s), "user", u}
 	app.Log.Info(fmt.Sprintf("[%s] Displaying '/user' page", u.Username))
 	return renderPage("users", web, app, w, r)

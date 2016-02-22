@@ -46,16 +46,17 @@ function checkPasswords(pwd1, pwd2) {
 }
 
 //
-function validatePasswordChange() {
+function validatePasswordChange(form) {
 
-    var old = document.getElementById("oldpassword").value;
-    var pwd = document.getElementById("newpassword").value;
-    var pwd2 = document.getElementById("newpassword2").value;
+    var old = form.oldpassword.value;
+    var pwd = form.newpassword.value;
+    var pwd2 = form.newpassword2.value;
 
-    if (!checkPasswords(pwd, pwd2)) { 
-        alert("New Password do not match!");
+    if (pwd !== pwd2) { 
+        alert("Passwords do not match!");
         return false; 
     }
+
     return true;
 }
 
