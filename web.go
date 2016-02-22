@@ -5,6 +5,7 @@ package main
 //
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/gorilla/mux"
@@ -32,7 +33,7 @@ type WebInfo struct {
 	store *sessions.CookieStore
 
 	// (error, info etc.) message to be displayed on page
-	Msg WebMessage
+	//Msg WebMessage
 }
 
 const (
@@ -97,21 +98,37 @@ func registerHandlers(aa *ArtisticApp) {
 	http.Handle("/", r)
 }
 
-// WebMessage is the structure for displaying messages on web page
-type WebMessage struct {
+// ErrorMessage is the structure for displaying messages on web page
+type ErrorMessage struct {
 
-	// message type: warning, danger, success, info
-	MsgType string
-
-	// actual text message
-	MsgText string
+	// Code is internal error code
+	Code int `json:"code"`
+	// Type denotes the message type: warning, danger, success, info
+	Type string `json:"type"`
+	// Text is the actual text of the message
+	Message string `json:"message"`
+	// Status is HTTP Error Code: 200, 404 etc.
+	Status int `json:"status"`
 }
 
-func (m *WebMessage) String() string {
-	return fmt.Sprintf("%s: %s", m.MsgType, m.MsgText)
+// A handy string represenation of the WebMessage instance.
+func (m *ErrorMessage) String() string {
+	return fmt.Sprintf("%d (%s): %s", m.Code, m.Type, m.Message)
 }
 
-// initializes and starts web server
+// MarshalJSON marshals the error message into JSON-encoded text.
+func (m *ErrorMessage) MarshalJSON() (string, error) {
+	b, err := json.Marshal(m)
+	return string(b[:]), err
+}
+
+// UnmarhalJSON unmarshals the JSON-encoded text into error message.
+func (m *ErrorMessage) UnmarshalJSON(j string) error {
+	err := json.Unmarshal([]byte(j), m)
+	return err
+}
+
+// The webStart function initializes and starts the web server.
 func webStart(aa *ArtisticApp, wwwpath string) error {
 	aa.WebInfo = new(WebInfo)
 
@@ -153,11 +170,16 @@ func webStart(aa *ArtisticApp, wwwpath string) error {
 	return nil
 }
 
-// SetMessage resets the contents of the page message (that is to be displayed on page).
+/*
+// SetMessage sets the contents of the page message (that is to be displayed on page).
 func SetMessage(wi *WebInfo, msgtype, msg string) {
-	wi.Msg.MsgType = msgtype
-	wi.Msg.MsgText = msg
+	wi.Msg.Type = msgtype
+	wi.Msg.Text = msg
 }
+
+// ResetMessage resets the contents of the page message.
+func ResetMessage(wi *WebInfo) { SetMessage(wi, "","") }
+*/
 
 func checkSessDir(path string, aa *ArtisticApp) bool {
 
@@ -202,7 +224,8 @@ func cleanSessDir(aa *ArtisticApp) bool {
 func redirectToLoginPage(w http.ResponseWriter, r *http.Request, aa *ArtisticApp) {
 
 	aa.Log.Warning("User not authenticated")
-	http.Redirect(w, r, "/login", http.StatusFound)
+	//http.Redirect(w, r, "/login", http.StatusFound)
+	http.Redirect(w, r, "/login", http.StatusUnauthorized)
 }
 
 // Aux function that renders the page (template!) with given (template) name.
