@@ -14,5 +14,6 @@ TODO list
  2. Use jQuery Validate for form validation.
  3. Revise the Mongo indexes and put them into app initialization procedure.
  4. Implement more complex filters.
- 5. Use HTML5 web storage for some of the functionalities(remember pagination page after refresh, filters...). 
+ 5. Use HTML5 web storage for some of the functionalities (remember pagination page after refresh, filters...). 
+ 6. Think how to use web sockets to get data on-the-fly (instead of AJAX).
 99. Port to Bootstrap 4.  
