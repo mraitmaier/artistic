@@ -102,6 +102,9 @@ type User struct {
 	// original User struct is embedded
 	utils.User `bson:",inline"`
 
+    // Image represents the image of the user, the JPEG or PNG.
+    Image []byte
+
 	// created timestamp
 	Created Timestamp
 
@@ -111,21 +114,27 @@ type User struct {
 
 // NewUser creates new empty DB user instance.
 func NewUser() *User {
+    t := NewTimestamp()
 	return &User{
-		bson.NewObjectId(),
-		*utils.CreateUser("", "", "guest", "", "", "", true, CheckRole),
-		NewTimestamp(),
-		NewTimestamp()}
+        ID: bson.NewObjectId(),
+        User: *utils.CreateUser("", "", "guest", "", "", "", true, CheckRole),
+        Image: make([]byte, 0),
+        Created: t,
+        Modified: t,
+    }
 }
 
 // CreateUser creates new DB user instance. We need basic stuff: username, password, user role; 'create' is a flag denoting
 // if this user's password must be hashed (insert new user into DB) or no (existing user).
 func CreateUser(user, pwd, role string, create bool) *User {
+    t := NewTimestamp()
 	return &User{
-		bson.NewObjectId(),
-		*utils.CreateUser(user, pwd, role, "Change Myname", "email@blah.org", "", create, CheckRole),
-		NewTimestamp(),
-		NewTimestamp()}
+        ID: bson.NewObjectId(),
+        User: *utils.CreateUser(user, pwd, role, "Change Myname", "email@blah.org", "", create, CheckRole),
+        Image: make([]byte, 0),
+        Created: t,
+        Modified: t,
+    }
 }
 
 // This is the the list of valid user roles.
@@ -190,6 +199,9 @@ type Artist struct {
 	// original core Artist struct is embedded
 	core.Artist `bson:",inline"`
 
+    // image (PNG or JPEG) of the artist
+    Image []byte
+
 	// created timestamp
 	Created Timestamp
 
@@ -197,8 +209,16 @@ type Artist struct {
 	Modified Timestamp
 }
 
+// NewArtist creates a new instance of Artist
 func NewArtist() *Artist {
-	return &Artist{bson.NewObjectId(), *core.CreateArtist(), NewTimestamp(), NewTimestamp()}
+    t := NewTimestamp()
+	return &Artist{
+        ID: bson.NewObjectId(),
+        Artist: *core.CreateArtist(),
+        Image: make([]byte, 0),
+        Created: t,
+        Modified: t,
+    }
 }
 
 ///
@@ -210,6 +230,9 @@ type Painting struct {
 	// original core Artwork interface is embedded
 	core.Painting `bson:",inline"`
 
+    // image of the (JPEG or PNG) of the painting
+    Image []byte
+
 	// created timestamp
 	Created Timestamp
 
@@ -217,8 +240,16 @@ type Painting struct {
 	Modified Timestamp
 }
 
+// NewPainting creates a new instance of Painting
 func NewPainting() *Painting {
-	return &Painting{bson.NewObjectId(), *core.NewPainting(), NewTimestamp(), NewTimestamp()}
+    t := NewTimestamp()
+	return &Painting{
+        ID: bson.NewObjectId(),
+        Painting: *core.NewPainting(),
+        Image: make([]byte, 0),
+        Created: t,
+        Modified: t,
+    }
 }
 
 ///
@@ -230,6 +261,9 @@ type Sculpture struct {
 	// original core Artwork interface is embedded
 	core.Sculpture `bson:",inline"`
 
+    // image of the (JPEG or PNG) of the sculpture
+    Image []byte
+
 	// created timestamp
 	Created Timestamp
 
@@ -237,8 +271,16 @@ type Sculpture struct {
 	Modified Timestamp
 }
 
+//
 func NewSculpture() *Sculpture {
-	return &Sculpture{bson.NewObjectId(), *core.NewSculpture(), NewTimestamp(), NewTimestamp()}
+    t := NewTimestamp()
+	return &Sculpture{
+        ID: bson.NewObjectId(),
+        Sculpture: *core.NewSculpture(),
+        Image: make([]byte, 0),
+        Created: t,
+        Modified: t,
+    }
 }
 
 ///
@@ -250,6 +292,9 @@ type Print struct {
 	// original core Artwork interface is embedded
 	core.Print `bson:",inline"`
 
+    // image of the (JPEG or PNG) of the print 
+    Image []byte
+
 	// created timestamp
 	Created Timestamp
 
@@ -257,8 +302,16 @@ type Print struct {
 	Modified Timestamp
 }
 
+//
 func NewPrint() *Print {
-	return &Print{bson.NewObjectId(), *core.NewPrint(), NewTimestamp(), NewTimestamp()}
+    t := NewTimestamp()
+	return &Print{
+        ID: bson.NewObjectId(),
+        Print: *core.NewPrint(),
+        Image: make([]byte, 0),
+        Created: t,
+        Modified: t,
+    }
 }
 
 /// buildings
@@ -272,6 +325,9 @@ type Building struct {
 	// original core Artwork interface is embedded
 	core.Building `bson:",inline"`
 
+    // image of the (JPEG or PNG) of the  building
+    Image []byte
+
 	// created timestamp
 	Created Timestamp
 
@@ -280,11 +336,14 @@ type Building struct {
 }
 
 func NewBuilding() *Building {
+    t := NewTimestamp()
 	return &Building{
 		ID:       bson.NewObjectId(),
 		Building: *core.NewBuilding(),
-		Created:  NewTimestamp(),
-		Modified: NewTimestamp()}
+        Image: make([]byte, 0),
+		Created:  t,
+		Modified: t,
+    }
 }
 
 // Book type is a MongoDB wrapper for core Book type.
