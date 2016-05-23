@@ -27,7 +27,7 @@
                     <tr> <th class="col-sm-1">#</th> <th class="col-sm-1">Dating</th> 
                          <th class="col-sm-9">Description</th> <th class="col-sm-1 text-right">Actions</th> </tr>
                 </thead>
-
+<!--
                 <tfoot>
                     <tr class="bg-primary">
                         <td colspan="4">
@@ -35,7 +35,7 @@
                         </td>
                     </tr>
                 </tfoot>
-
+-->
                 <tbody>
                     {{range $index, $element := .Datings}}
                     {{$num := add $index 1}}

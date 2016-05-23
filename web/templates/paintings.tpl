@@ -37,7 +37,7 @@
                     <th class="col-sm-1">Actions</th>
                   </tr>
                 </thead>
-
+<!--
                 <tfoot>
                     <tr class="bg-primary">
                     <td colspan="8"> 
@@ -45,7 +45,7 @@
                     </td>
                     </tr>
                 </tfoot>
-
+-->
                 <tbody>
                   {{range $index, $element := .Paintings}}
                   {{ $cnt := add $index 1 }}
@@ -152,6 +152,10 @@
 
 {{template "insert-js"}}
 <script>
+    $(document).ready( function() {
+
+        $('#painting-list-table').DataTable();
+    });
 
     $('#viewPaintingModal').on('show.bs.modal', function (event) {
 

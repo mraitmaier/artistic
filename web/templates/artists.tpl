@@ -39,6 +39,7 @@
                   </tr>
                 </thead>
 
+<!--
                 <tfoot>
                     <tr class="bg-primary">
                     <td colspan="7"> 
@@ -48,6 +49,7 @@
                     </td>
                     </tr>
                 </tfoot>
+-->
 
                 <tbody>
                   {{range $index, $element := .Artists}}
@@ -120,14 +122,6 @@
                   {{end}}
                 </tbody>
                 </table>
-                <ul class="pagination pagination-sm" id="cases-pagination">
-                    <li><a href="#">&laquo;</a></li>
-                    <li><a href="#">1</a></li>
-                    <li><a href="#">2</a></li>
-                    <li><a href="#">3</a></li>
-                    <li><a href="#">4</a></li>
-                    <li><a href="#">&raquo;</a></li>
-                </ul>
 
     <!-- add modals -->
     {{template "view_artist_modal"}}
@@ -151,6 +145,12 @@
 
 {{template "insert-js"}}
     <script>
+
+    $(document).ready( function() {
+
+        $('#artist-list-table').DataTable();
+
+    });
 
     $('#viewArtistModal').on('show.bs.modal', function (event) {
 

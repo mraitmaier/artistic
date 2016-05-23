@@ -38,13 +38,13 @@
                             <th class="col-sm-2">Actions</th>
                         </tr>
                     </thead>
-
+<!--
             		<tfoot>
                     	<tr class="bg-primary">
                     		<td colspan="9"><strong>{{.Num}} {{if eq .Num 1}} user {{else}} users {{end}} found.</strong></td>
                      	</tr>
                 	</tfoot>
-
+-->
                     <tbody>
                         {{ $uname := .User.Username }}
                         {{range $index, $element := .Users}}
@@ -144,6 +144,11 @@
 
 {{template "insert-js"}}
 	<script>
+
+        $(document).ready( function() {
+
+            $('#user-list-table').DataTable();
+        });
 
         $('#viewUserModal').on('show.bs.modal', function (event) {
 

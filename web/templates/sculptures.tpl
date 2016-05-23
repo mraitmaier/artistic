@@ -37,7 +37,7 @@
                     <th class="col-sm-1">Actions</th>
                   </tr>
                 </thead>
-
+<!--
                 <tfoot>
                     <tr class="bg-primary">
                     <td colspan="8"> 
@@ -45,7 +45,7 @@
                     </td>
                     </tr>
                 </tfoot>
-
+-->
                 <tbody>
                   {{range $index, $element := .Sculptures}}
                   {{ $cnt := add $index 1 }}
@@ -151,6 +151,11 @@
 
 {{template "insert-js"}}
     <script>
+
+    $(document).ready( function() {
+
+        $('#sculpture-list-table').DataTable();
+    });
 
     $('#viewSculptureModal').on('show.bs.modal', function (event) {
 

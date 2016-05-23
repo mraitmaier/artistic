@@ -38,7 +38,7 @@
                         <th class="col-sm-1 text-right">Actions</th>
                     </tr>
                 </thead>
-
+<!--
                 <tfoot>
                     <tr class="bg-primary">
                     <td colspan="4"> 
@@ -46,7 +46,7 @@
                     </td>
                     </tr>
                 </tfoot>
-
+-->
                 <tbody>
                     {{range $index, $element := .Techniques}}
                     {{$cnt := add $index 1}}
@@ -113,6 +113,11 @@
 
 {{template "insert-js"}}
     <script>
+
+    $(document).ready( function() {
+
+        $('#technique-list-table').DataTable();
+    });
 
     $('#viewTechniqueModal').on('show.bs.modal', function (event) {
 

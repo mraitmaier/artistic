@@ -37,6 +37,7 @@
                   </tr>
                 </thead>
 
+<!--
                 <tfoot>
                     <tr class="bg-primary">
                     <td colspan="6"> 
@@ -44,7 +45,7 @@
                     </td>
                     </tr>
                 </tfoot>
-
+-->
                 <tbody>
                   {{range $index, $element := .Articles}}
                   {{ $cnt := add $index 1 }}
@@ -134,6 +135,11 @@
 {{template "insert-js"}}
 
     <script>
+    $(document).ready( function() {
+
+        $('#article-list-table').DataTable();
+
+    });
 
     $('#viewArticleModal').on('show.bs.modal', function (event) {
 

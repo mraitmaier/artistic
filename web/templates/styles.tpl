@@ -36,7 +36,7 @@
 						<th class="col-sm-1 text-right">Actions</th>
 					</tr>
 				</thead>
-
+<!--
                <tfoot>
                     <tr class="bg-primary">
                     <td colspan="4"> 
@@ -44,7 +44,7 @@
                     </td>
                     </tr>
                 </tfoot>
-
+-->
 				<tbody>
 					{{range $index, $element := .Styles}}
 					{{ $cnt := add $index 1 }}
@@ -113,6 +113,11 @@
 
 {{template "insert-js"}}
     <script>
+
+    $(document).ready( function() {
+
+        $('#style-list-table').DataTable();
+    });
 
     $('#viewStyleModal').on('show.bs.modal', function (event) {
 

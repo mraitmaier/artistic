@@ -37,7 +37,7 @@
                     <th class="col-sm-1">Actions</th>
                   </tr>
                 </thead>
-
+<!--
                 <tfoot>
                     <tr class="bg-primary">
                     <td colspan="6"> 
@@ -45,7 +45,7 @@
                     </td>
                     </tr>
                 </tfoot>
-
+-->
                 <tbody>
                   {{range $index, $element := .Buildings}}
                   {{ $cnt := add $index 1 }}
@@ -134,6 +134,10 @@
 
 {{template "insert-js"}}
     <script>
+    $(document).ready( function() {
+
+        $('#building-list-table').DataTable();
+    });
 
     $('#viewBuildingModal').on('show.bs.modal', function (event) {
 
