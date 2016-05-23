@@ -16,4 +16,5 @@ TODO list
  4. Implement more complex filters.
  5. Use HTML5 web storage for some of the functionalities (remember pagination page after refresh, filters...). 
  6. Think how to use web sockets to get data on-the-fly (instead of AJAX).
-99. Port to Bootstrap 4.  
+ 7. Test & debug the authorization (and password change) procedure; I'm not sure this is 100% right now...
+99. Port to Bootstrap 4 (when available).  
