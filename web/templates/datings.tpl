@@ -31,7 +31,7 @@
                 <tfoot>
                     <tr class="bg-primary">
                         <td colspan="4">
-                             <strong>8 datings found.</strong> <!-- this is hardcoded, because it doesn't change. -->
+                             <strong>8 datings found.</strong> <!- this is hardcoded, because it doesn't change. ->
                         </td>
                     </tr>
                 </tfoot>
