@@ -224,8 +224,7 @@ func cleanSessDir(aa *ArtisticApp) bool {
 func redirectToLoginPage(w http.ResponseWriter, r *http.Request, aa *ArtisticApp) {
 
 	aa.Log.Warning("User not authenticated")
-	//http.Redirect(w, r, "/login", http.StatusFound)
-	http.Redirect(w, r, "/login", http.StatusUnauthorized)
+	http.Redirect(w, r, "/login", http.StatusFound)
 }
 
 // Aux function that renders the page (template!) with given (template) name.
