@@ -90,11 +90,12 @@ type UserGetter interface {
 	ByUsername(uname string) (interface{}, error)
 }
 
-// IDHandler represents the interface that operates the database IDs
-type IDHandler interface {
-	NewID() string
-	StringToID(string) interface{}
-	IDToString(interface{}) string
+// NOTE: how to abstract away the DB ID (for differents DBs)? By implementing
+// a type that satisfies the interface...
+//
+type DBIdentifier interface {
+	IdToString() string
+	StringToId(string)
 }
 
 // Interface that defines the data provider
@@ -218,14 +219,3 @@ const (
 	DBCmdDelete                  // delete a single record in DB
 )
 
-///////////////////////////// EXPERIMENTAL ///////////////////
-// NOTE: how to abstract away the DB ID (for differents DBs)? By implementing
-// a type that satisfies the interface...
-//
-type DbIdentifier interface {
-	IdToString() string
-
-	StringToId(string)
-
-	NewId()
-}

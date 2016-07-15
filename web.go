@@ -111,7 +111,7 @@ type ErrorMessage struct {
 	Status int `json:"status"`
 }
 
-// A handy string represenation of the WebMessage instance.
+// A handy string represenation of the ErrorMessage instance.
 func (m *ErrorMessage) String() string {
 	return fmt.Sprintf("%d (%s): %s", m.Code, m.Type, m.Message)
 }
