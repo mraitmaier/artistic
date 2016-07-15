@@ -52,8 +52,8 @@ func NewDbId(dbtype DbType) DbIdentifier {
 }
 */
 
-// DbConnector represents the open-close database interface (database connection).
-type DbConnector interface {
+// DBConnector represents the open-close database interface (database connection).
+type DBConnector interface {
 	Connect(url string, timeout time.Duration) error
 	Close()
 }
@@ -179,7 +179,7 @@ type DataProvider interface {
 // Note that DB connector and data provider are, in general, implemented
 // by the same type.
 func InitDb(dbtype DbType, host string, port int,
-	username, password, dbname string) (url string, db DbConnector, data DataProvider, e error) {
+	username, password, dbname string) (url string, db DBConnector, data DataProvider, e error) {
 
 	// initialize
 	url = ""
@@ -218,4 +218,3 @@ const (
 	DBCmdInsert                  // insert a new record in DB
 	DBCmdDelete                  // delete a single record in DB
 )
-

@@ -61,7 +61,7 @@ func registerHandlers(aa *ArtisticApp) {
 	r.Handle("/search", searchHandler(aa))
 	r.Handle("/user", userHandler(aa))
 	r.Handle("/user/{id}/{cmd}", userHandler(aa))
-	r.Handle("/log", logHandler(aa))
+//	r.Handle("/log", logHandler(aa))
 	r.Handle("/technique", techniqueHandler(aa))
 	r.Handle("/technique/{id}/{cmd}", techniqueHandler(aa))
 	r.Handle("/style", styleHandler(aa))
@@ -170,17 +170,7 @@ func webStart(aa *ArtisticApp, wwwpath string) error {
 	return nil
 }
 
-/*
-// SetMessage sets the contents of the page message (that is to be displayed on page).
-func SetMessage(wi *WebInfo, msgtype, msg string) {
-	wi.Msg.Type = msgtype
-	wi.Msg.Text = msg
-}
-
-// ResetMessage resets the contents of the page message.
-func ResetMessage(wi *WebInfo) { SetMessage(wi, "","") }
-*/
-
+// Helper function that checks path and creates it if needed.
 func checkSessDir(path string, aa *ArtisticApp) bool {
 
 	basedir := path
@@ -200,12 +190,10 @@ func checkSessDir(path string, aa *ArtisticApp) bool {
 		fmt.Println("FATAL: Cannot create path. Cannot continue...")
 		return false
 	}
-
 	return true
 }
 
-// remove all session files (and the session folder itself!) when app is
-// terminated.
+// Remove all session files (and the session folder itself!) when app is terminated.
 func cleanSessDir(aa *ArtisticApp) bool {
 
 	status := false
@@ -220,9 +208,8 @@ func cleanSessDir(aa *ArtisticApp) bool {
 	return status
 }
 
-// aux function redirecting to login page.
+// Aux function redirecting to login page.
 func redirectToLoginPage(w http.ResponseWriter, r *http.Request, aa *ArtisticApp) {
-
 	aa.Log.Warning("User not authenticated")
 	http.Redirect(w, r, "/login", http.StatusFound)
 }
@@ -236,7 +223,6 @@ func redirectToLoginPage(w http.ResponseWriter, r *http.Request, aa *ArtisticApp
 // - w    - ptr to the ResponseWriter type instance
 // - r    - ptr to the (HTTP) Request type instance
 func renderPage(name string, web interface{}, aa *ArtisticApp, w http.ResponseWriter, r *http.Request) error {
-
 	var err error
 	if err = aa.WebInfo.templates.ExecuteTemplate(w, name, web); err != nil {
 		http.Redirect(w, r, "/err404", http.StatusFound)
@@ -408,6 +394,7 @@ func loginHandler(aa *ArtisticApp) http.Handler {
 	}) // return handler closure
 }
 
+/*
 // log admin page handler
 func logHandler(aa *ArtisticApp) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -452,6 +439,7 @@ func logHandler(aa *ArtisticApp) http.Handler {
 		}
 	}) // return handler closure
 }
+*/
 
 // favincon handler
 func faviconHandler(w http.ResponseWriter, r *http.Request) { http.ServeFile(w, r, favicon) }
@@ -482,7 +470,7 @@ func datingHandler(app *ArtisticApp) http.Handler {
 			case "DELETE":
 				msg := fmt.Sprintf("[%s] Dating HTTP DELETE request received. Redirecting to main 'dating' page.", user.Username)
 				app.Log.Info(msg)
-				// unconditionally reroute to main test cases page
+				// unconditionally reroute to main dating page
 				// Use HTTP 303 (see other) to force GET to redirect as DELETE request is normally
 				// followed by another DELETE
 				http.Redirect(w, r, "/dating", http.StatusSeeOther)
@@ -490,7 +478,7 @@ func datingHandler(app *ArtisticApp) http.Handler {
 			case "PUT":
 				msg := fmt.Sprintf("[%s] Dating HTTP PUT request received. Redirecting to main 'dating' page.", user.Username)
 				app.Log.Info(msg)
-				// unconditionally reroute to main test cases page
+				// unconditionally reroute to main dating page
 				// Use HTTP 303 (see other) to force GET to redirect as PUT request is normally followed by
 				// another PUT
 				http.Redirect(w, r, "/dating", http.StatusSeeOther)
@@ -504,8 +492,7 @@ func datingHandler(app *ArtisticApp) http.Handler {
 			}
 
 		} else {
-			// if user not authenticated
-			redirectToLoginPage(w, r, app)
+			redirectToLoginPage(w, r, app) // if user not authenticated
 		}
 	})
 }
@@ -593,7 +580,7 @@ func techniqueHandler(app *ArtisticApp) http.Handler {
 				msg := fmt.Sprintf("[%s] Technique HTTP DELETE request received. Redirecting to main 'technique' page.",
 					user.Username)
 				app.Log.Info(msg)
-				// unconditionally reroute to main test cases page
+				// unconditionally reroute to main technique page
 				// Use HTTP 303 (see other) to force GET to redirect as DELETE request is normally
 				// followed by another DELETE
 				http.Redirect(w, r, "/technique", http.StatusSeeOther)
@@ -602,7 +589,7 @@ func techniqueHandler(app *ArtisticApp) http.Handler {
 				msg := fmt.Sprintf("[%s] Technique HTTP PUT request received. Redirecting to main 'technique' page.",
 					user.Username)
 				app.Log.Info(msg)
-				// unconditionally reroute to main test cases page
+				// unconditionally reroute to main technique page
 				// Use HTTP 303 (see other) to force GET to redirect as PUT request is normally followed by
 				// another PUT
 				http.Redirect(w, r, "/technique", http.StatusSeeOther)
@@ -701,7 +688,7 @@ func techniqueHTTPGetHandler(qry string, w http.ResponseWriter, r *http.Request,
 func styleHandler(app *ArtisticApp) http.Handler {
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// if user is autheticated, display the appropriate page
+
 		if loggedin, user := userIsAuthenticated(app, r); loggedin {
 
 			var err error

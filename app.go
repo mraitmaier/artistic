@@ -31,7 +31,7 @@ type ArtisticApp struct {
 	Log *utils.Log
 
 	// DB session
-	DbSess db.DbConnector
+	DbSess db.DBConnector
 
 	// DB data provider
 	DataProv db.DataProvider

@@ -27,8 +27,11 @@ type MongoDbConn struct {
 // Connect to mongoDB with given URL and timeout (in seconds) to stop trying
 // when server is not available.
 func (m *MongoDbConn) Connect(url string, timeout time.Duration) (e error) {
-	m.Sess, e = mgo.DialWithTimeout(url, timeout)
-	return e
+
+	if m.Sess, e = mgo.DialWithTimeout(url, timeout); e != nil {
+        return
+    }
+	return ensureIndexes(m)
 }
 
 // Close the mongoDB connection.
@@ -36,6 +39,72 @@ func (m *MongoDbConn) Close() {
 	if m.Sess != nil {
 		m.Sess.Close()
 	}
+}
+
+// The ensureIndexes function ensures that MongoDB indexes are created, when app is started.
+func ensureIndexes(m *MongoDbConn) error {
+
+	// wildcard text index is common to all collection
+	//wcix := mgo.Index{Key: []string{"$text:$**"}, Background: true, Sparse: true}
+
+	var err error
+	// the artists collection indexes
+	c := m.Sess.DB(m.name).C("artists")
+	err = c.EnsureIndex(mgo.Index{Key: []string{"nationality"}, Background: true, Sparse: true})
+	//err = c.EnsureIndex(wcix)
+
+	// the techniques collection indexes
+	c = m.Sess.DB(m.name).C("techniques")
+	err = c.EnsureIndex(mgo.Index{Key: []string{"techniquetype"}, Background: true, Sparse: true})
+    //err = c.EnsureIndex(wcix)
+
+	// the articles collection indexes
+	c = m.Sess.DB(m.name).C("articles")
+	err = c.EnsureIndex(mgo.Index{Key: []string{"year"}, Background: true, Sparse: true})
+	err = c.EnsureIndex(mgo.Index{Key: []string{"publisher"}, Background: true, Sparse: true})
+	err = c.EnsureIndex(mgo.Index{Key: []string{"authors"}, Background: true, Sparse: true})
+	//err = c.EnsureIndex(wcix)
+
+	// the books collection indexes
+	c = m.Sess.DB(m.name).C("books")
+	err = c.EnsureIndex(mgo.Index{Key: []string{"year"}, Background: true, Sparse: true})
+	err = c.EnsureIndex(mgo.Index{Key: []string{"publication"}, Background: true, Sparse: true})
+	err = c.EnsureIndex(mgo.Index{Key: []string{"authors"}, Background: true, Sparse: true})
+	//err = c.EnsureIndex(wcix)
+
+	// the paintings collection indexes
+	c = m.Sess.DB(m.name).C("paintings")
+	err = c.EnsureIndex(mgo.Index{Key: []string{"artist"}, Background: true, Sparse: true})
+	err = c.EnsureIndex(mgo.Index{Key: []string{"technique"}, Background: true, Sparse: true})
+	err = c.EnsureIndex(mgo.Index{Key: []string{"style"}, Background: true, Sparse: true})
+	err = c.EnsureIndex(mgo.Index{Key: []string{"dating"}, Background: true, Sparse: true})
+	//err = c.EnsureIndex(wcix)
+
+	// the sculptures collection indexes
+	c = m.Sess.DB(m.name).C("sculptures")
+	err = c.EnsureIndex(mgo.Index{Key: []string{"artist"}, Background: true, Sparse: true})
+	err = c.EnsureIndex(mgo.Index{Key: []string{"technique"}, Background: true, Sparse: true})
+	err = c.EnsureIndex(mgo.Index{Key: []string{"style"}, Background: true, Sparse: true})
+	err = c.EnsureIndex(mgo.Index{Key: []string{"dating"}, Background: true, Sparse: true})
+	//err = c.EnsureIndex(wcix)
+
+	// the prints collection indexes
+	c = m.Sess.DB(m.name).C("prints")
+	err = c.EnsureIndex(mgo.Index{Key: []string{"artist"}, Background: true, Sparse: true})
+	err = c.EnsureIndex(mgo.Index{Key: []string{"technique"}, Background: true, Sparse: true})
+	err = c.EnsureIndex(mgo.Index{Key: []string{"style"}, Background: true, Sparse: true})
+	err = c.EnsureIndex(mgo.Index{Key: []string{"dating"}, Background: true, Sparse: true})
+	//err = c.EnsureIndex(wcix)
+
+	// the buildings collection indexes
+	c = m.Sess.DB(m.name).C("buildings")
+	err = c.EnsureIndex(mgo.Index{Key: []string{"artist"}, Background: true, Sparse: true})
+	err = c.EnsureIndex(mgo.Index{Key: []string{"technique"}, Background: true, Sparse: true})
+	err = c.EnsureIndex(mgo.Index{Key: []string{"style"}, Background: true, Sparse: true})
+	err = c.EnsureIndex(mgo.Index{Key: []string{"dating"}, Background: true, Sparse: true})
+	//err = c.EnsureIndex(wcix)
+
+	return err
 }
 
 /* DataProvider interface implementation */

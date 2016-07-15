@@ -88,7 +88,7 @@ func main() {
 	url, aa.DbSess, aa.DataProv, err = db.InitDb(db.MongoDB, "localhost", 27017, DBUser, DBPwd, DBName)
 	if err = aa.DbSess.Connect(url, DatabaseTimeout); err != nil {
 		aa.Log.Critical("Connection to database cannot be established.")
-		fmt.Println("Connection to database cannot be established. Exiting...")
+        fmt.Printf("Connection to database cannot be established: %s. Exiting...\n", err.Error())
 		return
 	}
 	aa.Log.Info("Connection to MongoDB established.")
