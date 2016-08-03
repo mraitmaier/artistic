@@ -5,7 +5,7 @@ package main
 //
 
 import (
-	"encoding/json"
+	//"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/gorilla/mux"
@@ -98,6 +98,7 @@ func registerHandlers(aa *ArtisticApp) {
 	http.Handle("/", r)
 }
 
+/*
 // ErrorMessage is the structure for displaying messages on web page
 type ErrorMessage struct {
 
@@ -122,11 +123,12 @@ func (m *ErrorMessage) MarshalJSON() (string, error) {
 	return string(b[:]), err
 }
 
-// UnmarhalJSON unmarshals the JSON-encoded text into error message.
+// UnmarshalJSON unmarshals the JSON-encoded text into error message.
 func (m *ErrorMessage) UnmarshalJSON(j string) error {
 	err := json.Unmarshal([]byte(j), m)
 	return err
 }
+*/
 
 // The webStart function initializes and starts the web server.
 func webStart(aa *ArtisticApp, wwwpath string) error {
