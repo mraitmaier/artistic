@@ -13,15 +13,18 @@ var AllowedDatings = []string{"L", "S", "A", "a.q.", "a.q.n.", "p.q.", "p.q.n.",
  * Dating - a structure representing a dating
  */
 type Dating struct {
-	// ID is created by DB automatically and is only a RO property
-	//Id db.DbIdentifier `bson:"_id"`
-	//    Id bson.ObjectId `bson:"_id"`
-
 	// a dating value is defined (as enum) above
 	Dating string
-
 	// this is description of a dating
 	Description string
+}
+
+// NewDating Creates a new instance of Dating type.
+func NewDating() *Dating {
+    return &Dating {
+        Dating: "",
+        Description: "",
+    }
 }
 
 func (d *Dating) String() string {

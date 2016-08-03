@@ -29,8 +29,8 @@ type MongoDbConn struct {
 func (m *MongoDbConn) Connect(url string, timeout time.Duration) (e error) {
 
 	if m.Sess, e = mgo.DialWithTimeout(url, timeout); e != nil {
-        return
-    }
+		return
+	}
 	return ensureIndexes(m)
 }
 
@@ -56,7 +56,7 @@ func ensureIndexes(m *MongoDbConn) error {
 	// the techniques collection indexes
 	c = m.Sess.DB(m.name).C("techniques")
 	err = c.EnsureIndex(mgo.Index{Key: []string{"techniquetype"}, Background: true, Sparse: true})
-    //err = c.EnsureIndex(wcix)
+	//err = c.EnsureIndex(wcix)
 
 	// the articles collection indexes
 	c = m.Sess.DB(m.name).C("articles")
@@ -273,7 +273,7 @@ func (m *MongoDbConn) InsertUser(u *User) error { return m.adminUser(DBCmdInsert
 func (m *MongoDbConn) DeleteUser(u *User) error { return m.adminUser(DBCmdDelete, u) }
 
 // Aux method that administers the user records in DB
-func (m *MongoDbConn) adminUser(cmd DbCommand, u *User) error {
+func (m *MongoDbConn) adminUser(cmd DBCommand, u *User) error {
 
 	// acquire lock
 	dblock.Lock()
@@ -480,7 +480,7 @@ func (m *MongoDbConn) InsertStyle(s *Style) error { return m.adminStyle(DBCmdIns
 func (m *MongoDbConn) DeleteStyle(s *Style) error { return m.adminStyle(DBCmdDelete, s) }
 
 // Aux method that administers the style records in DB
-func (m *MongoDbConn) adminStyle(cmd DbCommand, s *Style) error {
+func (m *MongoDbConn) adminStyle(cmd DBCommand, s *Style) error {
 
 	// acquire lock
 	dblock.Lock()
@@ -572,7 +572,7 @@ func (m *MongoDbConn) InsertTechnique(t *Technique) error { return m.adminTechni
 func (m *MongoDbConn) DeleteTechnique(t *Technique) error { return m.adminTechnique(DBCmdDelete, t) }
 
 // Aux method that administers the technique records in DB
-func (m *MongoDbConn) adminTechnique(cmd DbCommand, t *Technique) error {
+func (m *MongoDbConn) adminTechnique(cmd DBCommand, t *Technique) error {
 
 	dblock.Lock()
 	defer dblock.Unlock()
@@ -714,7 +714,7 @@ func (m *MongoDbConn) InsertArtist(a *Artist) error { return m.adminArtist(DBCmd
 func (m *MongoDbConn) DeleteArtist(a *Artist) error { return m.adminArtist(DBCmdDelete, a) }
 
 // Aux method that administers the artist records in DB
-func (m *MongoDbConn) adminArtist(cmd DbCommand, a *Artist) error {
+func (m *MongoDbConn) adminArtist(cmd DBCommand, a *Artist) error {
 
 	dblock.Lock()
 	defer dblock.Unlock()
@@ -822,7 +822,7 @@ func (m *MongoDbConn) InsertPainting(p *Painting) error { return m.adminPainting
 func (m *MongoDbConn) DeletePainting(p *Painting) error { return m.adminPainting(DBCmdDelete, p) }
 
 // Aux method that administers the painting records in DB
-func (m *MongoDbConn) adminPainting(cmd DbCommand, p *Painting) error {
+func (m *MongoDbConn) adminPainting(cmd DBCommand, p *Painting) error {
 
 	dblock.Lock()
 	defer dblock.Unlock()
@@ -930,7 +930,7 @@ func (m *MongoDbConn) InsertSculpture(p *Sculpture) error { return m.adminSculpt
 func (m *MongoDbConn) DeleteSculpture(p *Sculpture) error { return m.adminSculpture(DBCmdDelete, p) }
 
 // Aux method that administers the painting records in DB
-func (m *MongoDbConn) adminSculpture(cmd DbCommand, p *Sculpture) error {
+func (m *MongoDbConn) adminSculpture(cmd DBCommand, p *Sculpture) error {
 
 	dblock.Lock()
 	defer dblock.Unlock()
@@ -1039,7 +1039,7 @@ func (m *MongoDbConn) InsertPrint(p *Print) error { return m.adminPrint(DBCmdIns
 func (m *MongoDbConn) DeletePrint(p *Print) error { return m.adminPrint(DBCmdDelete, p) }
 
 // Aux method that administers the graphic print records in DB
-func (m *MongoDbConn) adminPrint(cmd DbCommand, p *Print) error {
+func (m *MongoDbConn) adminPrint(cmd DBCommand, p *Print) error {
 
 	dblock.Lock()
 	defer dblock.Unlock()
@@ -1150,7 +1150,7 @@ func (m *MongoDbConn) InsertBuilding(b *Building) error { return m.adminBuilding
 func (m *MongoDbConn) DeleteBuilding(b *Building) error { return m.adminBuilding(DBCmdDelete, b) }
 
 // Aux method that administers the building records in DB
-func (m *MongoDbConn) adminBuilding(cmd DbCommand, p *Building) error {
+func (m *MongoDbConn) adminBuilding(cmd DBCommand, p *Building) error {
 
 	dblock.Lock()
 	defer dblock.Unlock()
@@ -1255,7 +1255,7 @@ func (m *MongoDbConn) InsertBook(b *Book) error { return m.adminBook(DBCmdInsert
 func (m *MongoDbConn) DeleteBook(b *Book) error { return m.adminBook(DBCmdDelete, b) }
 
 // Aux method that administers the book records in DB
-func (m *MongoDbConn) adminBook(cmd DbCommand, p *Book) error {
+func (m *MongoDbConn) adminBook(cmd DBCommand, p *Book) error {
 
 	dblock.Lock()
 	defer dblock.Unlock()
@@ -1360,7 +1360,7 @@ func (m *MongoDbConn) InsertArticle(b *Article) error { return m.adminArticle(DB
 func (m *MongoDbConn) DeleteArticle(b *Article) error { return m.adminArticle(DBCmdDelete, b) }
 
 // Aux method that administers the article records in DB
-func (m *MongoDbConn) adminArticle(cmd DbCommand, p *Article) error {
+func (m *MongoDbConn) adminArticle(cmd DBCommand, p *Article) error {
 
 	dblock.Lock()
 	defer dblock.Unlock()

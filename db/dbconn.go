@@ -1,7 +1,8 @@
+package db
+
 //
 // dbconn.go
 //
-package db
 
 import (
 	"fmt"
@@ -12,30 +13,28 @@ import (
 // DB access is guarded by simple mutex, it's easier than goroutines...
 var dblock sync.Mutex
 
-// let's define DB type enum
-type DbType int
+// DBType defines list (enumeration) of supported databases. 
+type DBType int
 
 const (
-
 	// UnknownDB represent unknown database server
-	UnknownDB DbType = 1 << iota
-
+	UnknownDB DBType = 1 << iota
 	// MongoDB represents the MongoDB server environment
 	MongoDB
+	// SQLite represents the SQLite environment
+	SQLite
 )
 
 const (
-
 	// DefAppUsername contains the default application username
 	DefAppUsername = "admin"
-
 	// DefAppPasswd contains the default application password
 	DefAppPasswd = "admin123!"
 )
 
 /*
 // A factory function for the right DB IDs: returns the proper DB ID for the DB type given.
-func NewDbId(dbtype DbType) DbIdentifier {
+func NewDbId(dbtype DBType) DbIdentifier {
 
     var id DbIdentifier = nil
 
@@ -44,6 +43,9 @@ func NewDbId(dbtype DbType) DbIdentifier {
     case MongoDB: // if DB is MongoDB
         var id MongoDbId
         id.NewId()
+
+    case SQLite:
+        // TODO
 
     default:     // other cases...
     }
@@ -58,45 +60,27 @@ type DBConnector interface {
 	Close()
 }
 
-// Counter represents the count-items database interface.
-type Counter interface {
-	Count() (int, error)
-}
+// DataType is an enumeration of possible data types in database. This is basically a helper type
+// to easier create new concrete instances of above defined interafaces.
+type DataType int
 
-// Inserter represents the insert database interface
-type Inserter interface {
-	Insert() error
-}
-
-// Updater represents the update database interface.
-type Updater interface {
-	Update() error
-}
-
-// Remover represents the remove database interface. Several items can be removed at once.
-type Remover interface {
-	Remove() error
-}
-
-// Getter represents the get DB interface.
-type Getter interface {
-	All() ([]interface{}, error)
-	One() (interface{}, error)
-}
-
-// UserGetter add an additional behavior to Getter interface: users are usually retrieved by username, not by ID.
-type UserGetter interface {
-	Getter
-	ByUsername(uname string) (interface{}, error)
-}
-
-// NOTE: how to abstract away the DB ID (for differents DBs)? By implementing
-// a type that satisfies the interface...
-//
-type DBIdentifier interface {
-	IdToString() string
-	StringToId(string)
-}
+const (
+	ErrorDataType = iota
+	ArtistDataType
+	DatingDataType
+	StyleDataType
+	TechniqueDataType
+	PaintingDataType
+	ScultptureDataType
+	PrintDataType
+	BuildingDataType
+	CollectionDataType
+	InstitutionDataType
+	ExhibitionDataType
+	BookDataType
+	ArticleDataType
+	UserDataType
+)
 
 // Interface that defines the data provider
 type DataProvider interface {
@@ -178,7 +162,7 @@ type DataProvider interface {
 // DB connector and initialized DB data provider, according to DB type given.
 // Note that DB connector and data provider are, in general, implemented
 // by the same type.
-func InitDb(dbtype DbType, host string, port int,
+func InitDb(dbtype DBType, host string, port int,
 	username, password, dbname string) (url string, db DBConnector, data DataProvider, e error) {
 
 	// initialize
@@ -191,6 +175,9 @@ func InitDb(dbtype DbType, host string, port int,
 	case MongoDB:
 		url, db, data = initMongo(host, port, username, password, dbname)
 		return url, db, data, e
+
+	case SQLite:
+		// TODO
 
 	}
 	return url, db, data, fmt.Errorf("Unknown database: cannot connect.\n")
@@ -210,10 +197,10 @@ func initMongo(host string, port int, username, passwd, dbname string) (string, 
 }
 
 ///////////////
-type DbCommand int
+type DBCommand int
 
 const (
-	DBCmdGetOne DbCommand = iota // get a single record from DB
+	DBCmdGetOne DBCommand = iota // get a single record from DB
 	DBCmdUpdate                  // update a single record in DB
 	DBCmdInsert                  // insert a new record in DB
 	DBCmdDelete                  // delete a single record in DB

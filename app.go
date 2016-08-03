@@ -42,6 +42,16 @@ type ArtisticApp struct {
 	// a web stuff structure instance
 	*WebInfo
 
+	// Cached is a collection of pre-cached data (read in app init procedure)
+	Cached struct {
+		// Datings is a list of datings: independent of DB type it must implement the BulkReceiver interface
+		Datings []*db.Dating
+		// Styles is a list of styles: independent of DB type it must implement the BulkReceiver interface
+		Styles []*db.Style
+		// Techniques is a list of rechniques: independent of DB type it must implement the BulkReceiver interface
+		Techniques []*db.Technique
+	}
+
 	// a debug flag (only for testing purposes)
 	Debug bool
 }

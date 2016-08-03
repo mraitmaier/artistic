@@ -88,7 +88,7 @@ func main() {
 	url, aa.DbSess, aa.DataProv, err = db.InitDb(db.MongoDB, "localhost", 27017, DBUser, DBPwd, DBName)
 	if err = aa.DbSess.Connect(url, DatabaseTimeout); err != nil {
 		aa.Log.Critical("Connection to database cannot be established.")
-        fmt.Printf("Connection to database cannot be established: %s. Exiting...\n", err.Error())
+		fmt.Printf("Connection to database cannot be established: %s. Exiting...\n", err.Error())
 		return
 	}
 	aa.Log.Info("Connection to MongoDB established.")
@@ -142,6 +142,14 @@ func initDB(aa *ArtisticApp) error {
 		aa.Log.Info("Dating records created")
 	}
 
+    /* FIXME
+    //aa.Cached.Datings = *(new(db.BulkRetriever))
+    aa.Cached.Datings = db.NewBulkRetriever(db.MongoDB, db.DatingDataType)
+    if err = aa.Cached.Datings.All(aa.DbSess); err != nil {
+        return fmt.Errorf("Cannot retrieve the datings from database: '%s'", err.Error())
+    }
+    fmt.Printf("DEBUG datings: %v\n", aa.Cached.Datings) // DEBUG
+    */
 	return err
 }
 

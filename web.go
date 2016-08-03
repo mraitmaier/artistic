@@ -61,7 +61,7 @@ func registerHandlers(aa *ArtisticApp) {
 	r.Handle("/search", searchHandler(aa))
 	r.Handle("/user", userHandler(aa))
 	r.Handle("/user/{id}/{cmd}", userHandler(aa))
-//	r.Handle("/log", logHandler(aa))
+	//	r.Handle("/log", logHandler(aa))
 	r.Handle("/technique", techniqueHandler(aa))
 	r.Handle("/technique/{id}/{cmd}", techniqueHandler(aa))
 	r.Handle("/style", styleHandler(aa))
@@ -513,6 +513,7 @@ func datingHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *Artistic
 		if d := parseDatingFormValues(r); d != nil {
 			d.ID = db.MongoStringToId(id)
 			err = app.DataProv.UpdateDating(d)
+			// err = app.DataProv.Update(d) // TODO
 			app.Log.Info(fmt.Sprintf("[%s] Updating Dating '%s'", u.Username, d.Dating))
 		}
 
