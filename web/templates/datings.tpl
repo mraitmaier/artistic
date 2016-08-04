@@ -114,13 +114,13 @@
 
             var btn = $(event.relatedTarget); // button that triggerd event
             // extract info from data-dating attribute
-            // var hexid = btn.data('id');
+             //var hexid = btn.data('id');
             var dating = btn.data('dating');
             var created = btn.data('created');
             // Update the modal's content.
             var modal = $(this);
             modal.find('.modal-title').text('Modify Dating "' + dating + '"');
-            modal.find('.modal-body #hexid').val(btn.data('hexid'));
+            modal.find('.modal-body #hexid').val(btn.data('id'));
             modal.find('.modal-body #dating').val(dating);
             modal.find('.modal-body #description').val(btn.data('desc'));
             modal.find('.modal-body #created').val(created);   // hidden val
