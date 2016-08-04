@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"os"
 	"runtime"
-	//    "time"
-	//    "errors"
 	"github.com/mraitmaier/artistic/db"
 	"github.com/mraitmaier/artistic/utils"
 	"path/filepath"
