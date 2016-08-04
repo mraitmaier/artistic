@@ -35,9 +35,6 @@ const (
 	DBPwd = "My9xpk$!W"
 )
 
-// create a new Artistic application instance
-//var aa = new(ArtisticApp)
-
 // Parse the CLI arguments.
 func parseArgs(ac *ArtisticApp, cfgfile *string) {
 
@@ -142,14 +139,16 @@ func initDB(aa *ArtisticApp) error {
 		aa.Log.Info("Dating records created")
 	}
 
-    /* FIXME
-    //aa.Cached.Datings = *(new(db.BulkRetriever))
-    aa.Cached.Datings = db.NewBulkRetriever(db.MongoDB, db.DatingDataType)
-    if err = aa.Cached.Datings.All(aa.DbSess); err != nil {
-        return fmt.Errorf("Cannot retrieve the datings from database: '%s'", err.Error())
-    }
-    fmt.Printf("DEBUG datings: %v\n", aa.Cached.Datings) // DEBUG
-    */
+	// Now let's cache some data to ease the burden on DB in runtime...
+	if aa.Cached.Datings, err = aa.DataProv.GetDatings(""); err != nil {
+		return fmt.Errorf("Cannot retrieve the datings from database: '%s'", err.Error())
+	}
+	if aa.Cached.Styles, err = aa.DataProv.GetStyles(""); err != nil {
+		return fmt.Errorf("Cannot retrieve the datings from database: '%s'", err.Error())
+	}
+	if aa.Cached.Techniques, err = aa.DataProv.GetTechniques(""); err != nil {
+		return fmt.Errorf("Cannot retrieve the datings from database: '%s'", err.Error())
+	}
 	return err
 }
 

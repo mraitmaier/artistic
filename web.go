@@ -514,13 +514,34 @@ func datingHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *Artistic
 		}
 		if d := parseDatingFormValues(r); d != nil {
 			d.ID = db.MongoStringToId(id)
+			if err = updateCachedDating(d, app); err != nil {
+				return err
+			}
 			err = app.DataProv.UpdateDating(d)
-			// err = app.DataProv.Update(d) // TODO
 			app.Log.Info(fmt.Sprintf("[%s] Updating Dating '%s'", u.Username, d.Dating))
 		}
 
 	default:
 		err = fmt.Errorf("Illegal POST request for dating")
+	}
+	return err
+}
+
+// Helper function that updates the cached list of datings.
+func updateCachedDating(d *db.Dating, app *ArtisticApp) error {
+
+	var err error
+	if app.Cached.Datings != nil {
+
+		for _, val := range app.Cached.Datings {
+			if val.ID == d.ID {
+				val.Dating = d.Dating
+				val.Description = d.Description
+				val.Modified = db.NewTimestamp()
+			}
+		}
+	} else {
+		err = fmt.Errorf("Datings cache empty?")
 	}
 	return err
 }
@@ -540,10 +561,17 @@ func parseDatingFormValues(r *http.Request) *db.Dating {
 // This is HTTP GET handler for datings.
 func datingHTTPGetHandler(qry string, w http.ResponseWriter, r *http.Request, app *ArtisticApp, u *db.User) error {
 
-	datings, err := app.DataProv.GetDatings(qry)
-	if err != nil {
-		http.Redirect(w, r, "/err404", http.StatusFound)
-		return fmt.Errorf("Problem getting datings from DB: '%s'", err.Error())
+	var d []*db.Dating
+	var err error
+
+	if app.Cached.Datings == nil {
+		d, err = app.DataProv.GetDatings(qry)
+		if err != nil {
+			http.Redirect(w, r, "/err404", http.StatusFound)
+			return fmt.Errorf("Problem getting datings from DB: '%s'", err.Error())
+		}
+	} else {
+		d = app.Cached.Datings
 	}
 	// create ad-hoc struct to be sent to page template
 	var web = struct {
@@ -551,7 +579,7 @@ func datingHTTPGetHandler(qry string, w http.ResponseWriter, r *http.Request, ap
 		Num     int
 		Ptype   string
 		User    *db.User
-	}{datings, len(datings), "dating", u}
+	}{d, len(d), "dating", u}
 	app.Log.Info(fmt.Sprintf("[%s] Displaying '/dating' page", u.Username))
 	return renderPage("datings", web, app, w, r)
 }
@@ -635,6 +663,9 @@ func techniqueHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *Artis
 		}
 		if d := parseTechniqueFormValues(r); d != nil {
 			d.ID = db.MongoStringToId(id)
+			if err = updateCachedTechniques(d, app); err != nil {
+				return err
+			}
 			err = app.DataProv.UpdateTechnique(d)
 			app.Log.Info(fmt.Sprintf("[%s] Updating Technique '%s'", u.Username, d.Name))
 		}
@@ -650,6 +681,26 @@ func techniqueHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *Artis
 
 	default:
 		err = fmt.Errorf("Illegal POST request for technique")
+	}
+	return err
+}
+
+// Helper function that updates the cached list of techniques.
+func updateCachedTechniques(t *db.Technique, app *ArtisticApp) error {
+
+	var err error
+	if app.Cached.Techniques != nil {
+
+		for _, val := range app.Cached.Techniques {
+			if val.ID == t.ID {
+				val.Name = t.Name
+				val.Description = t.Description
+				val.Type = t.Type
+				val.Modified = db.NewTimestamp()
+			}
+		}
+	} else {
+		err = fmt.Errorf("Techniques cache empty?")
 	}
 	return err
 }
@@ -671,10 +722,17 @@ func parseTechniqueFormValues(r *http.Request) *db.Technique {
 // This is HTTP GET handler for techniques
 func techniqueHTTPGetHandler(qry string, w http.ResponseWriter, r *http.Request, app *ArtisticApp, u *db.User) error {
 
-	t, err := app.DataProv.GetTechniques(qry)
-	if err != nil {
-		http.Redirect(w, r, "/err404", http.StatusFound)
-		return fmt.Errorf("Problem getting techniques from DB: '%s'", err.Error())
+	var t []*db.Technique
+	var err error
+
+	if app.Cached.Techniques == nil {
+		t, err = app.DataProv.GetTechniques(qry)
+		if err != nil {
+			http.Redirect(w, r, "/err404", http.StatusFound)
+			return fmt.Errorf("Problem getting techniques from DB: '%s'", err.Error())
+		}
+	} else {
+		t = app.Cached.Techniques
 	}
 	// create ad-hoc struct to be sent to page template
 	var web = struct {
@@ -764,6 +822,9 @@ func styleHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *ArtisticA
 		}
 		if s := parseStyleFormValues(r); s != nil {
 			s.ID = db.MongoStringToId(id)
+			if err = updateCachedStyles(s, app); err != nil {
+				return err
+			}
 			err = app.DataProv.UpdateStyle(s)
 			app.Log.Info(fmt.Sprintf("[%s] Updating Style '%s'", u.Username, s.Name))
 		}
@@ -779,6 +840,25 @@ func styleHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *ArtisticA
 
 	default:
 		err = fmt.Errorf("Illegal POST request for style")
+	}
+	return err
+}
+
+// Helper function that updates the cached list of styles.
+func updateCachedStyles(s *db.Style, app *ArtisticApp) error {
+
+	var err error
+	if app.Cached.Styles != nil {
+
+		for _, val := range app.Cached.Styles {
+			if val.ID == s.ID {
+				val.Name = s.Name
+				val.Description = s.Description
+				val.Modified = db.NewTimestamp()
+			}
+		}
+	} else {
+		err = fmt.Errorf("Styles cache empty?")
 	}
 	return err
 }
@@ -800,10 +880,17 @@ func parseStyleFormValues(r *http.Request) *db.Style {
 // This is HTTP GET handler for styles
 func styleHTTPGetHandler(qry string, w http.ResponseWriter, r *http.Request, app *ArtisticApp, u *db.User) error {
 
-	s, err := app.DataProv.GetStyles(qry) // empty query  retrieves all records
-	if err != nil {
-		http.Redirect(w, r, "/err404", http.StatusFound)
-		return fmt.Errorf("Problem getting styles from DB: '%s'", err.Error())
+	var s []*db.Style
+	var err error
+
+	if app.Cached.Styles == nil {
+		s, err = app.DataProv.GetStyles(qry) // empty query  retrieves all records
+		if err != nil {
+			http.Redirect(w, r, "/err404", http.StatusFound)
+			return fmt.Errorf("Problem getting styles from DB: '%s'", err.Error())
+		}
+	} else {
+		s = app.Cached.Styles
 	}
 	// create ad-hoc struct to be sent to page template
 	var web = struct {
