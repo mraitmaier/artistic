@@ -725,7 +725,7 @@ func deleteCachedTechnique(t *db.Technique, app *ArtisticApp) error {
 				app.Cached.Techniques = newtech
 				break
 			}
-			ix += 1
+			ix++
 		}
 	} else {
 		err = fmt.Errorf("Removing Technique: techniques cache empty?")
@@ -911,7 +911,7 @@ func deleteCachedStyle(s *db.Style, app *ArtisticApp) error {
 				app.Cached.Styles = newst
 				break
 			}
-			ix += 1
+			ix++
 		}
 	} else {
 		err = fmt.Errorf("Removing Technique: techniques cache empty?")
