@@ -652,6 +652,9 @@ func techniqueHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *Artis
 	case "":
 		// insert new technique, when 'cmd' is empty...
 		if t := parseTechniqueFormValues(r); t != nil {
+			if app.Cached.Techniques != nil {
+				app.Cached.Techniques = append(app.Cached.Techniques, t)
+			}
 			err = app.DataProv.InsertTechnique(t)
 		} else {
 			app.Log.Info(fmt.Sprintf("[%s] Creating new Technique '%s'", u.Username, t.Name))
@@ -661,13 +664,13 @@ func techniqueHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *Artis
 		if id == "" {
 			return fmt.Errorf("Modify technique: ID is empty")
 		}
-		if d := parseTechniqueFormValues(r); d != nil {
-			d.ID = db.MongoStringToId(id)
-			if err = updateCachedTechniques(d, app); err != nil {
+		if t := parseTechniqueFormValues(r); t != nil {
+			t.ID = db.MongoStringToId(id)
+			if err = updateCachedTechniques(t, app); err != nil {
 				return err
 			}
-			err = app.DataProv.UpdateTechnique(d)
-			app.Log.Info(fmt.Sprintf("[%s] Updating Technique '%s'", u.Username, d.Name))
+			err = app.DataProv.UpdateTechnique(t)
+			app.Log.Info(fmt.Sprintf("[%s] Updating Technique '%s'", u.Username, t.Name))
 		}
 
 	case "delete":
@@ -676,6 +679,9 @@ func techniqueHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *Artis
 		}
 		t := db.NewTechnique()
 		t.ID = db.MongoStringToId(id)
+		if err = deleteCachedTechnique(t, app); err != nil {
+			return err
+		}
 		err = app.DataProv.DeleteTechnique(t)
 		app.Log.Info(fmt.Sprintf("[%s] Removing Technique '%s'", u.Username, t.Name))
 
@@ -700,7 +706,29 @@ func updateCachedTechniques(t *db.Technique, app *ArtisticApp) error {
 			}
 		}
 	} else {
-		err = fmt.Errorf("Techniques cache empty?")
+		err = fmt.Errorf("Updating Techniques: techniques cache empty?")
+	}
+	return err
+}
+
+// Helper function that deletes the cached technique.
+func deleteCachedTechnique(t *db.Technique, app *ArtisticApp) error {
+
+	var err error
+	if app.Cached.Techniques != nil {
+		ix := 0
+		for _, val := range app.Cached.Techniques {
+			if val.ID == t.ID {
+				newtech := make([]*db.Technique, len(app.Cached.Techniques)-1)
+				copy(newtech, app.Cached.Techniques[:ix])
+				copy(newtech, app.Cached.Techniques[ix+1:])
+				app.Cached.Techniques = newtech
+				break
+			}
+			ix += 1
+		}
+	} else {
+		err = fmt.Errorf("Removing Technique: techniques cache empty?")
 	}
 	return err
 }
@@ -811,6 +839,9 @@ func styleHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *ArtisticA
 	case "":
 		// insert new style, when 'cmd' is empty...
 		if s := parseStyleFormValues(r); s != nil {
+			if app.Cached.Styles != nil {
+				app.Cached.Styles = append(app.Cached.Styles, s)
+			}
 			err = app.DataProv.InsertStyle(s)
 		} else {
 			app.Log.Info(fmt.Sprintf("[%s] Creating new Style '%s'", u.Username, s.Name))
@@ -822,7 +853,7 @@ func styleHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *ArtisticA
 		}
 		if s := parseStyleFormValues(r); s != nil {
 			s.ID = db.MongoStringToId(id)
-			if err = updateCachedStyles(s, app); err != nil {
+			if err = updateCachedStyle(s, app); err != nil {
 				return err
 			}
 			err = app.DataProv.UpdateStyle(s)
@@ -835,6 +866,9 @@ func styleHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *ArtisticA
 		}
 		s := db.NewStyle()
 		s.ID = db.MongoStringToId(id)
+		if err = deleteCachedStyle(s, app); err != nil {
+			return err
+		}
 		err = app.DataProv.DeleteStyle(s)
 		app.Log.Info(fmt.Sprintf("[%s] Removing style '%s'", u.Username, s.Name))
 
@@ -845,7 +879,7 @@ func styleHTTPPostHandler(w http.ResponseWriter, r *http.Request, app *ArtisticA
 }
 
 // Helper function that updates the cached list of styles.
-func updateCachedStyles(s *db.Style, app *ArtisticApp) error {
+func updateCachedStyle(s *db.Style, app *ArtisticApp) error {
 
 	var err error
 	if app.Cached.Styles != nil {
@@ -859,6 +893,28 @@ func updateCachedStyles(s *db.Style, app *ArtisticApp) error {
 		}
 	} else {
 		err = fmt.Errorf("Styles cache empty?")
+	}
+	return err
+}
+
+// Helper function that deletes the cached styles.
+func deleteCachedStyle(s *db.Style, app *ArtisticApp) error {
+
+	var err error
+	if app.Cached.Styles != nil {
+		ix := 0
+		for _, val := range app.Cached.Styles {
+			if val.ID == s.ID {
+				newst := make([]*db.Style, len(app.Cached.Styles)-1)
+				copy(newst, app.Cached.Styles[:ix])
+				copy(newst, app.Cached.Styles[ix+1:])
+				app.Cached.Styles = newst
+				break
+			}
+			ix += 1
+		}
+	} else {
+		err = fmt.Errorf("Removing Technique: techniques cache empty?")
 	}
 	return err
 }

@@ -4,11 +4,11 @@ package main
 
 import (
 	"fmt"
-	"os"
-	"runtime"
 	"github.com/mraitmaier/artistic/db"
 	"github.com/mraitmaier/artistic/utils"
+	"os"
 	"path/filepath"
+	"runtime"
 )
 
 //var cleanupTime = time.Second * 1
