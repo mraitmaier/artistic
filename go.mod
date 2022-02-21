@@ -1,4 +1,4 @@
-module artistic
+module github.com/mraitmaier/artistic
 
 go 1.18
 
